@@ -1,11 +1,10 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useMemo, useState } from 'react';
 import styles from './AuthGate.module.scss';
-import { createApiClient } from '@client/api';
+import { AuthProvider, createApiClient } from '@client/api';
 import { apiKeyAtom } from '@client/atoms/auth';
 import { useAtom } from 'jotai';
 import { Input } from '@client/components/Input';
 import { Button } from '@client/components/Button';
-import { wait } from '@client/utils/time';
 
 export type AuthGateProps = {
   children: ReactNode
@@ -35,6 +34,7 @@ export const AuthGate = ({ children }: AuthGateProps) => {
     }
   };
   const [{ apiKey, lastCheck }, setApiKeyAtom] = useAtom(apiKeyAtom);
+  const apiClient = useMemo(() => createApiClient(apiKey), [apiKey]);
   const [isLoading, setIsLoading] = useState(false);
   const [apiKeyDraft, setApiKeyDraft] = useState('');
   const [error, setError] = useState('');
@@ -55,7 +55,7 @@ export const AuthGate = ({ children }: AuthGateProps) => {
     </div>);
   }
 
-  return (<>
+  return (<AuthProvider value={apiClient}>
     {children}
-  </>);
+  </AuthProvider>);
 };

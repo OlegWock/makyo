@@ -1,5 +1,6 @@
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { Database } from "bun:sqlite";
+import * as schema from './schema';
 
 if (!process.env.KATUKO_DB_PATH) {
   console.error('You must set KATUKO_DB_PATH env variable');
@@ -7,4 +8,4 @@ if (!process.env.KATUKO_DB_PATH) {
 }
 
 const sqlite = new Database(process.env.KATUKO_DB_PATH);
-export const db = drizzle(sqlite);
+export const db = drizzle(sqlite, { schema });

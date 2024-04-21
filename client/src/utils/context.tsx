@@ -15,5 +15,5 @@ export const createStrictContext = <T,>(name: string) => {
     return val;
   }
 
-  return [ctx.Provider, useCtx];
+  return [ctx.Provider, useCtx] as const;
 }

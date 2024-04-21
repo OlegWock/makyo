@@ -176,3 +176,5 @@ dist
 
 .vscode/*
 !.vscode/extensions.json
+
+katuko.db

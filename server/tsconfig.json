@@ -8,6 +8,14 @@
     "jsx": "react-jsx",
     "allowJs": true,
 
+    // TODO: remove this once issue in Bun gets fixed https://github.com/oven-sh/bun/issues/4774
+    "paths": {
+      "@client/*": ["../client/src/*"],
+      "@public/*": ["../client/public/*"],
+      "@server/*": ["./*"],
+      "@shared/*": ["../shared/*"],
+    },
+
     // Bundler mode
     "verbatimModuleSyntax": true,
     "noEmit": true,

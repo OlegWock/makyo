@@ -2,8 +2,10 @@ import { OpenAPIHono } from '@hono/zod-openapi';
 import { bearerAuth } from 'hono/bearer-auth';
 import { cors } from 'hono/cors';
 import { apiReference } from '@scalar/hono-api-reference';
-import { usersRouter } from './routes/users';
-import { authRouter } from './routes/auth';
+import { prettyJSON } from 'hono/pretty-json'
+import { usersRouter } from '@server/routes/users';
+import { authRouter } from '@server/routes/auth';
+import { configurationRouter } from '@server/routes/configuration';
 
 const app = new OpenAPIHono();
 
@@ -18,11 +20,13 @@ app.use('/*', cors({
   credentials: true,
 }));
 app.use('/api/*', bearerAuth({ token: process.env.KATUKO_API_TOKEN }));
+app.use('/*', prettyJSON());
 
 // Attach other routes by chaining calls on top of previous .route instead of calling app.route multiple times
 const router = app
   .route('/', usersRouter)
-  .route('/', authRouter);
+  .route('/', authRouter)
+  .route('/', configurationRouter);
 
 app.openAPIRegistry.registerComponent('securitySchemes', 'BearerAuth', {
   type: 'http',
