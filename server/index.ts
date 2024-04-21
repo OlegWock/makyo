@@ -16,7 +16,8 @@ if (!process.env.KATUKO_API_TOKEN) {
 
 app.use('/*', cors({
   origin: '*',
-  allowHeaders: ['Authorization'],
+  allowHeaders: ['*'],
+  allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   credentials: true,
 }));
 app.use('/api/*', bearerAuth({ token: process.env.KATUKO_API_TOKEN }));

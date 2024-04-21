@@ -3,8 +3,12 @@ import * as schema from './schema';
 
 await db.insert(schema.settings).values([
   {
-    key: 'username',
-    value: 'Katuko'
+    key: 'openai',
+    value: ''
+  },
+  {
+    key: 'anthropic',
+    value: ''
   },
 ]);
 

@@ -8,19 +8,22 @@ import { ChatsPage } from "@client/routes/ChatsPage";
 import { PresetsPage } from "@client/routes/PresetsPage";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@client/api";
+import { Suspense } from "react";
 
 export const App = () => {
   return (
     <AuthGate>
       <QueryClientProvider client={queryClient}>
         <Layout>
-          <Switch>
-            <Route path="/" component={RootPage} />
-            <Route path="/chats" component={ChatsPage} />
-            <Route path="/presets" component={PresetsPage} />
-            <Route path="/settings" component={SettingsPage} />
-            <Route component={NotFound} />
-          </Switch>
+          <Suspense>
+            <Switch>
+              <Route path="/" component={RootPage} />
+              <Route path="/chats" component={ChatsPage} />
+              <Route path="/presets" component={PresetsPage} />
+              <Route path="/settings" component={SettingsPage} />
+              <Route component={NotFound} />
+            </Switch>
+          </Suspense>
         </Layout>
       </QueryClientProvider>
     </AuthGate >

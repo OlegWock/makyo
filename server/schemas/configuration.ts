@@ -50,3 +50,5 @@ export const ConfigurationUpdateSchema = z
     }).optional()
   })
   .openapi('ConfigurationUpdate');
+
+export type ConfigurationUpdateSchemaType = z.infer<typeof ConfigurationUpdateSchema>;

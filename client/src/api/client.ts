@@ -10,3 +10,5 @@ export const createApiClient = (apiKey: string) => {
     }
   }).api;
 };
+
+export type ApiClient = ReturnType<typeof createApiClient>;
