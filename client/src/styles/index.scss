@@ -1,0 +1,47 @@
+@import "./fonts.scss";
+
+@import '@radix-ui/colors/gray.css';
+@import '@radix-ui/colors/mint.css';
+@import '@radix-ui/colors/jade.css';
+@import '@radix-ui/colors/blue.css';
+@import '@radix-ui/colors/red.css';
+
+
+:root {
+  font-family: 'Work Sans', 'Seravek', 'Gill Sans Nova', 'Ubuntu', 'Calibri', 'DejaVu Sans', 'source-sans-pro', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-size: 16px;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background: #ffffff;
+  color: var(--gray-12)
+}
+
+#root {
+  height: 100%;
+  max-height: 100%;
+}
+
+*, *::after, *::before {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+code, pre {
+  font-family: 'Source Code Pro', monospace;
+}

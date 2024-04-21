@@ -1,0 +1,23 @@
+.TopNav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  height: 100%;
+
+  .item {
+    text-decoration: none;
+    text-align: left;
+
+    svg {
+      width: 1.4rem;
+    }
+  }
+
+  .active {
+    --color-btn-background: var(--gray-2) !important;
+  }
+
+  .spacer {
+    flex-grow: 1;
+  }
+}

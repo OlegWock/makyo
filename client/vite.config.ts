@@ -6,6 +6,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 export default defineConfig({
   root: import.meta.dir,
   plugins: [react(), tsconfigPaths()],
+  envPrefix: 'VITE_KATUKO_',
   server: {
     port: 8441
   }

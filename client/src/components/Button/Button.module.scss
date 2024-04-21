@@ -1,3 +1,69 @@
 .Button {
-  
+  box-sizing: border-box;
+  white-space: nowrap;
+  font-weight: 400;
+  font-family: inherit;
+  font-size: 1rem;
+  text-align: left;
+  cursor: pointer;
+  transition: 0.1s ease-in-out;
+  border-radius: .25rem;
+  border: none;
+  line-height: 1;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+
+  user-select: none;
+  -webkit-user-select: none;
+  transition: ease-in-out 0.15s;
+
+  &.normal,
+  &.borderless,
+  &.primary {
+    --color-btn-background: white;
+    --color-btn-border: var(--gray-4);
+    --color-btn-background-hover: var(--gray-2);
+    --color-btn-background-loading: var(--gray-3);
+
+    padding: 0.75rem 1.5rem;
+    background-color: var(--color-btn-background);
+    color: inherit;
+    border: 1px solid var(--color-btn-border);
+
+    &:hover {
+      background-color: var(--color-btn-background-hover);
+    }
+  }
+
+  &.borderless {
+    --color-btn-border: transparent;
+  }
+
+
+  &.primary {
+    --color-btn-background: var(--mint-10);
+    --color-btn-border: var(--jade-4);
+    --color-btn-background-hover: var(--mint-9);
+    --color-btn-background-loading: var(--mint-9);
+    color: var(--mint-contrast);
+  }
+
+  &.text {
+    background: transparent;
+    padding: 0;
+    color: var(--mint-10);
+  }
+
+  &.withIcon {}
+
+  &.onlyIcon {
+    padding: 0.75rem;
+  }
+
+  .icon {
+    // width: 1.25rem;
+    width: 1rem;
+    height: auto;
+  }
 }

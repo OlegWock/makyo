@@ -4,7 +4,7 @@ const AuthCheckSchema = z
   .object({
     valid: z.literal(true),
   })
-  .openapi('AuthCheckSchema')
+  .openapi('AuthCheckResponse')
 
 const route = createRoute({
   method: 'get',

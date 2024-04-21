@@ -1,0 +1,43 @@
+.AuthGate {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+
+  .card {
+    border: 1px solid var(--gray-4);
+    padding: 1rem;
+    border-radius: 0.25rem;
+    width: 800px;
+    max-width: 100%;
+    height: 600px;
+    max-height: 100%;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .title {
+    font-size: 2.5rem;
+    font-weight: 500;
+  }
+
+  .error {
+    color: var(--red-10);
+  }
+
+  .inputWrapper {
+    display: flex;
+    gap: 1rem;
+
+    .input {
+      width: 300px;
+      flex-shrink: 1;
+    }
+  }
+}

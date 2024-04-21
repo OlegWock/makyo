@@ -1,0 +1,26 @@
+.Input {
+  flex-grow: 1;
+  padding: 0.5rem 0.75rem;
+  outline: none;
+  background: white;
+  transition: ease-in-out 0.15s border-color, ease-in-out 0.15s box-shadow;
+  background: white;
+
+  border: 1px solid var(--gray-4);
+  border-radius: 0.25rem;
+
+  &:focus-visible {
+    border-color: var(--jade-8);
+    box-shadow: 0px 0px 0px 1px var(--jade-8);
+  }
+
+  &::placeholder {
+    color: var(--gray-10);
+    font-size: 0.875rem;
+    transform: translate(0, -2px);
+  }
+}
+
+.Textarea {
+  
+}
