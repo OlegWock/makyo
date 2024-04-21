@@ -1,4 +1,6 @@
-# katuko-app
+# Katuko
+
+Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 
 To install dependencies:
 
@@ -11,6 +13,7 @@ Setup database:
 ```bash
 bun run drizzle:schema
 bun run drizzle:migrate
+bun run drizzle:seed
 ```
 
 To run:
