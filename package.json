@@ -9,7 +9,8 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "scaffold": "bunx --bun hygen",
     "drizzle:schema": "bunx drizzle-kit generate:sqlite",
-    "drizzle:migrate": "bun run ./server/db/migrate.ts"
+    "drizzle:migrate": "bun run ./server/db/migrate.ts",
+    "drizzle:seed": "bun run ./server/db/seed.ts"
   },
   "dependencies": {
     "@hono/zod-openapi": "^0.11.0",
