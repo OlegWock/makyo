@@ -1,15 +1,6 @@
 import { db } from './index';
 import * as schema from './schema';
 
-await db.insert(schema.settings).values([
-  {
-    key: 'openai',
-    value: ''
-  },
-  {
-    key: 'anthropic',
-    value: ''
-  },
-]);
+// await db.insert(schema.settings).values([]);
 
 console.log(`Seeding complete.`);

@@ -31,7 +31,7 @@
     color: inherit;
     border: 1px solid var(--color-btn-border);
 
-    &:hover {
+    &:hover:not(.loading) {
       background-color: var(--color-btn-background-hover);
     }
   }
@@ -57,6 +57,7 @@
 
   &.loading {
     --color-btn-background: var(--gray-3);
+    cursor: not-allowed;
   }
 
   &.withIcon {}

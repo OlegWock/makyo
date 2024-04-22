@@ -1,50 +1,34 @@
-import { useSettings, useSettingsMutation } from '@client/api';
+import { useModels, useSettings } from '@client/api';
 import styles from './SettingsPage.module.scss';
-import { useState } from 'react';
-import { PiFloppyDiskLight } from 'react-icons/pi';
-import { Input } from '@client/components/Input';
-import { Button } from '@client/components/Button';
+import { HiNoSymbol, HiOutlineCheckCircle } from 'react-icons/hi2';
 
 export const SettingsPage = () => {
-  const { data } = useSettings();
-  const settingsMutation = useSettingsMutation();
-  const [openaiKey, setOpenaiKey] = useState(data.openai.apiKey);
-  const [anthropicKey, setAnthropicKey] = useState(data.anthropic.apiKey);
+  const { data: { openai, anthropic, ollama } } = useSettings();
+  const { data: models } = useModels();
 
   return (<div className={styles.SettingsPage}>
     <div className={styles.content}>
       <section>
         <div className={styles.sectionTitle}>Cloud providers</div>
-        {/* TODO: user proper alert component here? */}
-        {settingsMutation.isError ? (
-          <div>An error occurred: {settingsMutation.error.message}</div>
-        ) : null}
-        {settingsMutation.isSuccess ? (
-          <div>Saved!</div>
-        ) : null}
-        <div className={styles.row}>
-          <label>OpenAI API key</label>
-          <Input value={openaiKey} onValueChange={setOpenaiKey} placeholder='sk-proj-scr*******' />
-        </div>
-        <div className={styles.row}>
-          <label>Anthropic API key</label>
-          <Input value={anthropicKey} onValueChange={setAnthropicKey} placeholder='sk-ant-api*******' />
-        </div>
 
-        <Button
-          className={styles.save}
-          icon={<PiFloppyDiskLight />}
-          loading={settingsMutation.isPending}
-          onClick={() => settingsMutation.mutate({
-            openai: { apiKey: openaiKey },
-            anthropic: { apiKey: anthropicKey },
-          })}
-        >Save</Button>
+        <div className={styles.status}>{openai.enabled ? <HiOutlineCheckCircle /> : <HiNoSymbol />} OpenAI – {openai.enabled ? 'enabled' : 'API key not set'}</div>
+        <div className={styles.status}>{anthropic.enabled ? <HiOutlineCheckCircle /> : <HiNoSymbol />} Anthropic – {anthropic.enabled ? 'enabled' : 'API key not set'}</div>
       </section>
 
-      {/* <section> 
+      <section>
         <div className={styles.sectionTitle}>Ollama</div>
-      </section> */}
+        <div className={styles.status}>
+          {ollama.enabled ? <>
+            <HiOutlineCheckCircle /> – Enabled
+          </> : <>
+            <HiNoSymbol /> – Disabled
+          </>}
+        </div>
+      </section>
+      <section>
+        <div className={styles.sectionTitle}>Available models</div>
+        <pre>{JSON.stringify(models, null, 4)}</pre>
+      </section>
     </div>
   </div>);
 };

@@ -21,21 +21,25 @@
         font-size: 2rem;
       }
 
+      .sectionSubtitle {
+        font-size: 1.5rem;
+      }
+
       .row {
         display: flex;
         flex-direction: column;
-
-        label {
-          display: block;
-          font-size: 1.25rem;
-          margin-bottom: 0.5rem;
-        }
       }
 
-    }
+      .status {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
 
-    .save {
-      align-self: flex-end;
+        svg {
+          height: 1.5rem;
+          width: auto;
+        }
+      }
     }
   }
 }

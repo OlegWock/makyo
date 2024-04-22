@@ -1,14 +1,15 @@
 import { ApiType } from '@shared/api';
 import { hc } from 'hono/client';
 
-console.log('API host', import.meta.env.VITE_KATUKO_API_HOST);
+export const API_HOST = import.meta.env.VITE_KATUKO_API_HOST || window.location.origin;
+console.log('API host', API_HOST);
 
-export const createApiClient = (apiKey: string) => {
-  return hc<ApiType>(import.meta.env.VITE_KATUKO_API_HOST || 'http://localhost:8440/', {
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-    }
-  }).api;
+export const createApiClient = () => {
+  return hc<ApiType>(API_HOST).api;
+};
+
+export const createHttpClient = () => {
+  return hc<ApiType>(API_HOST);
 };
 
 export type ApiClient = ReturnType<typeof createApiClient>;

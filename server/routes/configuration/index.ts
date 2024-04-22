@@ -1,15 +1,14 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
-import { db } from "@server/db";
-import { settings } from "@server/db/schema";
-import { getConfigurationFromDb } from "@server/routes/configuration/utils";
-import { ConfigurationSchema, ConfigurationUpdateSchema } from "@server/schemas/configuration";
-import { eq } from "drizzle-orm";
+import { anthropicProvider } from "@server/providers/anthropic";
+import { ollamaProvider } from "@server/providers/ollama";
+import { openaiProvider } from "@server/providers/openai";
+import { ConfigurationSchema } from "@server/schemas/configuration";
 
 
 const getConfiguration = createRoute({
   method: 'get',
   path: '/api/configuration',
-  security: [{ BearerAuth: [] }],
+  security: [{ CookieAuth: [] }],
   responses: {
     200: {
       content: {
@@ -22,44 +21,19 @@ const getConfiguration = createRoute({
   },
 });
 
-const setConfiguration = createRoute({
-  method: 'patch',
-  path: '/api/configuration',
-  security: [{ BearerAuth: [] }],
-  request: {
-    body: {
-      content: {
-        'application/json': {
-          schema: ConfigurationUpdateSchema,
-        }
-      }
-    },
-  },
-  responses: {
-    200: {
-      content: {
-        'application/json': {
-          schema: ConfigurationSchema,
-        },
-      },
-      description: 'Update current configuration',
-    },
-  },
-});
-
 export const configurationRouter = new OpenAPIHono()
   .openapi(getConfiguration, async (c) => {
-    return c.json(await getConfigurationFromDb());
-  })
-  .openapi(setConfiguration, async (c) => {
-    const body = c.req.valid('json');
-    if (body.openai) {
-      await db.update(settings).set({value: body.openai.apiKey}).where(eq(settings.key, 'openai'));
-    }
-    if (body.anthropic) {
-      await db.update(settings).set({value: body.anthropic.apiKey}).where(eq(settings.key, 'anthropic'));
-    }
-    return c.json(await getConfigurationFromDb());
+    return c.json({
+      openai: {
+        enabled: await openaiProvider.isEnabled()
+      },
+      anthropic: {
+        enabled: await anthropicProvider.isEnabled()
+      },
+      ollama: {
+        enabled: await ollamaProvider.isEnabled()
+      },
+    });
   });
 
 

@@ -1,8 +1,6 @@
-import { ReactNode, useMemo, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
 import styles from './AuthGate.module.scss';
-import { AuthProvider, createApiClient } from '@client/api';
-import { apiKeyAtom } from '@client/atoms/auth';
-import { useAtom } from 'jotai';
+import { AuthProvider, createApiClient, createHttpClient } from '@client/api';
 import { Input } from '@client/components/Input';
 import { Button } from '@client/components/Button';
 
@@ -12,20 +10,18 @@ export type AuthGateProps = {
 
 export const AuthGate = ({ children }: AuthGateProps) => {
   const tryLogin = async () => {
+    console.log('Try login');
     if (!apiKeyDraft) return;
     try {
       setIsLoading(true);
       setError('');
-      const api = createApiClient(apiKeyDraft);
-      const resp = await api.auth.validate.$get();
+      const http = createHttpClient();
+      const resp = await http.authenticate.$post({ json: { token: apiKeyDraft } });
       const json = await resp.json();
       setIsLoading(false);
-      setApiKeyAtom({
-        apiKey: apiKeyDraft,
-        lastCheck: Date.now(),
-      });
       setError('');
       setApiKeyDraft('');
+      setIsAuthenticated(true);
     } catch (err) {
       console.log(err);
       setError('Incorrect password');
@@ -33,15 +29,20 @@ export const AuthGate = ({ children }: AuthGateProps) => {
       setIsLoading(false);
     }
   };
-  const [{ apiKey, lastCheck }, setApiKeyAtom] = useAtom(apiKeyAtom);
-  const apiClient = useMemo(() => createApiClient(apiKey), [apiKey]);
-  const [isLoading, setIsLoading] = useState(false);
+  const apiClient = useMemo(() => createApiClient(), []);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [apiKeyDraft, setApiKeyDraft] = useState('');
   const [error, setError] = useState('');
 
-  const authenticated = !!apiKey && (Date.now() - lastCheck) < 1000 * 60 * 60 * 12;
+  useEffect(() => {
+    apiClient.auth.verify.$get().then((res) => {
+      setIsAuthenticated(res.ok);
+      setIsLoading(false);
+    });
+  }, []);
 
-  if (isLoading || !authenticated) {
+  if (isLoading || !isAuthenticated) {
     console.log('Render authgate, is loading', isLoading);
     return (<div className={styles.AuthGate}>
       <div className={styles.card}>

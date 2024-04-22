@@ -30,7 +30,7 @@ const UserSchema = z
 const route = createRoute({
   method: 'get',
   path: '/api/users/{id}',
-  security: [{ BearerAuth: [] }],
+  security: [{ CookieAuth: [] }],
   request: {
     params: ParamsSchema,
   },

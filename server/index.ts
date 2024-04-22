@@ -1,37 +1,39 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
-import { bearerAuth } from 'hono/bearer-auth';
 import { cors } from 'hono/cors';
 import { apiReference } from '@scalar/hono-api-reference';
 import { prettyJSON } from 'hono/pretty-json'
 import { usersRouter } from '@server/routes/users';
-import { authRouter } from '@server/routes/auth';
+import { authRouter, cookieAuthMiddleware } from '@server/routes/auth';
 import { configurationRouter } from '@server/routes/configuration';
+import { providersRouter } from '@server/routes/providers';
+import { chatsRouter } from '@server/routes/chats';
+import { bunWebSocket, websocketsRouter } from '@server/routes/websockets';
+import { Context, Env } from 'hono';
 
 const app = new OpenAPIHono();
 
-if (!process.env.KATUKO_API_TOKEN) {
-  console.error(`You must set KATUKO_API_TOKEN env variable`);
-  process.exit(1);
-}
-
 app.use('/*', cors({
-  origin: '*',
-  allowHeaders: ['*'],
+  origin: ['http://localhost:8441'],
+  allowHeaders: ['Content-Type'],
   allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   credentials: true,
 }));
-app.use('/api/*', bearerAuth({ token: process.env.KATUKO_API_TOKEN }));
 app.use('/*', prettyJSON());
+app.use('/api/*', cookieAuthMiddleware());
 
 // Attach other routes by chaining calls on top of previous .route instead of calling app.route multiple times
 const router = app
   .route('/', usersRouter)
   .route('/', authRouter)
+  .route('/', providersRouter)
+  .route('/', chatsRouter)
+  .route('/', websocketsRouter)
   .route('/', configurationRouter);
 
-app.openAPIRegistry.registerComponent('securitySchemes', 'BearerAuth', {
-  type: 'http',
-  scheme: 'bearer',
+app.openAPIRegistry.registerComponent('securitySchemes', 'CookieAuth', {
+  type: 'apiKey',
+  in: 'cookie',
+  name: 'token'
 });
 
 app.doc('/swagger.json', {
@@ -62,4 +64,10 @@ export type ApiType = typeof router;
 export default {
   port: 8440,
   fetch: app.fetch,
+  websocket: bunWebSocket,
 }; 
+
+function getCookie(c: Context<Env, never, {}>, sessionCookieName: any) {
+  throw new Error('Function not implemented.');
+}
+

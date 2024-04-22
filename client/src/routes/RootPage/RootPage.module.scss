@@ -1,32 +1,3 @@
 .RootPage {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  gap: 1rem;
-
-  .chat {
-    flex-grow: 1;
-    border: 1px solid var(--gray-4);
-    background: var(--gray-2);
-    padding: 0.25rem;
-    border-radius: 0.25rem;
-  }
-
-  .messageArea {
-    min-height: 300px;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-
-    .textarea {
-      flex-grow: 1;
-      resize: none;
-    }
-
-    .messageActions {
-      display: flex;
-      gap: 0.5rem;
-      justify-content: flex-end;
-    }
-  }
+  
 }

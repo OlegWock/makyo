@@ -1,16 +1,22 @@
-import { Textarea } from '@client/components/Input';
+
+import { navigate } from 'wouter/use-browser-location';
+import { ChatLayout } from '@client/components/ChatLayout';
 import styles from './RootPage.module.scss';
-import { Button } from '@client/components/Button';
-import { HiOutlinePaperAirplane } from 'react-icons/hi2';
+import { useNewChatMutation } from '@client/api';
 
 export const RootPage = () => {
-  return (<div className={styles.RootPage}>
-    <div className={styles.chat}></div>
-    <div className={styles.messageArea}>
-      <Textarea className={styles.textarea} rows={4} />
-      <div className={styles.messageActions}>
-        <Button icon={<HiOutlinePaperAirplane />} iconPosition='after'>Send</Button>
-      </div>
-    </div>
-  </div>);
+  const newChat = useNewChatMutation();
+
+  return (<ChatLayout
+    onSend={(text) => {
+      newChat.mutateAsync({
+        // TODO: proper select for models
+        providerId: 'ollama',
+        modelId: 'llama3:latest',
+        text,
+      }).then((res) => {
+        navigate(`/chats/${res.id}`);
+      })
+    }}
+  />);
 };

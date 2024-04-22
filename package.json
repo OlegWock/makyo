@@ -3,7 +3,7 @@
   "type": "module",
   "scripts": {
     "server": "KATUKO_API_TOKEN=testtoken bun --watch run server/index.ts",
-    "client": "bunx --bun vite --config client/vite.config.ts",
+    "client": "bunx vite --config client/vite.config.ts",
     "client:build": "bunx tsc --project client/tsconfig.json && bunx --bun vite --config client/vite.config.ts build",
     "client:preview": "bunx --bun vite --config client/vite.config.ts preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
@@ -13,6 +13,7 @@
     "drizzle:seed": "bun run ./server/db/seed.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.20.6",
     "@hono/zod-openapi": "^0.11.0",
     "@hono/zod-validator": "^0.2.1",
     "@radix-ui/colors": "^3.0.0",
@@ -23,18 +24,23 @@
     "framer-motion": "^11.1.7",
     "hono": "^4.2.5",
     "jotai": "^2.8.0",
+    "ollama": "^0.5.0",
+    "openai": "^4.38.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.1.0",
     "sass": "^1.75.0",
+    "uuid": "^9.0.1",
     "vite-tsconfig-paths": "^4.3.2",
     "wouter": "^3.1.2",
     "zod": "^3.22.5"
   },
   "devDependencies": {
+    "@total-typescript/ts-reset": "^0.5.1",
     "@types/bun": "latest",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
+    "@types/uuid": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "^7.2.0",
     "@typescript-eslint/parser": "^7.2.0",
     "@vitejs/plugin-react": "^4.2.1",
