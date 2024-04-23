@@ -2,6 +2,42 @@
 
 Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 
+
+## Roadmap
+
+- [ ] Use transactions when inserting messages into DB
+- [ ] Add 'lastMessageAt' column to `chat` table
+- [ ] Render chat messages instead of raw JSON
+  - [ ] Sort messages by date and correctly pick parentId when sending new message
+- [ ] Implement OpenAI and Anthropic providers
+- [ ] Let user select model when creating chat
+- [ ] Generate a proper chat title
+- [ ] Messages branching
+  - [ ] Regenerating LLM response
+  - [ ] Editing user's message (and thus regenerating LLM response)
+  - [ ] Free branching - user selects AI message and Katuko creates separate branch from it (without regenerating)
+- [ ] Chat settings (so far just a temperature, system prompt and title change)
+- [ ] Better chats management screen
+  - [ ] rename/delete
+  - [ ] search + go to message
+- [ ] Better 'New chat' screen: suggest user some pre-defined questions or continue one of recent chats
+- [ ] Docker deployment
+- [ ] Support for snippets
+  - [ ] Snippets management (add/edit/delete)
+  - [ ] Snippets handling (insert snippet when user types `/keyword`)
+  - [ ] Autocomplete for snippets when user types `/`
+  - [ ] Experiment maybe to allow entering just `keyword` and then pressing Tab
+  - [ ] Allow placing placeholders in the snippet (when pasted, user will be prompted to fill placeholders)
+- [ ] Support for personas
+  - [ ] Essentially just a preset with name, icon and chat settings (model, temperature, system prompt)
+  - [ ] When creating new chat, parameters are copied + chat is associated with persona, but user can change any parameter
+
+## Deploy
+
+There will be Docker/docker-compose option.
+
+## Local development
+
 To install dependencies:
 
 ```bash
@@ -27,11 +63,11 @@ bun run client
   * API docs available on [localhost:8440/scalar](http://localhost:8440/scalar)
 * Client available on [localhost:8441](http://localhost:8441)
 
-
-To create new component:
+There is a template to easily create new components and routes:
 
 ```bash
 bun scaffold component new Button
+bun scaffold route new DetailsPage
 ```
 
 This project was created using `bun init` in bun v1.1.4. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.

@@ -17,7 +17,19 @@ export const ChatLayout = ({ children, onSend }: ChatLayoutProps) => {
       <div className={styles.scollAnchor} />
     </div>
     <div className={styles.messageArea}>
-      <Textarea className={styles.textarea} rows={4} value={text} onValueChange={setText} />
+      <Textarea
+        className={styles.textarea}
+        rows={4}
+        value={text}
+        onValueChange={setText}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            onSend?.(text);
+            setText('');
+          }
+        }}
+      />
       <div className={styles.messageActions}>
         <Button
           icon={<HiOutlinePaperAirplane />}
