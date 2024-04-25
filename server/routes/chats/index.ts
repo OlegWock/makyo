@@ -1,11 +1,11 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { db } from "@server/db";
-import { chat, message } from "@server/db/schema";
+import { chat } from "@server/db/schema";
 import { getProviderById } from "@server/providers";
 import { getChatWithMessagesFromDb, sendMessageAndSave } from "@server/routes/chats/utils";
-import { ChatSchema, ChatWithMessagesSchema, MessageSchema, NewChatSchema, NewMessageSchema } from "@server/schemas/chats";
+import { ChatSchema, ChatWithMessagesSchema, NewChatSchema, NewMessageSchema } from "@server/schemas/chats";
 import { generateName } from "@server/utils/misc";
-import { omit, serialize } from "@server/utils/serialization";
+import { serialize } from "@server/utils/serialization";
 import { transformStringToNumber } from "@server/utils/zod";
 import { eq } from "drizzle-orm";
 
@@ -123,7 +123,7 @@ export const chatsRouter = new OpenAPIHono()
     }
 
     // TODO: generate proper title
-    const [newChat] = await db.insert(chat).values({ title: generateName(), providerId, modelId }).returning();
+    const [newChat] = await db.insert(chat).values({ title: generateName(), providerId, modelId, lastMessageAt: new Date() }).returning();
 
     await sendMessageAndSave({
       provider,

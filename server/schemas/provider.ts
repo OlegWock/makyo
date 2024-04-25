@@ -15,3 +15,5 @@ export const ModelResponseSchema = z.array(z.object({
   provider: ProviderSchema,
   models: z.array(ModelSchema),
 }));
+
+export type ModelResponseSchemaType = z.infer<typeof ModelResponseSchema>;

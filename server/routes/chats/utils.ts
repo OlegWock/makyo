@@ -15,25 +15,32 @@ export const sendMessageAndSave = async ({ parentId, provider, modelId, text, ch
   chatId: number,
   parentId?: number | null
 }) => {
-  const [userMessage] = await db.insert(message).values({
-    parentId: parentId ?? null,
-    text: text,
-    sender: 'user',
-    chatId,
-    isGenerating: false,
-    createdAt: new Date(),
-  }).returning();
+  const { messagesHistory, responseMessage } = await db.transaction(async (tx) => {
+    const [userMessage] = await tx.insert(message).values({
+      parentId: parentId ?? null,
+      text: text,
+      sender: 'user',
+      chatId,
+      isGenerating: false,
+      createdAt: new Date(),
+    }).returning();
+    await tx.update(chat).set({ lastMessageAt: new Date() }).where(eq(chat.id, chatId));
 
-  const messagesHistory = await getMessageHistoryUpwards(userMessage.id);
+    const messagesHistory = await getMessageHistoryUpwards(userMessage.id);
 
-  const [responseMessage] = await db.insert(message).values({
-    parentId: userMessage.parentId,
-    text: '',
-    sender: 'ai',
-    chatId,
-    isGenerating: true,
-    createdAt: new Date(Date.now() + 1),
-  }).returning();
+    const [responseMessage] = await tx.insert(message).values({
+      parentId: userMessage.id,
+      text: '',
+      sender: 'ai',
+      chatId,
+      isGenerating: true,
+      createdAt: new Date(Date.now() + 1),
+    }).returning();
+    await tx.update(chat).set({ lastMessageAt: new Date() }).where(eq(chat.id, chatId));
+
+    return { messagesHistory, responseMessage };
+  });
+
 
 
   provider.chat(

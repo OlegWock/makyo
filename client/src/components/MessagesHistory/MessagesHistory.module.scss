@@ -1,0 +1,75 @@
+.MessagesHistory {
+  padding: 2rem;
+  max-height: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column-reverse;
+
+  .messagesWrapper {
+    display: flex;
+    // TODO: this makes scroll stick to bottom, but when user scrolls up while message is generating, older messages become jumpy
+    flex-direction: column-reverse;
+    gap: 1rem;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    overflow-anchor: none;
+  }
+}
+
+.MessageBubble {
+  background: white;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
+  line-height: 1.65;
+  // max-width: 90%;
+
+  &.user {
+    align-self: flex-end;
+  }
+
+  &.ai {
+    align-self: flex-start;
+  }
+
+  .senderName {
+    font-weight: 600;
+  }
+
+  .loader {
+    margin-top: 0.75rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .content {
+    margin-top: 0.5rem;
+  }
+
+  p,
+  ul,
+  ol {
+    margin-top: 1rem;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  ul,
+  ol {
+    li {
+      margin-left: 1.25rem;
+    }
+  }
+
+  pre>code {
+    border-radius: 0.35rem;
+    display: block;
+    overflow-x: auto;
+    padding: 1em;
+    background: #1a1b26;
+    color: #9aa5ce;
+  }
+}

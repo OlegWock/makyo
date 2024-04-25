@@ -14,6 +14,7 @@ export const chat = sqliteTable('chat', {
   providerId: text('providerId').notNull(),
   modelId: text('modelId').notNull(),
   createdAt: integer('createdAt', { mode: 'timestamp_ms' }).notNull().default(sql`(unixepoch() * 1000)`),
+  lastMessageAt: integer('createdAt', { mode: 'timestamp_ms' }).notNull(),
 });
 
 export const message = sqliteTable('message', {

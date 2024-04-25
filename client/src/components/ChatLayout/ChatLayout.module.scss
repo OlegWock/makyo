@@ -4,7 +4,6 @@
   flex-grow: 1;
   gap: 1rem;
   max-height: 100%;
-  overflow: hidden;
 
   .chat {
     flex: 1;
@@ -13,16 +12,9 @@
     background: var(--gray-2);
     padding: 0.25rem;
     border-radius: 0.25rem;
-
-    & * {
-      overflow-anchor: none;
-    }
+    overflow: hidden;
   }
 
-  .scollAnchor {
-    overflow-anchor: auto;
-    height: 1px;
-  }
 
   .messageArea {
     min-height: 300px;

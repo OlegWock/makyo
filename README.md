@@ -5,10 +5,6 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 
 ## Roadmap
 
-- [ ] Use transactions when inserting messages into DB
-- [ ] Add 'lastMessageAt' column to `chat` table
-- [ ] Render chat messages instead of raw JSON
-  - [ ] Sort messages by date and correctly pick parentId when sending new message
 - [ ] Implement OpenAI and Anthropic providers
 - [ ] Let user select model when creating chat
 - [ ] Generate a proper chat title

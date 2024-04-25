@@ -6,6 +6,8 @@
 @import '@radix-ui/colors/blue.css';
 @import '@radix-ui/colors/red.css';
 
+@import 'highlight.js/scss/tokyo-night-dark.scss';
+
 
 :root {
   font-family: 'Work Sans', 'Seravek', 'Gill Sans Nova', 'Ubuntu', 'Calibri', 'DejaVu Sans', 'source-sans-pro', sans-serif;
@@ -25,7 +27,7 @@ html, body {
 
 body {
   background: #ffffff;
-  color: var(--gray-12)
+  color: var(--gray-12);
 }
 
 #root {
@@ -44,6 +46,7 @@ body {
 
 code, pre {
   font-family: 'Source Code Pro', monospace;
+  font-size: 0.9rem;
 }
 
 pre {

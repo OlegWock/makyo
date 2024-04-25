@@ -27,6 +27,8 @@ export const MessageSchema = z.object({
   createdAt: z.number(),
 }).openapi('Message');
 
+export type MessageSchemaType = z.infer<typeof MessageSchema>;
+
 export const ChatWithMessagesSchema = z.object({
   chat: ChatSchema,
   messages: z.array(MessageSchema)

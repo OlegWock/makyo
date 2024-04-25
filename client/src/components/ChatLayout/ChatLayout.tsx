@@ -14,7 +14,6 @@ export const ChatLayout = ({ children, onSend }: ChatLayoutProps) => {
   return (<div className={styles.ChatLayout}>
     <div className={styles.chat}>
       {children}
-      <div className={styles.scollAnchor} />
     </div>
     <div className={styles.messageArea}>
       <Textarea
