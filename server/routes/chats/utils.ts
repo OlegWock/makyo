@@ -8,6 +8,7 @@ import { broadcastWSMessage } from "@server/utils/websockets";
 import { throttle } from "@shared/utils";
 import { eq } from "drizzle-orm";
 
+
 export const sendMessageAndSave = async ({ parentId, provider, modelId, text, chatId }: {
   provider: Provider,
   modelId: string,
@@ -40,8 +41,6 @@ export const sendMessageAndSave = async ({ parentId, provider, modelId, text, ch
 
     return { messagesHistory, responseMessage };
   });
-
-
 
   provider.chat(
     modelId,
@@ -76,7 +75,60 @@ export const sendMessageAndSave = async ({ parentId, provider, modelId, text, ch
   });
 
   return responseMessage;
-}
+};
+
+export const regenerateResponseForMessage = async ({ chatId, parentId, modelId, provider }: {
+  provider: Provider,
+  modelId: string,
+  chatId: number,
+  parentId: number,
+}) => {
+  const [responseMessage] = await db.insert(message).values({
+    parentId,
+    text: '',
+    sender: 'ai',
+    chatId,
+    isGenerating: true,
+    createdAt: new Date(),
+  }).returning();
+  await db.update(chat).set({ lastMessageAt: new Date() }).where(eq(chat.id, chatId));
+
+  const messagesHistory = await getMessageHistoryUpwards(parentId);
+
+  provider.chat(
+    modelId,
+    messagesHistory,
+    {
+      onProgress: throttle((response) => {
+        broadcastWSMessage({
+          type: 'updateMessage',
+          data: {
+            messageId: responseMessage.id,
+            chatId,
+            text: response,
+          }
+        });
+      }, 100),
+    }
+  ).then(response => {
+    return db.update(message).set({
+      text: response,
+      isGenerating: false,
+    }).where(eq(message.id, responseMessage.id)).returning();
+  }).then(([responseMessage]) => {
+    broadcastWSMessage({
+      type: 'updateMessage',
+      data: {
+        messageId: responseMessage.id,
+        chatId,
+        text: responseMessage.text,
+        isGenerating: responseMessage.isGenerating,
+      }
+    });
+  });
+
+  return responseMessage;
+};
 
 export const getChatWithMessagesFromDb = async (chatId: number): Promise<ChatWithMessagesSchemaType> => {
   const chatFromDb = await db.query.chat.findFirst({

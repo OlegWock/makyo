@@ -1,9 +1,9 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { db } from "@server/db";
-import { chat } from "@server/db/schema";
+import { chat, message } from "@server/db/schema";
 import { getProviderById } from "@server/providers";
-import { getChatWithMessagesFromDb, sendMessageAndSave } from "@server/routes/chats/utils";
-import { ChatSchema, ChatWithMessagesSchema, NewChatSchema, NewMessageSchema } from "@server/schemas/chats";
+import { getChatWithMessagesFromDb, regenerateResponseForMessage, sendMessageAndSave } from "@server/routes/chats/utils";
+import { ChatSchema, ChatWithMessagesSchema, MessageSchema, NewChatSchema, NewMessageSchema } from "@server/schemas/chats";
 import { generateName } from "@server/utils/misc";
 import { createTitlePrompt } from "@server/utils/prompts";
 import { serialize } from "@server/utils/serialization";
@@ -54,13 +54,13 @@ const createChat = createRoute({
 
 const getChatWithMessages = createRoute({
   method: 'get',
-  path: '/api/chats/{id}',
+  path: '/api/chats/{chatId}',
   security: [{ CookieAuth: [] }],
   request: {
     params: z.object({
-      id: z.string().openapi({
+      chatId: z.string().openapi({
         param: {
-          name: 'id',
+          name: 'chatId',
           in: 'path',
         },
       }).transform(transformStringToNumber)
@@ -80,13 +80,13 @@ const getChatWithMessages = createRoute({
 
 const sendMessage = createRoute({
   method: 'put',
-  path: '/api/chats/{id}',
+  path: '/api/chats/{chatId}',
   security: [{ CookieAuth: [] }],
   request: {
     params: z.object({
-      id: z.string().openapi({
+      chatId: z.string().openapi({
         param: {
-          name: 'id',
+          name: 'chatId',
           in: 'path',
         },
       }).transform(transformStringToNumber)
@@ -110,6 +110,38 @@ const sendMessage = createRoute({
     },
   },
 });
+
+const regenerateResponse = createRoute({
+  method: 'post',
+  path: '/api/chats/{chatId}/{messageId}',
+  security: [{ CookieAuth: [] }],
+  request: {
+    params: z.object({
+      chatId: z.string().openapi({
+        param: {
+          name: 'chatId',
+          in: 'path',
+        },
+      }).transform(transformStringToNumber),
+      messageId: z.string().openapi({
+        param: {
+          name: 'messageId',
+          in: 'path',
+        },
+      }).transform(transformStringToNumber)
+    }),
+  },
+  responses: {
+    200: {
+      content: {
+        'application/json': {
+          schema: MessageSchema,
+        },
+      },
+      description: 'Get all chats',
+    },
+  },
+})
 
 export const chatsRouter = new OpenAPIHono()
   .openapi(getChats, async (c) => {
@@ -149,13 +181,13 @@ export const chatsRouter = new OpenAPIHono()
     return c.json(serialize(newChat));
   })
   .openapi(getChatWithMessages, async (c) => {
-    const { id } = c.req.valid('param');
-    return c.json(await getChatWithMessagesFromDb(id));
+    const { chatId } = c.req.valid('param');
+    return c.json(await getChatWithMessagesFromDb(chatId));
   })
   .openapi(sendMessage, async (c) => {
-    const { id } = c.req.valid('param');
+    const { chatId } = c.req.valid('param');
     const chatFromDb = await db.query.chat.findFirst({
-      where: eq(chat.id, id)
+      where: eq(chat.id, chatId)
     });
     if (!chatFromDb) {
       throw new Error('unknown chat');
@@ -169,9 +201,39 @@ export const chatsRouter = new OpenAPIHono()
       modelId,
       text,
       parentId: parentId,
-      chatId: id,
+      chatId,
     });
-    return c.json(await getChatWithMessagesFromDb(id));
+    return c.json(await getChatWithMessagesFromDb(chatId));
+  })
+  .openapi(regenerateResponse, async (c) => {
+    const { chatId, messageId } = c.req.valid('param');
+    const chatFromDb = await db.query.chat.findFirst({
+      where: eq(chat.id, chatId)
+    });
+    if (!chatFromDb) {
+      throw new Error('unknown chat');
+    }
+    const messageFromDb = await db.query.message.findFirst({
+      where: eq(message.id, messageId)
+    });
+    if (!messageFromDb || messageFromDb.chatId !== chatId) {
+      throw new Error('unknown message');
+    }
+    if (!messageFromDb.parentId || messageFromDb.sender === 'user') {
+      throw new Error(`can't regenerate user messages`);
+    }
+
+    const provider = getProviderById(chatFromDb.providerId);
+    const modelId = chatFromDb.modelId;
+
+    const responseMessage = await regenerateResponseForMessage({
+      provider,
+      modelId,
+      parentId: messageFromDb.parentId,
+      chatId,
+    });
+
+    return c.json(serialize(responseMessage));
   });
 
 

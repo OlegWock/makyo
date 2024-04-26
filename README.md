@@ -6,7 +6,7 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 ## Roadmap
 
 - [ ] Messages branching
-  - [ ] Regenerating LLM response
+  - [x] Regenerating LLM response
   - [ ] Editing user's message (and thus regenerating LLM response)
   - [ ] Free branching - user selects AI message and Katuko creates separate branch from it (without regenerating)
 - [ ] Chat settings (so far just a temperature, system prompt and title change)

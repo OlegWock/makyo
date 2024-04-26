@@ -42,17 +42,17 @@
 
 
   &.primary {
-    --color-btn-background: var(--mint-10);
+    --color-btn-background: var(--jade-10);
     --color-btn-border: var(--jade-4);
-    --color-btn-background-hover: var(--mint-9);
-    --color-btn-background-loading: var(--mint-9);
+    --color-btn-background-hover: var(--jade-9);
+    --color-btn-background-loading: var(--jade-9);
     color: var(--mint-contrast);
   }
 
   &.text {
     background: transparent;
     padding: 0;
-    color: var(--mint-10);
+    color: var(--jade-11);
   }
 
   &.loading {
