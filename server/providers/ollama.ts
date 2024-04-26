@@ -42,7 +42,7 @@ class OllamaProvider extends Provider {
         role: m.sender === 'ai' ? 'assistant' : 'user',
         content: m.text,
       }
-    })
+    });
     const responseGenerator = await ollama.chat({ model: modelId, messages: patchedMessages, stream: true });
     let response = '';
     for await (const part of responseGenerator) {
