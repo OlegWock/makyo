@@ -5,6 +5,12 @@
   gap: 1rem;
   max-height: 100%;
 
+  .header {
+    display: flex;
+    justify-content: center;
+
+  }
+
   .chat {
     flex: 1;
     overflow: auto;
@@ -31,6 +37,12 @@
       display: flex;
       gap: 0.5rem;
       justify-content: flex-end;
+    }
+
+    .secondaryActions {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-start;
     }
   }
 }

@@ -2,7 +2,7 @@ import { Link as WouterLink, LinkProps as WouterLinkProps } from 'wouter';
 import styles from './Link.module.scss';
 import buttonStyles from '../Button/Button.module.scss';
 import clsx from 'clsx';
-import { cloneElement, ReactElement } from 'react';
+import { cloneElement, ReactElement, Ref } from 'react';
 
 type Variant = "underline" | "unstyled" | "button" | "button-primary" | "button-text" | "button-borderless";
 
@@ -10,10 +10,12 @@ export type LinkProps = {
   className?: string | ((active: boolean) => string),
   variant?: Variant,
   icon?: ReactElement,
+  ref?: Ref<HTMLAnchorElement>;
 } & WouterLinkProps;
 
-export const Link = ({ className, children, icon, variant = "underline", asChild, ...props }: LinkProps) => {
-  return (<WouterLink className={(matching) => clsx(
+export const Link = ({ className, children, icon, variant = "underline", asChild, ref, ...props }: LinkProps) => {
+  return (<WouterLink 
+    className={(matching) => clsx(
     styles.Link,
     variant === 'underline' && styles.withUnderline,
     variant.startsWith('button-') && buttonStyles.Button,
@@ -24,7 +26,10 @@ export const Link = ({ className, children, icon, variant = "underline", asChild
     variant.startsWith('button-') && !!icon && buttonStyles.withIcon,
     variant.startsWith('button-') && !!icon && !children && buttonStyles.onlyIcon,
     typeof className === 'function' ? className(matching) : className,
-  )} asChild={false} {...props}
+  )} 
+  asChild={false} 
+  ref={ref}
+  {...props}
   >
     {!!icon && cloneElement(icon, { className: buttonStyles.icon })}
     {children}

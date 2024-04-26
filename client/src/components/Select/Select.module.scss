@@ -2,21 +2,29 @@
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
-  border-radius: 8px;
+  border-radius: 0.25rem;
   padding: 0 15px;
   font-size: 0.875rem;
   line-height: 1;
-  height: 35px;
+  min-height: 35px;
   gap: 12px;
   min-width: 250px;
-  border: 0px solid transparent;
+  border: 1px solid var(--gray-4);
   color: inherit;
   background: white;
   cursor: pointer;
+  white-space: nowrap;
+
+  overflow: hidden;
 }
 
 .SelectTrigger[data-placeholder] {
   color: var(--gray-8);
+}
+
+.SelectValue {
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .SelectIcon {

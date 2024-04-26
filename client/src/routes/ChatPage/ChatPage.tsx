@@ -8,17 +8,18 @@ import { useMemo } from 'react';
 
 export const ChatPage = () => {
   const { id } = useStrictRouteParams({ id: z.coerce.number() });
-  const { data } = useChat(id);
+  const { data: chatInfo } = useChat(id);
   const { data: providers } = useModels();
   const sendMessage = useChatMessagesMutation(id);
 
-  const sortedMessages = useMemo(() => [...data.messages].sort((a, b) => a.createdAt - b.createdAt), [data.messages])
+  const sortedMessages = useMemo(() => [...chatInfo.messages].sort((a, b) => a.createdAt - b.createdAt), [chatInfo.messages])
   const usedModel = useMemo(() => {
-    const provider = providers.find(p => p.provider.id === data.chat.providerId);
-    const model = provider?.models.find(m => m.id === data.chat.modelId);
+    const provider = providers.find(p => p.provider.id === chatInfo.chat.providerId);
+    const model = provider?.models.find(m => m.id === chatInfo.chat.modelId);
     return model?.name;
-  }, [providers, data.chat.modelId, data.chat.providerId])
+  }, [providers, chatInfo.chat.modelId, chatInfo.chat.providerId])
 
+  // TODO: show chat title here and also in tab title
   return (<ChatLayout
     onSend={(text) => {
       sendMessage.mutate({
@@ -27,9 +28,13 @@ export const ChatPage = () => {
       })
     }}
   >
-    <MessagesHistory
-      messages={sortedMessages}
-      modelName={usedModel}
-    />
+    <ChatLayout.Title>{chatInfo.chat.title}</ChatLayout.Title>
+    <ChatLayout.MessagesArea>
+      <MessagesHistory
+        messages={sortedMessages}
+        modelName={usedModel}
+      />
+    </ChatLayout.MessagesArea>
+
   </ChatLayout>);
 };

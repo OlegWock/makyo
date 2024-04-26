@@ -12,6 +12,9 @@ export type MessageBubbleProps = {
 
 export const MessageBubble = ({ message, senderName }: MessageBubbleProps) => {
   const showPlaceholder = message.isGenerating && !message.text;
+
+  // TODO: markdown-to-jsx doesn't have option to preserve line breaks, need to either hack something or replace it with another library
+
   return (<div className={clsx(styles.MessageBubble, styles[message.sender])}>
     <div className={styles.senderName}>{senderName}</div>
     {showPlaceholder

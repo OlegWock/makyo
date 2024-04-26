@@ -1,19 +1,16 @@
 import clsx from 'clsx';
 import { HiPlus, HiListBullet, HiOutlineUser, HiOutlineCog6Tooth } from 'react-icons/hi2';
 import styles from './TopNav.module.scss';
-import { Link } from '@client/components/Link';
-import { ReactElement, ReactNode } from 'react';
+import { Link, LinkProps } from '@client/components/Link';
+import { Tooltip } from '@client/components/Tooltip';
 
 
-const Item = ({ href, children, icon }: { href: string, children?: ReactNode; icon?: ReactElement }) => {
+const Item = (props: LinkProps) => {
   return (<Link
     variant='button-borderless'
-    href={href}
-    icon={icon}
     className={(active) => clsx(styles.item, active && styles.active)}
-  >
-    {children}
-  </Link>);
+    {...props}
+  />);
 };
 
 export type TopNavProps = {
@@ -22,10 +19,22 @@ export type TopNavProps = {
 
 export const TopNav = ({ }: TopNavProps) => {
   return (<div className={styles.TopNav}>
-    <Item icon={<HiPlus />} href="/" />
-    <Item href="/chats" icon={<HiListBullet />} />
-    <Item href="/presets" icon={<HiOutlineUser />} />
+
+    <Tooltip text='New chat' side='right'>
+      <Item icon={<HiPlus />} href="/" />
+    </Tooltip>
+
+    <Tooltip text='All chats' side='right'>
+      <Item href="/chats" icon={<HiListBullet />} />
+    </Tooltip>
+
+    <Tooltip text='Presets' side='right'>
+      <Item href="/presets" icon={<HiOutlineUser />} />
+    </Tooltip>
+
     <div className={styles.spacer} />
-    <Item href="/settings" icon={<HiOutlineCog6Tooth />} />
-  </div>);
+    <Tooltip text='Settings' side='right'>
+      <Item href="/settings" icon={<HiOutlineCog6Tooth />} />
+    </Tooltip>
+  </div >);
 };

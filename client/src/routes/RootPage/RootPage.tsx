@@ -3,8 +3,11 @@ import { navigate } from 'wouter/use-browser-location';
 import { ChatLayout } from '@client/components/ChatLayout';
 import styles from './RootPage.module.scss';
 import { useModels, useNewChatMutation } from '@client/api';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Select } from '@client/components/Select';
+import { WithLabel } from '@client/components/WithLabel';
+import { useAtom } from 'jotai/react';
+import { lastUsedModelAtom } from '@client/atoms/chat';
 
 export const RootPage = () => {
   const newChat = useNewChatMutation();
@@ -20,8 +23,10 @@ export const RootPage = () => {
     }));
   }, [providers]);
 
-  const [selectedModel, setSelectedModel] = useState(options[0]);
+  const [lastUsedModel, setLastUsedModel] = useAtom(lastUsedModelAtom);
+  const selectedModel = options.find(o => o.providerId === lastUsedModel?.providerId && o.modelId === lastUsedModel?.modelId) || options[0];
 
+  // TODO: when redirecting to /chats/{id}, there is a flick of white screen (from Suspense) and also text area loses focus
   return (<ChatLayout
     onSend={(text) => {
       newChat.mutateAsync({
@@ -33,17 +38,20 @@ export const RootPage = () => {
       })
     }}
   >
-    <div className={styles.modelSelect}>
-      <div>
-        <div>Select model:</div>
+    <ChatLayout.Title>New chat</ChatLayout.Title>
+    <ChatLayout.MessagesArea>
+    </ChatLayout.MessagesArea>
+    <ChatLayout.TextareaActions>
+      <WithLabel label='Model:'>
         <Select
+          triggerClassname={styles.modelSelect}
           options={options}
           value={selectedModel}
-          onChange={setSelectedModel}
+          onChange={setLastUsedModel}
           getOptionKey={o => o.providerId + o.modelId}
           getOptionLabel={o => o.name}
         />
-      </div>
-    </div>
+      </WithLabel>
+    </ChatLayout.TextareaActions>
   </ChatLayout>);
 };

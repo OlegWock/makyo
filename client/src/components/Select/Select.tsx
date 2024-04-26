@@ -47,13 +47,15 @@ export const Select = <T,>({ options, value, onChange, placeholder = 'Select...'
   return (
     <RadixSelectRoot value={innerValue} onValueChange={innerOnChange}>
       <RadixSelectTrigger className={clsx(styles.SelectTrigger, triggerClassname)} aria-label={placeholder}>
-        <RadixSelectValue placeholder={placeholder} />
+        <span className={styles.SelectValue}>
+          <RadixSelectValue placeholder={placeholder} />
+        </span>
         <RadixSelectIcon className={styles.SelectIcon}>
           <HiChevronDown />
         </RadixSelectIcon>
       </RadixSelectTrigger>
       <RadixSelectPortal>
-        <RadixSelectContent className={clsx(styles.SelectContent, contentClassname)}>
+        <RadixSelectContent className={clsx(styles.SelectContent, contentClassname)} position='popper'>
           <RadixSelectScrollUpButton className={styles.SelectScrollButton}>
             <HiChevronUp />
           </RadixSelectScrollUpButton>

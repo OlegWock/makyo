@@ -1,16 +1,5 @@
-.RootPage {
-
-}
+.RootPage {}
 
 .modelSelect {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-
-  &>div {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
+  width: 200px;
 }
