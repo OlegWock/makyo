@@ -6,7 +6,7 @@ export type Model = {
   name: string;
 }
 
-export type MessageForLLM = InferSelectModel<typeof message>;
+export type MessageForLLM = Pick<InferSelectModel<typeof message>, 'sender' | 'text'>;
 
 export type ProviderType = 'local' | 'cloud';
 

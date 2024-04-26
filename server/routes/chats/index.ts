@@ -5,7 +5,9 @@ import { getProviderById } from "@server/providers";
 import { getChatWithMessagesFromDb, sendMessageAndSave } from "@server/routes/chats/utils";
 import { ChatSchema, ChatWithMessagesSchema, NewChatSchema, NewMessageSchema } from "@server/schemas/chats";
 import { generateName } from "@server/utils/misc";
+import { createTitlePrompt } from "@server/utils/prompts";
 import { serialize } from "@server/utils/serialization";
+import { broadcastWSMessage } from "@server/utils/websockets";
 import { transformStringToNumber } from "@server/utils/zod";
 import { eq } from "drizzle-orm";
 
@@ -122,8 +124,19 @@ export const chatsRouter = new OpenAPIHono()
       throw new Error('unknown model');
     }
 
-    // TODO: generate proper title
-    const [newChat] = await db.insert(chat).values({ title: generateName(), providerId, modelId, lastMessageAt: new Date() }).returning();
+    const tmpName = text.length > 40 ? text.slice(0, 39) + '…' : text;
+    const [newChat] = await db.insert(chat).values({ title: tmpName, providerId, modelId, lastMessageAt: new Date() }).returning();
+
+    provider.chat(modelId, [{ sender: 'user', text: createTitlePrompt(text) }]).then((newTitle) => {
+      broadcastWSMessage({
+        type: 'updateChat',
+        data: {
+          chatId: newChat.id,
+          title: newTitle,
+        }
+      });
+      return db.update(chat).set({ title: newTitle }).where(eq(chat.id, newChat.id)).returning();
+    });
 
     await sendMessageAndSave({
       provider,

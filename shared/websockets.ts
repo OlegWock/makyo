@@ -3,10 +3,14 @@ type WSMessageGeneric<N extends string, D extends Record<string, any>> = {
   data: D,
 }
 
-export type WSMessage = 
-  WSMessageGeneric<"updateMessage", {
+export type WSMessage =
+  | WSMessageGeneric<"updateMessage", {
     messageId: number,
     chatId: number,
     text: string,
     isGenerating?: boolean,
+  }>
+  | WSMessageGeneric<"updateChat", {
+    chatId: number,
+    title?: string,
   }>
