@@ -5,8 +5,6 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 
 ## Roadmap
 
-- [ ] Implement OpenAI and Anthropic providers
-- [ ] Let user select model when creating chat
 - [ ] Generate a proper chat title
 - [ ] Messages branching
   - [ ] Regenerating LLM response
