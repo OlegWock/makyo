@@ -1,29 +1,23 @@
 import { ReactNode, useMemo, useRef } from 'react';
-import { useImmer } from 'use-immer';
-import { MessageSchemaType } from '@shared/api';
 import styles from './ChatPage.module.scss';
 import { useMount } from '@client/utils/hooks';
-import { buildTreeFromMessages } from './tree';
 import { MessageBubble } from '@client/components/MessageBubble';
 import { useRegenerateMessageMutation } from '@client/api';
 import { useChatPageContext } from '@client/routes/ChatPage/context';
 import { minmax } from '@client/utils/animations';
 
 export type MessagesHistoryProps = {
-  messages: MessageSchemaType[];
   modelName?: string;
 };
 
-export const MessagesHistory = ({ messages: messagesFromProps, modelName }: MessagesHistoryProps) => {
-  const { chatId } = useChatPageContext();
+export const MessagesHistory = ({ modelName }: MessagesHistoryProps) => {
+  const { chatId, messagesTree, treeChoices, setTreeChoices } = useChatPageContext();
   const regenerateMessage = useRegenerateMessageMutation(chatId);
 
-  const tree = useMemo(() => buildTreeFromMessages(messagesFromProps), [messagesFromProps]);
-  const [treeChoices, setTreeChoices] = useImmer(() => new Map<number, number>());
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   let bubbles: ReactNode[] = [];
-  let currentNode = tree;
+  let currentNode = messagesTree;
   while (currentNode) {
     const node = currentNode;
     const parent = node.parent;
@@ -47,11 +41,11 @@ export const MessagesHistory = ({ messages: messagesFromProps, modelName }: Mess
           setTreeChoices((draft) => {
             const current = draft.get(parent.message.id) ?? 0;
             const target = current + (forward ? 1 : -1);
-            draft.set(parent.message.id, minmax(target, 0, parent.children.length -1));
+            draft.set(parent.message.id, minmax(target, 0, parent.children.length - 1));
           });
         }}
         onRegenerate={node.message.sender === 'user' ? undefined : async () => {
-          await regenerateMessage.mutateAsync({messageId: node.message.id});
+          await regenerateMessage.mutateAsync({ messageId: node.message.id });
           setTreeChoices((draft) => {
             draft.set(node.parent!.message.id, node.parent!.children.length);
           });
@@ -64,7 +58,6 @@ export const MessagesHistory = ({ messages: messagesFromProps, modelName }: Mess
 
     currentNode = currentNode.children[selectedBranch];
   }
-  bubbles.reverse();
 
   useMount(() => {
     wrapperRef.current?.scrollTo({ top: wrapperRef.current.scrollHeight });

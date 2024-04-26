@@ -1,6 +1,6 @@
 import { MessageSchemaType } from "@shared/api";
 
-type MessageTreeNode = {
+export type MessageTreeNode = {
   message: MessageSchemaType;
   parent: MessageTreeNode | null;
   children: MessageTreeNode[];
