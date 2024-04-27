@@ -6,6 +6,8 @@ import { ModelResponseSchema } from "@server/schemas/provider";
 const getModels = createRoute({
   method: 'get',
   path: '/api/providers/models',
+  summary: 'Get models',
+  tags: ['Providers'],
   security: [{ CookieAuth: [] }],
   responses: {
     200: {

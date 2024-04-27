@@ -6,13 +6,13 @@ export type MessageTreeNode = {
   children: MessageTreeNode[];
 };
 
-export type PreferredTreeBranchesMap = Map<number, number>;
+export type PreferredTreeBranchesMap = Map<number | 'root', number>;
 
 export const buildTreeFromMessages = (messages: MessageSchemaType[]) => {
   const messageMap = new Map<number, MessageSchemaType>();
   const childsMap = new Map<number, Array<MessageSchemaType>>();
 
-  let rootMessage: MessageSchemaType | undefined = undefined;
+  let rootMessages: MessageSchemaType[] = [];
   messages.forEach(message => {
     messageMap.set(message.id, message);
     if (message.parentId) {
@@ -21,11 +21,11 @@ export const buildTreeFromMessages = (messages: MessageSchemaType[]) => {
       parentMessageChildren.push(message);
       childsMap.set(message.parentId, parentMessageChildren);
     } else {
-      rootMessage = message;
+      rootMessages.push(message);
     }
   });
 
-  if (!rootMessage) {
+  if (!rootMessages.length) {
     throw new Error('no root message found');
   }
 
@@ -45,12 +45,12 @@ export const buildTreeFromMessages = (messages: MessageSchemaType[]) => {
     return node;
   };
 
-  const rootNode = createNode(rootMessage, null);
-  return rootNode;
+  return rootMessages.map(message => createNode(message, null));
 };
 
-export const getLastMessage = (tree: MessageTreeNode, treeChoices: PreferredTreeBranchesMap) => {
-  let currentNode = tree;
+export const getLastMessage = (tree: MessageTreeNode[], treeChoices: PreferredTreeBranchesMap) => {
+  const branchIndex = treeChoices.get('root') ?? 0;
+  let currentNode = tree[branchIndex];
   while (currentNode.children.length) {
     const branchIndex = treeChoices.get(currentNode.message.id) ?? 0;
     currentNode = currentNode.children[branchIndex];
@@ -59,12 +59,13 @@ export const getLastMessage = (tree: MessageTreeNode, treeChoices: PreferredTree
   return currentNode;
 };
 
-export const walkOverMessagesTree = (tree: MessageTreeNode, treeChoices: PreferredTreeBranchesMap, cb: (node: MessageTreeNode) => void | boolean) => {
-  let currentNode = tree;
+export const walkOverMessagesTree = (tree: MessageTreeNode[], treeChoices: PreferredTreeBranchesMap, cb: (node: MessageTreeNode) => void | boolean) => {
+  const branchIndex = treeChoices.get('root') ?? 0;
+  let currentNode = tree[branchIndex];
   while (currentNode) {
     const node = currentNode;
     const selectedBranch = treeChoices.get(node.message.id) ?? 0;
-  
+
     const result = cb(node);
     if (result === false) {
       break;
@@ -74,7 +75,7 @@ export const walkOverMessagesTree = (tree: MessageTreeNode, treeChoices: Preferr
   }
 };
 
-export const mapOverMessagesTree = <T>(tree: MessageTreeNode, treeChoices: PreferredTreeBranchesMap, cb: (node: MessageTreeNode) => T) => {
+export const mapOverMessagesTree = <T>(tree: MessageTreeNode[], treeChoices: PreferredTreeBranchesMap, cb: (node: MessageTreeNode) => T) => {
   let result: T[] = [];
   walkOverMessagesTree(tree, treeChoices, (node) => {
     result.push(cb(node));

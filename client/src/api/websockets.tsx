@@ -4,6 +4,7 @@ import { ChatSchemaType, ChatWithMessagesSchemaType } from "@shared/api";
 import { safeCall } from "@shared/utils";
 import { WSMessage } from "@shared/websockets";
 import { useQueryClient } from "@tanstack/react-query";
+import { produce } from "immer";
 import { ReactNode, useEffect, useMemo } from "react";
 
 
@@ -60,48 +61,40 @@ export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     return client.onMessage((message) => {
       console.log('WebSocket message', message);
-      // TODO: need to bring immer here, it gets out of control D:
+
       if (message.type === 'updateMessage') {
         queryClient.setQueryData(['chats', message.data.chatId], (old: ChatWithMessagesSchemaType | undefined): ChatWithMessagesSchemaType | undefined => {
           if (!old) return old;
 
-          return {
-            ...old,
-            messages: old.messages.map(m => {
-              if (m.id === message.data.messageId) {
-                return {
-                  ...m,
-                  text: message.data.text,
-                  isGenerating: message.data.isGenerating ?? m.isGenerating,
-                };
+          return produce(old, (draft) => {
+            draft.messages.forEach(m => {
+              if (m.id !== message.data.messageId) return;
+
+              m.text = message.data.text;
+              if (message.data.isGenerating !== undefined) {
+                m.isGenerating = message.data.isGenerating;
               }
-              return m;
-            }),
-          };
+            })
+          });
         });
       } else if (message.type === 'updateChat') {
         queryClient.setQueryData(['chats', message.data.chatId], (old: ChatWithMessagesSchemaType | undefined): ChatWithMessagesSchemaType | undefined => {
           if (!old) return old;
 
-          return {
-            ...old,
-            chat: {
-              ...old.chat,
-              title: message.data.title ?? old.chat.title,
+          return produce(old, (draft) => {
+            if (message.data.title) {
+              draft.chat.title = message.data.title;
             }
-          };
+          });
         });
         queryClient.setQueryData(['chats'], (old: ChatSchemaType[] | undefined): ChatSchemaType[] | undefined => {
           if (!old) return old;
 
-          return old.map((chat): ChatSchemaType => {
-            if (chat.id === message.data.chatId) {
-              return {
-                ...chat,
-                title: message.data.title ?? chat.title,
-              }
+          return produce(old, (draft) => {
+            const chat = draft.find(c => c.id === message.data.chatId);
+            if (chat && message.data.title) {
+              chat.title = message.data.title;
             }
-            return chat;
           });
         });
       }

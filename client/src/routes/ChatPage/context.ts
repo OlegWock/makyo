@@ -4,7 +4,7 @@ import { Updater } from "use-immer";
 
 export const [ChatPageContextProvider, useChatPageContext] = createStrictContext<{
   chatId: number,
-  messagesTree: MessageTreeNode,
+  messagesTree: MessageTreeNode[],
   treeChoices: PreferredTreeBranchesMap,
-  setTreeChoices: Updater<Map<number, number>>,
+  setTreeChoices: Updater<PreferredTreeBranchesMap>,
 }>('ChatPageContext');

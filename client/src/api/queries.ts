@@ -4,6 +4,7 @@ import { throwExceptionOnFailedResponse } from "@client/api/exceptions";
 import { ChatSchemaType, ChatWithMessagesSchemaType, MessageSchemaType, NewChatSchemaType, NewMessageSchemaType } from "@shared/api";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { ClientResponse } from "hono/client";
+import { produce } from "immer";
 
 type Key<T> = (string | number)[] | ((arg: T) => (string | number)[]);
 
@@ -13,7 +14,7 @@ const createQueryHook = <Out, In = void>(key: Key<In>, func: (api: ApiClient, ar
     queryKey: typeof key === 'function' ? key(arg) : key,
     queryFn: () => func(api, arg).then(r => {
       throwExceptionOnFailedResponse(r);
-      
+
       return r.json() as Promise<Out>;
     }),
   });
@@ -59,7 +60,6 @@ export const useSendMessageMutation = (chatId: number) => {
     },
     onSuccess(data) {
       client.setQueryData(['chats', chatId], () => data);
-      // client.invalidateQueries({ queryKey: ['chats'] });
     },
   });
 };
@@ -77,15 +77,11 @@ export const useRegenerateMessageMutation = (chatId: number) => {
     onSuccess(data: MessageSchemaType) {
       client.setQueryData(['chats', chatId], (old: ChatWithMessagesSchemaType | undefined) => {
         if (!old) return old;
-        return {
-          ...old,
-          messages: [
-            ...old.messages,
-            data
-          ],
-        };
+
+        return produce(old, (draft) => {
+          draft.messages.push(data);
+        });
       });
-      // client.invalidateQueries({ queryKey: ['chats'] });
     },
   });
 };
@@ -103,15 +99,46 @@ export const useDuplicateMessageMutation = (chatId: number) => {
     onSuccess(data: MessageSchemaType) {
       client.setQueryData(['chats', chatId], (old: ChatWithMessagesSchemaType | undefined) => {
         if (!old) return old;
-        return {
-          ...old,
-          messages: [
-            ...old.messages,
-            data
-          ],
-        };
+        return produce(old, (draft) => {
+          draft.messages.push(data);
+        });
       });
-      // client.invalidateQueries({ queryKey: ['chats'] });
+    },
+  });
+};
+
+export const useEditMessageMutation = (chatId: number) => {
+  const api = useApiClient();
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ messageId, text, regenerateResponse }: { messageId: number, text: string, regenerateResponse: boolean }) => {
+      const resp = await api.chats[":chatId"][":messageId"].$patch({
+        param: { chatId: chatId.toString(), messageId: messageId.toString() },
+        json: {
+          text,
+          regenerateResponse,
+        }
+      });
+      return resp.json();
+    },
+    onSuccess(data) {
+      client.setQueryData(['chats', chatId], () => data);
+    },
+  });
+};
+
+export const useDeleteMessageMutation = (chatId: number) => {
+  const api = useApiClient();
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async (messageId: number) => {
+      const resp = await api.chats[":chatId"][":messageId"].$delete({
+        param: { chatId: chatId.toString(), messageId: messageId.toString() },
+      });
+      return resp.json();
+    },
+    onSuccess(data) {
+      client.setQueryData(['chats', chatId], () => data);
     },
   });
 };

@@ -16,3 +16,7 @@ export function throttle<A extends any[], R>(func: (...args: A) => R, timeFrame:
     }
   };
 }
+
+export const iife = <T>(cb: () => T): T => {
+  return cb();
+};

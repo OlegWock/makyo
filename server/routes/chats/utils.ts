@@ -6,7 +6,7 @@ import { ChatWithMessagesSchemaType } from "@server/schemas/chats";
 import { omit, serialize } from "@server/utils/serialization";
 import { broadcastWSMessage } from "@server/utils/websockets";
 import { throttle } from "@shared/utils";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
 
@@ -145,3 +145,23 @@ export const getChatWithMessagesFromDb = async (chatId: number): Promise<ChatWit
     messages: messages.map(m => serialize(omit(m, ['chatId'])))
   };
 };
+
+export const getMessageFromDb = async (chatId: number, messageId: number) => {
+  const chatFromDb = await db.query.chat.findFirst({
+    where: eq(chat.id, chatId)
+  });
+  if (!chatFromDb) {
+    throw new HTTPException(404, { message: 'unknown chat' });
+  }
+  const messageFromDb = await db.query.message.findFirst({
+    where: and(
+      eq(message.id, messageId),
+      eq(message.chatId, chatId)
+    )
+  });
+  if (!messageFromDb) {
+    throw new HTTPException(404, { message: 'unknown message' });
+  }
+
+  return { chatFromDb, messageFromDb };
+}

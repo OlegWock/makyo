@@ -12,6 +12,8 @@ const AuthCheckSchema = z
 const loginRoute = createRoute({
   method: 'post',
   path: '/authenticate',
+  summary: 'Authenticate',
+  tags: ['Auth'],
   request: {
     body: {
       content: {
@@ -38,6 +40,8 @@ const loginRoute = createRoute({
 const verifyRoute = createRoute({
   method: 'get',
   path: '/api/auth/verify',
+  summary: 'Verify auth cookie',
+  tags: ['Auth'],
   security: [{ CookieAuth: [] }],
   responses: {
     200: {

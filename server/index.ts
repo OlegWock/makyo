@@ -2,7 +2,6 @@ import { OpenAPIHono } from '@hono/zod-openapi';
 import { cors } from 'hono/cors';
 import { apiReference } from '@scalar/hono-api-reference';
 import { prettyJSON } from 'hono/pretty-json'
-import { usersRouter } from '@server/routes/users';
 import { authRouter, cookieAuthMiddleware } from '@server/routes/auth';
 import { configurationRouter } from '@server/routes/configuration';
 import { providersRouter } from '@server/routes/providers';
@@ -24,7 +23,6 @@ app.use('/api/*', cookieAuthMiddleware());
 
 // Attach other routes by chaining calls on top of previous .route instead of calling app.route multiple times
 const router = app
-  .route('/', usersRouter)
   .route('/', authRouter)
   .route('/', providersRouter)
   .route('/', chatsRouter)

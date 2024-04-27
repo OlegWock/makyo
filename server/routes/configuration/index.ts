@@ -8,6 +8,8 @@ import { ConfigurationSchema } from "@server/schemas/configuration";
 const getConfiguration = createRoute({
   method: 'get',
   path: '/api/configuration',
+  summary: 'Get current configuration',
+  tags: ['Settings'],
   security: [{ CookieAuth: [] }],
   responses: {
     200: {
@@ -16,7 +18,7 @@ const getConfiguration = createRoute({
           schema: ConfigurationSchema,
         },
       },
-      description: 'Get current configuration',
+      description: '',
     },
   },
 });

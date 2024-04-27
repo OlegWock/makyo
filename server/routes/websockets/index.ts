@@ -11,6 +11,8 @@ export const bunWebSocket: any = websocket;
 const subscribe = createRoute({
   method: 'get',
   path: '/api/subscribe',
+  summary: 'Websockets subscribe',
+  tags: ["Websockers"],
   security: [{ CookieAuth: [] }],
   responses: {
     101: {

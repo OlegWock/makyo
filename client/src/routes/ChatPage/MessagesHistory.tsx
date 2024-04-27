@@ -2,10 +2,10 @@ import { UIEventHandler, useRef } from 'react';
 import styles from './ChatPage.module.scss';
 import { useMount } from '@client/utils/hooks';
 import { MessageBubble, MessageBubbleActionsProp } from '@client/components/MessageBubble';
-import { useDuplicateMessageMutation, useRegenerateMessageMutation } from '@client/api';
+import { useDeleteMessageMutation, useDuplicateMessageMutation, useEditMessageMutation, useRegenerateMessageMutation } from '@client/api';
 import { useChatPageContext } from '@client/routes/ChatPage/context';
 import { minmax } from '@client/utils/animations';
-import { mapOverMessagesTree } from '@client/routes/ChatPage/tree';
+import { mapOverMessagesTree, MessageTreeNode } from '@client/routes/ChatPage/tree';
 import useMotionMeasure from 'react-use-motion-measure';
 import { useMotionValueEvent } from 'framer-motion';
 
@@ -20,9 +20,23 @@ export const MessagesHistory = ({ modelName }: MessagesHistoryProps) => {
     shouldControlScrollRef.current = scrolledToBottom;
   };
 
+  const onEditMessage = (node: MessageTreeNode, text: string, regenerateResponse: boolean) => {
+    editMessage.mutateAsync({ messageId: node.message.id, text, regenerateResponse }).then(() => {
+      if (regenerateResponse) {
+        const parentId = node.parent ? node.parent.message.id : 'root';
+        const parentChildren = node.parent ? node.parent.children : messagesTree;
+        setTreeChoices((draft) => {
+          draft.set(parentId, parentChildren.length);
+        });
+      }
+    });
+  };
+
   const { chatId, messagesTree, treeChoices, setTreeChoices } = useChatPageContext();
   const regenerateMessage = useRegenerateMessageMutation(chatId);
   const duplicateMessage = useDuplicateMessageMutation(chatId);
+  const editMessage = useEditMessageMutation(chatId);
+  const deleteMessage = useDeleteMessageMutation(chatId);
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const shouldControlScrollRef = useRef(true);
@@ -36,25 +50,44 @@ export const MessagesHistory = ({ modelName }: MessagesHistoryProps) => {
 
   const bubbles = mapOverMessagesTree(messagesTree, treeChoices, (node) => {
     const { parent, message } = node;
-    const totalVariants = parent?.children.length ?? 1;
-    const currentVariantIndex = (parent ? treeChoices.get(parent.message.id) ?? 0 : 0) + 1;
+    const parentId = parent?.message.id ?? 'root';
+    const parentChildren = parent?.children ?? messagesTree;
+    const totalVariants = parentChildren.length ?? 1;
+    const currentVariantIndex = (treeChoices.get(parentId) ?? 0) + 1;
 
     const sender = message.sender === 'user' ? 'User' : modelName ?? 'LLM';
 
-    const actions = message.sender === 'user' ? undefined : {
+    const sharedActions: Partial<MessageBubbleActionsProp> = {
       variants: {
         current: currentVariantIndex,
         total: totalVariants,
         onSwitchVariant(forward) {
           // Here we need to modify parent preferred branch
-          if (!parent) return;
           setTreeChoices((draft) => {
-            const current = draft.get(parent.message.id) ?? 0;
+            const current = draft.get(parentId) ?? 0;
             const target = current + (forward ? 1 : -1);
-            draft.set(parent.message.id, minmax(target, 0, parent.children.length - 1));
+            draft.set(parentId, minmax(target, 0, parentChildren.length - 1));
           });
         },
       },
+      editing: {
+        allowRegenerateResponse: message.sender === 'user',
+        onEdit: (text, regenerateMessage) => onEditMessage(node, text, regenerateMessage),
+      },
+      onDelete: async () => {
+        await deleteMessage.mutateAsync(message.id);
+        const treeChoiceOutOfBounds = (treeChoices.get(parentId) ?? 0) > (parentChildren.length - 2);
+        if (treeChoiceOutOfBounds) {
+          setTreeChoices(draft => {
+            draft.set(parentId, parentChildren.length - 2);
+          });
+        }
+      }
+    };
+    const actions: MessageBubbleActionsProp = message.sender === 'user' ? {
+      ...sharedActions,
+    } : {
+      ...sharedActions,
       onRegenerate: async () => {
         await regenerateMessage.mutateAsync({ messageId: message.id });
         setTreeChoices((draft) => {
@@ -67,7 +100,7 @@ export const MessagesHistory = ({ modelName }: MessagesHistoryProps) => {
           draft.set(parent!.message.id, parent!.children.length);
         });
       },
-    } satisfies MessageBubbleActionsProp;
+    };
     return (
       <MessageBubble
         senderName={sender}

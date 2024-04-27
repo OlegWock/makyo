@@ -35,6 +35,7 @@ export const ChatLayout = componentFactory('ChatLayout', ({ onSend, slots }: Cha
       </div>
       <Textarea
         className={styles.textarea}
+        autoFocus
         rows={4}
         value={text}
         onValueChange={setText}

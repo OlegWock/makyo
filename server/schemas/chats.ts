@@ -42,3 +42,10 @@ export const NewMessageSchema = z.object({
 });
 
 export type NewMessageSchemaType = z.infer<typeof NewMessageSchema>;
+
+export const EditMessageSchema = z.object({
+  text: z.string(),
+  regenerateResponse: z.boolean().optional().default(false),
+});
+
+export type EditMessageSchemaType = z.infer<typeof EditMessageSchema>;
