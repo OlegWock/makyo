@@ -7,6 +7,7 @@ import { omit, serialize } from "@server/utils/serialization";
 import { broadcastWSMessage } from "@server/utils/websockets";
 import { throttle } from "@shared/utils";
 import { eq } from "drizzle-orm";
+import { HTTPException } from "hono/http-exception";
 
 
 export const sendMessageAndSave = async ({ parentId, provider, modelId, text, chatId }: {
@@ -135,7 +136,7 @@ export const getChatWithMessagesFromDb = async (chatId: number): Promise<ChatWit
     where: eq(chat.id, chatId)
   });
   if (!chatFromDb) {
-    throw new Error('unknown chat');
+    throw new HTTPException(404, { message: 'unknown chat' });
   }
   const messages = await db.select().from(message).where(eq(message.chatId, chatId));
 

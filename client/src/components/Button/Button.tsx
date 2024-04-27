@@ -1,10 +1,7 @@
-import { cloneElement, ComponentPropsWithoutRef, MouseEventHandler, ReactElement, ReactNode } from 'react';
+import { cloneElement, ComponentPropsWithRef, MouseEventHandler, ReactElement, ReactNode } from 'react';
 import styles from './Button.module.scss';
 import clsx from 'clsx';
-import { motion, useMotionTemplate, useTime, useTransform } from 'framer-motion';
-import { inverseLerp, lerp } from '@client/utils/animations';
-
-const LOADING_CYCLE_DURATION = 1000; // ms
+import { motion } from 'framer-motion';
 
 export type ButtonProps = {
   loading?: boolean,
@@ -12,7 +9,7 @@ export type ButtonProps = {
   icon?: ReactElement,
   iconPosition?: 'before' | 'after',
   children?: ReactNode;
-} & Omit<ComponentPropsWithoutRef<typeof motion.button>, 'children'>;
+} & Omit<ComponentPropsWithRef<typeof motion.button>, 'children'>;
 
 export const Button = ({ loading = false, variant = 'normal', iconPosition = 'before', onClick, className, style = {}, icon, children, ...props }: ButtonProps) => {
   const localOnClick: MouseEventHandler<HTMLButtonElement> = (e) => {

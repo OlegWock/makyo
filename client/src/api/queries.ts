@@ -1,5 +1,6 @@
 import { ApiClient } from "@client/api/client";
 import { useApiClient } from "@client/api/context";
+import { throwExceptionOnFailedResponse } from "@client/api/exceptions";
 import { ChatSchemaType, ChatWithMessagesSchemaType, MessageSchemaType, NewChatSchemaType, NewMessageSchemaType } from "@shared/api";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { ClientResponse } from "hono/client";
@@ -10,7 +11,11 @@ const createQueryHook = <Out, In = void>(key: Key<In>, func: (api: ApiClient, ar
   const api = useApiClient();
   return useSuspenseQuery({
     queryKey: typeof key === 'function' ? key(arg) : key,
-    queryFn: () => func(api, arg).then(r => r.json()),
+    queryFn: () => func(api, arg).then(r => {
+      throwExceptionOnFailedResponse(r);
+      
+      return r.json() as Promise<Out>;
+    }),
   });
 };
 
@@ -64,9 +69,35 @@ export const useRegenerateMessageMutation = (chatId: number) => {
   const client = useQueryClient();
   return useMutation({
     mutationFn: async ({ messageId }: { messageId: number }) => {
-      const resp = await api.chats[":chatId"][":messageId"].$post({
+      const resp = await api.chats[":chatId"][":messageId"].regenerate.$post({
         param: { chatId: chatId.toString(), messageId: messageId.toString() }
-      })
+      });
+      return resp.json();
+    },
+    onSuccess(data: MessageSchemaType) {
+      client.setQueryData(['chats', chatId], (old: ChatWithMessagesSchemaType | undefined) => {
+        if (!old) return old;
+        return {
+          ...old,
+          messages: [
+            ...old.messages,
+            data
+          ],
+        };
+      });
+      // client.invalidateQueries({ queryKey: ['chats'] });
+    },
+  });
+};
+
+export const useDuplicateMessageMutation = (chatId: number) => {
+  const api = useApiClient();
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ messageId }: { messageId: number }) => {
+      const resp = await api.chats[":chatId"][":messageId"].duplicate.$post({
+        param: { chatId: chatId.toString(), messageId: messageId.toString() }
+      });
       return resp.json();
     },
     onSuccess(data: MessageSchemaType) {

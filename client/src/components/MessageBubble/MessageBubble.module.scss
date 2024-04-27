@@ -27,6 +27,40 @@
     margin-top: 0.5rem;
   }
 
+  .actionsWrapper {
+    display: flex;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-top: 0.75rem;
+    color: var(--gray-10);
+    line-height: 1;
+
+    .variants {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .spacer {
+      flex-grow: 1;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+    }
+
+    button {
+      color: var(--gray-10);
+      padding: 0.125rem;
+    }
+  }
+
+
+
+
   p,
   ul,
   ol {

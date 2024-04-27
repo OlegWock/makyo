@@ -11,13 +11,12 @@
 
   .messagesWrapper {
     display: flex;
-    // TODO: this makes scroll stick to bottom, but when user scrolls up while message is generating, older messages become jumpy
-    // flex-direction: column-reverse;
     flex-direction: column;
     gap: 1rem;
     align-items: center;
     width: 100%;
     max-width: 800px;
+    height: fit-content;
     margin: 0 auto;
     overflow-anchor: none;
   }

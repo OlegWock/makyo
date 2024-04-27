@@ -9,6 +9,7 @@ import { providersRouter } from '@server/routes/providers';
 import { chatsRouter } from '@server/routes/chats';
 import { bunWebSocket, websocketsRouter } from '@server/routes/websockets';
 import { Context, Env } from 'hono';
+import { HTTPException } from 'hono/http-exception';
 
 const app = new OpenAPIHono();
 
@@ -59,15 +60,20 @@ app.get('*', (c) => {
   return c.text('Should serve static resources!');
 });
 
+app.onError((err, c) => {
+  if (err instanceof HTTPException) {
+    return c.json({
+      code: err.status,
+      message: err.message,
+    }, err.status);
+  }
+  return c.res;
+})
+
 export type ApiType = typeof router;
 
 export default {
   port: 8440,
   fetch: app.fetch,
   websocket: bunWebSocket,
-}; 
-
-function getCookie(c: Context<Env, never, {}>, sessionCookieName: any) {
-  throw new Error('Function not implemented.');
-}
-
+};

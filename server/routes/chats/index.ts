@@ -6,10 +6,11 @@ import { getChatWithMessagesFromDb, regenerateResponseForMessage, sendMessageAnd
 import { ChatSchema, ChatWithMessagesSchema, MessageSchema, NewChatSchema, NewMessageSchema } from "@server/schemas/chats";
 import { generateName } from "@server/utils/misc";
 import { createTitlePrompt } from "@server/utils/prompts";
-import { serialize } from "@server/utils/serialization";
+import { omit, serialize } from "@server/utils/serialization";
 import { broadcastWSMessage } from "@server/utils/websockets";
 import { transformStringToNumber } from "@server/utils/zod";
 import { eq } from "drizzle-orm";
+import { HTTPException } from "hono/http-exception";
 
 const getChats = createRoute({
   method: 'get',
@@ -113,7 +114,7 @@ const sendMessage = createRoute({
 
 const regenerateResponse = createRoute({
   method: 'post',
-  path: '/api/chats/{chatId}/{messageId}',
+  path: '/api/chats/{chatId}/{messageId}/regenerate',
   security: [{ CookieAuth: [] }],
   request: {
     params: z.object({
@@ -138,10 +139,42 @@ const regenerateResponse = createRoute({
           schema: MessageSchema,
         },
       },
-      description: 'Get all chats',
+      description: 'Regenerate AI message',
     },
   },
-})
+});
+
+const duplicateResponse = createRoute({
+  method: 'post',
+  path: '/api/chats/{chatId}/{messageId}/duplicate',
+  security: [{ CookieAuth: [] }],
+  request: {
+    params: z.object({
+      chatId: z.string().openapi({
+        param: {
+          name: 'chatId',
+          in: 'path',
+        },
+      }).transform(transformStringToNumber),
+      messageId: z.string().openapi({
+        param: {
+          name: 'messageId',
+          in: 'path',
+        },
+      }).transform(transformStringToNumber)
+    }),
+  },
+  responses: {
+    200: {
+      content: {
+        'application/json': {
+          schema: MessageSchema,
+        },
+      },
+      description: 'Duplicate AI message',
+    },
+  },
+});
 
 export const chatsRouter = new OpenAPIHono()
   .openapi(getChats, async (c) => {
@@ -153,7 +186,7 @@ export const chatsRouter = new OpenAPIHono()
     const provider = getProviderById(providerId);
     const modelSupported = provider.isModelSupported(modelId);
     if (!modelSupported) {
-      throw new Error('unknown model');
+      throw new HTTPException(404, { message: 'unknown model'});
     }
 
     const tmpName = text.length > 40 ? text.slice(0, 39) + '…' : text;
@@ -190,7 +223,7 @@ export const chatsRouter = new OpenAPIHono()
       where: eq(chat.id, chatId)
     });
     if (!chatFromDb) {
-      throw new Error('unknown chat');
+      throw new HTTPException(404, { message: 'unknown chat'});
     }
     const { parentId, text } = c.req.valid('json');
     const provider = getProviderById(chatFromDb.providerId);
@@ -211,16 +244,16 @@ export const chatsRouter = new OpenAPIHono()
       where: eq(chat.id, chatId)
     });
     if (!chatFromDb) {
-      throw new Error('unknown chat');
+      throw new HTTPException(404, { message: 'unknown chat'});
     }
     const messageFromDb = await db.query.message.findFirst({
       where: eq(message.id, messageId)
     });
     if (!messageFromDb || messageFromDb.chatId !== chatId) {
-      throw new Error('unknown message');
+      throw new HTTPException(404, { message: 'unknown message'});
     }
     if (!messageFromDb.parentId || messageFromDb.sender === 'user') {
-      throw new Error(`can't regenerate user messages`);
+      throw new HTTPException(400, { message: `can't regenerate user messages`});
     }
 
     const provider = getProviderById(chatFromDb.providerId);
@@ -234,6 +267,28 @@ export const chatsRouter = new OpenAPIHono()
     });
 
     return c.json(serialize(responseMessage));
+  })
+  .openapi(duplicateResponse, async (c) => {
+    const { chatId, messageId } = c.req.valid('param');
+    const chatFromDb = await db.query.chat.findFirst({
+      where: eq(chat.id, chatId)
+    });
+    if (!chatFromDb) {
+      throw new HTTPException(404, { message: 'unknown chat'});
+    }
+    const messageFromDb = await db.query.message.findFirst({
+      where: eq(message.id, messageId)
+    });
+    if (!messageFromDb || messageFromDb.chatId !== chatId) {
+      throw new HTTPException(404, { message: 'unknown message'});
+    }
+    if (!messageFromDb.parentId || messageFromDb.sender === 'user') {
+      throw new HTTPException(400, { message: `can't duplicate user messages`});
+    }
+
+    const [copyMessage] = await db.insert(message).values(omit(messageFromDb, ['id', 'createdAt'])).returning();
+
+    return c.json(serialize(copyMessage));
   });
 
 

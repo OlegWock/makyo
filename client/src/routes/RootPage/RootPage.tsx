@@ -8,8 +8,9 @@ import { Select } from '@client/components/Select';
 import { WithLabel } from '@client/components/WithLabel';
 import { useAtom } from 'jotai/react';
 import { lastUsedModelAtom } from '@client/atoms/chat';
+import { withErrorBoundary } from '@client/components/ErrorBoundary';
 
-export const RootPage = () => {
+export const RootPage = withErrorBoundary(() => {
   const newChat = useNewChatMutation();
   const { data: providers } = useModels();
 
@@ -54,4 +55,6 @@ export const RootPage = () => {
       </WithLabel>
     </ChatLayout.TextareaActions>
   </ChatLayout>);
-};
+});
+
+RootPage.displayName = 'RootPage'

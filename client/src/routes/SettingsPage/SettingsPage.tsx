@@ -1,8 +1,9 @@
 import { useModels, useSettings } from '@client/api';
 import styles from './SettingsPage.module.scss';
 import { HiNoSymbol, HiOutlineCheckCircle } from 'react-icons/hi2';
+import { withErrorBoundary } from '@client/components/ErrorBoundary';
 
-export const SettingsPage = () => {
+export const SettingsPage = withErrorBoundary(() => {
   const { data: { openai, anthropic, ollama } } = useSettings();
   const { data: models } = useModels();
 
@@ -31,4 +32,6 @@ export const SettingsPage = () => {
       </section>
     </div>
   </div>);
-};
+});
+
+SettingsPage.displayName = 'SettingsPage';

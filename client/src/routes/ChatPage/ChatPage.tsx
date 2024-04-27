@@ -7,9 +7,10 @@ import { useMemo } from 'react';
 import { MessagesHistory } from './MessagesHistory';
 import { ChatPageContextProvider } from './context';
 import { useImmer } from 'use-immer';
-import { buildTreeFromMessages } from './tree';
+import { buildTreeFromMessages, getLastMessage, PreferredTreeBranchesMap } from './tree';
+import { withErrorBoundary } from '@client/components/ErrorBoundary';
 
-export const ChatPage = () => {
+export const ChatPage = withErrorBoundary(() => {
   const { id } = useStrictRouteParams({ id: z.coerce.number() });
   const { data: chatInfo } = useChat(id);
   const { data: providers } = useModels();
@@ -22,13 +23,8 @@ export const ChatPage = () => {
   }, [providers, chatInfo.chat.modelId, chatInfo.chat.providerId]);
 
   const tree = useMemo(() => buildTreeFromMessages(chatInfo.messages), [chatInfo.messages]);
-  const [treeChoices, setTreeChoices] = useImmer(() => new Map<number, number>());
-
-  let currentNode = tree;
-  while (currentNode.children.length) {
-    const branchIndex = treeChoices.get(currentNode.message.id) ?? 0;
-    currentNode = currentNode.children[branchIndex];
-  }
+  const [treeChoices, setTreeChoices] = useImmer<PreferredTreeBranchesMap>(() => new Map<number, number>());
+  const lastMessage = getLastMessage(tree, treeChoices);
 
   // TODO: show chat title here and also in tab title
   return (<ChatPageContextProvider value={{ chatId: id, messagesTree: tree, treeChoices, setTreeChoices }}>
@@ -36,7 +32,7 @@ export const ChatPage = () => {
       onSend={(text) => {
         sendMessage.mutate({
           text,
-          parentId: currentNode.message.id,
+          parentId: lastMessage.message.id,
         })
       }}
     >
@@ -49,4 +45,6 @@ export const ChatPage = () => {
 
     </ChatLayout>
   </ChatPageContextProvider>);
-};
+});
+
+ChatPage.displayName = 'ChatPage';
