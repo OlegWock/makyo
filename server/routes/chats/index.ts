@@ -10,7 +10,7 @@ import { createTitlePrompt } from "@server/utils/prompts";
 import { omit, serialize } from "@server/utils/serialization";
 import { broadcastWSMessage } from "@server/utils/websockets";
 import { transformStringToNumber } from "@server/utils/zod";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
 const getChats = createRoute({
@@ -384,6 +384,15 @@ export const chatsRouter = new OpenAPIHono()
   .openapi(deleteMessage, async (c) => {
     const { chatId, messageId } = c.req.valid('param');
     const { chatFromDb, messageFromDb } = await getMessageFromDb(chatId, messageId);
+    if (!messageFromDb.parentId) {
+      const rootMessages = await db.select().from(message).where(and(
+        eq(message.chatId, chatId),
+        isNull(message.parentId),
+      ));
+      if (rootMessages.length === 1) {
+        throw new HTTPException(400, {message: `can't delete single root message`});
+      }
+    }
     const history = await getMessageHistoryDownwards(messageId);
     await db.delete(message).where(inArray(message.id, history.map(m => m.id)));
     return c.json(await getChatWithMessagesFromDb(chatId));

@@ -54,6 +54,7 @@ export const MessagesHistory = ({ modelName }: MessagesHistoryProps) => {
     const parentChildren = parent?.children ?? messagesTree;
     const totalVariants = parentChildren.length ?? 1;
     const currentVariantIndex = (treeChoices.get(parentId) ?? 0) + 1;
+    const isSingleRootMessage = !parent && totalVariants === 1;
 
     const sender = message.sender === 'user' ? 'User' : modelName ?? 'LLM';
 
@@ -74,7 +75,7 @@ export const MessagesHistory = ({ modelName }: MessagesHistoryProps) => {
         allowRegenerateResponse: message.sender === 'user',
         onEdit: (text, regenerateMessage) => onEditMessage(node, text, regenerateMessage),
       },
-      onDelete: async () => {
+      onDelete: isSingleRootMessage ? undefined : async () => {
         await deleteMessage.mutateAsync(message.id);
         const treeChoiceOutOfBounds = (treeChoices.get(parentId) ?? 0) > (parentChildren.length - 2);
         if (treeChoiceOutOfBounds) {
