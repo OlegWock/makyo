@@ -5,7 +5,6 @@
   font-family: inherit;
   font-size: 1rem;
   text-align: left;
-  cursor: pointer;
   transition: 0.1s ease-in-out;
   border-radius: .25rem;
   border: none;
@@ -17,6 +16,10 @@
   user-select: none;
   -webkit-user-select: none;
   transition: ease-in-out 0.15s;
+
+  &:not(:disabled) {
+    cursor: pointer;
+  }
 
   &.normal,
   &.borderless,
@@ -31,7 +34,7 @@
     color: inherit;
     border: 1px solid var(--color-btn-border);
 
-    &:hover:not(.loading) {
+    &:hover:not(.loading):not(:disabled) {
       background-color: var(--color-btn-background-hover);
     }
   }
