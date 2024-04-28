@@ -7,8 +7,18 @@
 
   .header {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
 
+    .title {
+      display: flex;
+      align-items: center;
+    }
+
+    .rightActions, .leftActions {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
   }
 
   .chat {

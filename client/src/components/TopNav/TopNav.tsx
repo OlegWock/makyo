@@ -8,6 +8,7 @@ import { Tooltip } from '@client/components/Tooltip';
 const Item = (props: LinkProps) => {
   return (<Link
     variant='button-borderless'
+    size='large'
     className={(active) => clsx(styles.item, active && styles.active)}
     {...props}
   />);

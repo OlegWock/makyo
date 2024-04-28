@@ -5,20 +5,10 @@
   padding: 1rem;
   gap: 1rem;
 
-  .navWrapper {
-    border: 1px solid var(--gray-4);
-    padding: 0.25rem;
-    border-radius: 0.25rem;
-  }
-
   .content {
-    flex-grow: 1;
-    border: 1px solid var(--gray-4);
-    padding: 1rem;
-    border-radius: 0.25rem;
     display: flex;
-    flex-direction: column;
-    overflow-x: hidden;
-    overflow-y: auto;
+    align-items: stretch;
+    flex-grow: 1;
+    overflow: hidden;
   }
 }

@@ -5,7 +5,7 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 
 ## Roadmap
 
-- [ ] Chat settings (so far just a temperature, system prompt and title change)
+- [ ] Rename chat from details screen
 - [ ] Better chats management screen
   - [ ] rename/delete
   - [ ] search + go to message

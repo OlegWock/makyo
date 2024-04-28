@@ -4,13 +4,13 @@ import { getMessageHistoryDownwards } from "@server/db/queries/messages";
 import { chat, message } from "@server/db/schema";
 import { getProviderById } from "@server/providers";
 import { getChatWithMessagesFromDb, getMessageFromDb, regenerateResponseForMessage, sendMessageAndSave } from "@server/routes/chats/utils";
-import { ChatSchema, ChatWithMessagesSchema, EditMessageSchema, MessageSchema, NewChatSchema, NewMessageSchema } from "@server/schemas/chats";
+import { ChatSchema, ChatWithMessagesSchema, EditMessageSchema, MessageSchema, NewChatSchema, NewMessageSchema, UpdateChatSchema } from "@server/schemas/chats";
 import { generateName } from "@server/utils/misc";
 import { createTitlePrompt } from "@server/utils/prompts";
 import { omit, serialize } from "@server/utils/serialization";
 import { broadcastSubscriptionMessage } from "@server/utils/subscriptions";
 import { transformStringToNumber } from "@server/utils/zod";
-import { and, eq, inArray, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull, InferInsertModel, param } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
 const getChats = createRoute({
@@ -73,6 +73,41 @@ const getChatWithMessages = createRoute({
         },
       }).transform(transformStringToNumber)
     }),
+  },
+  responses: {
+    200: {
+      content: {
+        'application/json': {
+          schema: ChatWithMessagesSchema,
+        },
+      },
+      description: '',
+    },
+  },
+});
+
+const editChat = createRoute({
+  method: 'patch',
+  path: '/api/chats/{chatId}',
+  summary: 'Update chat parameters',
+  tags: ['Chats'],
+  security: [{ CookieAuth: [] }],
+  request: {
+    params: z.object({
+      chatId: z.string().openapi({
+        param: {
+          name: 'chatId',
+          in: 'path',
+        },
+      }).transform(transformStringToNumber)
+    }),
+    body: {
+      content: {
+        'application/json': {
+          schema: UpdateChatSchema,
+        }
+      }
+    }
   },
   responses: {
     200: {
@@ -271,17 +306,32 @@ export const chatsRouter = new OpenAPIHono()
     return c.json(chats.map(c => serialize(c)));
   })
   .openapi(createChat, async (c) => {
-    const { providerId, modelId, text } = c.req.valid('json');
+    const { providerId, modelId, text, parameters } = c.req.valid('json');
     const provider = getProviderById(providerId);
-    const modelSupported = provider.isModelSupported(modelId);
-    if (!modelSupported) {
+    const model = await provider.getModelById(modelId);
+    if (!model) {
       throw new HTTPException(404, { message: 'unknown model' });
     }
 
-    const tmpName = text.length > 40 ? text.slice(0, 39) + '…' : text;
-    const [newChat] = await db.insert(chat).values({ title: tmpName, providerId, modelId, lastMessageAt: new Date() }).returning();
+    if (parameters && Object.keys(parameters).some(key => !model.availableParameters.includes(key))) {
+      throw new HTTPException(400, { message: `selected model doesn't support one or more provided parameters` });
+    }
 
-    provider.chat(modelId, [{ sender: 'user', text: createTitlePrompt(text) }]).then((newTitle) => {
+    const tmpName = text.length > 40 ? text.slice(0, 39) + '…' : text;
+    const [newChat] = await db.insert(chat).values({
+      title: tmpName,
+      providerId,
+      modelId,
+      temperature: parameters?.temperature,
+      system: parameters?.system,
+      lastMessageAt: new Date()
+    }).returning();
+
+    provider.chat(modelId, {
+      messages: [{ sender: 'user', text: createTitlePrompt(text) }],
+      system: parameters?.system,
+      temperature: parameters?.temperature,
+    }).then((newTitle) => {
       broadcastSubscriptionMessage({
         type: 'updateChat',
         data: {
@@ -297,6 +347,8 @@ export const chatsRouter = new OpenAPIHono()
       modelId,
       text,
       chatId: newChat.id,
+      system: parameters?.system,
+      temperature: parameters?.temperature,
       parentId: null,
     });
 
@@ -304,6 +356,20 @@ export const chatsRouter = new OpenAPIHono()
   })
   .openapi(getChatWithMessages, async (c) => {
     const { chatId } = c.req.valid('param');
+    return c.json(await getChatWithMessagesFromDb(chatId));
+  })
+  .openapi(editChat, async (c) => {
+    const { chatId } = c.req.valid('param');
+    const { title, parameters } = c.req.valid('json');
+    let payload: Partial<InferInsertModel<typeof chat>> = {};
+    if (title) payload.title = title;
+    if (parameters) {
+      payload.system = parameters.system ?? null;
+      payload.temperature = parameters.temperature ?? null;
+    }
+
+    await db.update(chat).set(payload).where(eq(chat.id, chatId)).returning();
+
     return c.json(await getChatWithMessagesFromDb(chatId));
   })
   .openapi(sendMessage, async (c) => {
@@ -324,6 +390,8 @@ export const chatsRouter = new OpenAPIHono()
       text,
       parentId: parentId,
       chatId,
+      system: chatFromDb.system ?? undefined,
+      temperature: chatFromDb.temperature ?? undefined,
     });
     return c.json(await getChatWithMessagesFromDb(chatId));
   })
@@ -342,6 +410,8 @@ export const chatsRouter = new OpenAPIHono()
       modelId,
       parentId: messageFromDb.parentId,
       chatId,
+      system: chatFromDb.system ?? undefined,
+      temperature: chatFromDb.temperature ?? undefined,
     });
 
     return c.json(serialize(responseMessage));
@@ -374,6 +444,8 @@ export const chatsRouter = new OpenAPIHono()
         text,
         parentId: messageFromDb.parentId,
         chatId,
+        system: chatFromDb.system ?? undefined,
+        temperature: chatFromDb.temperature ?? undefined,
       });
     } else {
       await db.update(message).set({ text }).where(eq(message.id, messageId)).returning();

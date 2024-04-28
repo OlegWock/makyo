@@ -1,7 +1,7 @@
 import { db } from "@server/db";
 import { getMessageHistoryUpwards } from "@server/db/queries/messages";
 import { chat, message } from "@server/db/schema";
-import { Provider } from "@server/providers/provider"
+import { ModelParameters, Provider } from "@server/providers/provider"
 import { ChatWithMessagesSchemaType } from "@server/schemas/chats";
 import { omit, serialize } from "@server/utils/serialization";
 import { broadcastSubscriptionMessage } from "@server/utils/subscriptions";
@@ -10,13 +10,13 @@ import { and, eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
 
-export const sendMessageAndSave = async ({ parentId, provider, modelId, text, chatId }: {
+export const sendMessageAndSave = async ({ parentId, provider, modelId, text, chatId, temperature, system }: {
   provider: Provider,
   modelId: string,
   text: string,
   chatId: number,
   parentId?: number | null
-}) => {
+} & Partial<ModelParameters>) => {
   const { messagesHistory, responseMessage } = await db.transaction(async (tx) => {
     const [userMessage] = await tx.insert(message).values({
       parentId: parentId ?? null,
@@ -45,7 +45,11 @@ export const sendMessageAndSave = async ({ parentId, provider, modelId, text, ch
 
   provider.chat(
     modelId,
-    messagesHistory,
+    {
+      messages: messagesHistory,
+      temperature,
+      system,
+    },
     {
       onProgress: throttle((response) => {
         broadcastSubscriptionMessage({
@@ -78,12 +82,12 @@ export const sendMessageAndSave = async ({ parentId, provider, modelId, text, ch
   return responseMessage;
 };
 
-export const regenerateResponseForMessage = async ({ chatId, parentId, modelId, provider }: {
+export const regenerateResponseForMessage = async ({ chatId, parentId, modelId, provider, temperature, system }: {
   provider: Provider,
   modelId: string,
   chatId: number,
   parentId: number,
-}) => {
+} & Partial<ModelParameters>) => {
   const [responseMessage] = await db.insert(message).values({
     parentId,
     text: '',
@@ -98,7 +102,11 @@ export const regenerateResponseForMessage = async ({ chatId, parentId, modelId, 
 
   provider.chat(
     modelId,
-    messagesHistory,
+    {
+      messages: messagesHistory,
+      temperature,
+      system,
+    },
     {
       onProgress: throttle((response) => {
         broadcastSubscriptionMessage({

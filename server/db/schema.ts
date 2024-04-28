@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { AnySQLiteColumn, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { AnySQLiteColumn, integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 // TODO: need to add indexes too
 
@@ -13,6 +13,8 @@ export const chat = sqliteTable('chat', {
   title: text('title').notNull(),
   providerId: text('providerId').notNull(),
   modelId: text('modelId').notNull(),
+  system: text('system'),
+  temperature: real('temperature'),
   createdAt: integer('createdAt', { mode: 'timestamp_ms' }).notNull().default(sql`(unixepoch() * 1000)`),
   lastMessageAt: integer('createdAt', { mode: 'timestamp_ms' }).notNull(),
 });

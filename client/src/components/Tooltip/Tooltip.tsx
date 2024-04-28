@@ -10,6 +10,7 @@ export type TooltipProps = {
   children: ReactNode;
   side?: Side;
   delayDuration?: number,
+  sideOffset?: number,
 };
 
 const variants = {
@@ -25,7 +26,7 @@ const variants = {
   },
 } satisfies Variants;
 
-export const Tooltip = ({ children, text, side = 'top', delayDuration = 300 }: TooltipProps) => {
+export const Tooltip = ({ children, text, side = 'top', delayDuration = 300, sideOffset = 2 }: TooltipProps) => {
   const [open, setOpen] = useState(false);
   return (
     <RadixTooltip.Provider>
@@ -38,7 +39,7 @@ export const Tooltip = ({ children, text, side = 'top', delayDuration = 300 }: T
             <RadixTooltip.Content
               forceMount
               className={styles.content}
-              sideOffset={2}
+              sideOffset={sideOffset}
               side={side}
               asChild
             >

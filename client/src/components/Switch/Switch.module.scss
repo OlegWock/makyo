@@ -1,0 +1,32 @@
+.Switch {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+
+  .root {
+    width: 2.5rem;
+    height: 1.4rem;
+    background-color: var(--gray-6);
+    border-radius: 9999px;
+    position: relative;
+    border: none;
+    display: flex;
+    justify-content: flex-start;
+
+    &[data-state='checked'] {
+      justify-content: flex-end;
+    }
+  }
+
+  .thumb {
+    display: block;
+    width: 1.4rem;
+    height: 1.4rem;
+    border: 0.2rem solid transparent;
+    background-color: white;
+    background-clip: padding-box;
+    border-radius: 9999px;
+  }
+
+  .label {}
+}

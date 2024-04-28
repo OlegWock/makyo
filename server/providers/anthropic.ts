@@ -1,23 +1,18 @@
-import { MessageForLLM, Provider, ProviderChatOptions, ProviderType } from "@server/providers/provider";
+import { Model, Provider, ProviderChatOptions, ProviderChatParameters, ProviderType } from "@server/providers/provider";
 import Anthropic from '@anthropic-ai/sdk';
+import { convertKatukoMessagesForLLM } from "@server/providers/utils";
 
 class AnthropicProvider extends Provider {
   id = 'anthropic';
   name = 'Anthropic';
   type: ProviderType = 'cloud';
 
-  async chat(modelId: string, messages: MessageForLLM[], options?: ProviderChatOptions): Promise<string> {
+  async chat(modelId: string, { messages }: ProviderChatParameters, options?: ProviderChatOptions): Promise<string> {
     const anthropic = new Anthropic({
       apiKey: process.env.KATUKO_ANTHROPIC_KEY,
     });
 
-    // TODO: this code is same for all 3 providers, need to lift it up
-    const patchedMessages = messages.map(m => {
-      return {
-        role: m.sender === 'ai' ? 'assistant' : 'user',
-        content: m.text,
-      } as const;
-    });
+    const patchedMessages = convertKatukoMessagesForLLM(messages);
     const stream = await anthropic.messages.stream({
       max_tokens: 2048,
       messages: patchedMessages,
@@ -38,14 +33,62 @@ class AnthropicProvider extends Provider {
     return !!process.env.KATUKO_ANTHROPIC_KEY;
   }
 
-  async getModels() {
+  async getModels(): Promise<Model[]> {
     return [
-      {id: 'claude-3-opus-20240229', name: 'Claude 3 Opus'},
-      {id: 'claude-3-sonnet-20240229', name: 'Claude 3 Sonnet'},
-      {id: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku'},
-      {id: 'claude-2.1', name: 'Claude 2.1'},
-      {id: 'claude-2.0', name: 'Claude 2'},
-      {id: 'claude-instant-1.2', name: 'Claude Instant 1.2'},
+      {
+        id: 'claude-3-opus-20240229',
+        name: 'Claude 3 Opus',
+        availableParameters: ['system', 'temperature'],
+        defaultParameters: {
+          system: undefined,
+          temperature: undefined,
+        },
+      },
+      {
+        id: 'claude-3-sonnet-20240229',
+        name: 'Claude 3 Sonnet',
+        availableParameters: ['system', 'temperature'],
+        defaultParameters: {
+          system: undefined,
+          temperature: undefined,
+        },
+      },
+      {
+        id: 'claude-3-haiku-20240307',
+        name: 'Claude 3 Haiku',
+        availableParameters: ['system', 'temperature'],
+        defaultParameters: {
+          system: undefined,
+          temperature: undefined,
+        },
+      },
+      {
+        id: 'claude-2.1',
+        name: 'Claude 2.1',
+        availableParameters: ['system', 'temperature'],
+        defaultParameters: {
+          system: undefined,
+          temperature: undefined,
+        },
+      },
+      {
+        id: 'claude-2.0',
+        name: 'Claude 2',
+        availableParameters: ['system', 'temperature'],
+        defaultParameters: {
+          system: undefined,
+          temperature: undefined,
+        },
+      },
+      {
+        id: 'claude-instant-1.2',
+        name: 'Claude Instant 1.2',
+        availableParameters: ['system', 'temperature'],
+        defaultParameters: {
+          system: undefined,
+          temperature: undefined,
+        },
+      },
     ];
   }
 }

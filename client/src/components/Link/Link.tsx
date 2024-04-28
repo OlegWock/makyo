@@ -9,11 +9,12 @@ type Variant = "underline" | "unstyled" | "button" | "button-primary" | "button-
 export type LinkProps = {
   className?: string | ((active: boolean) => string),
   variant?: Variant,
+  size?: 'small' | 'medium' | 'large',
   icon?: ReactElement,
   ref?: Ref<HTMLAnchorElement>;
 } & WouterLinkProps;
 
-export const Link = ({ className, children, icon, variant = "underline", asChild, ref, ...props }: LinkProps) => {
+export const Link = ({ className, children, icon, variant = "underline", asChild, ref, size = 'medium', ...props }: LinkProps) => {
   return (<WouterLink 
     className={(matching) => clsx(
     styles.Link,
@@ -23,6 +24,7 @@ export const Link = ({ className, children, icon, variant = "underline", asChild
     variant === "button-text" && buttonStyles.text,
     variant === "button-borderless" && buttonStyles.borderless,
     variant === "button" && buttonStyles.normal,
+    variant.startsWith('button-') && buttonStyles[size],
     variant.startsWith('button-') && !!icon && buttonStyles.withIcon,
     variant.startsWith('button-') && !!icon && !children && buttonStyles.onlyIcon,
     typeof className === 'function' ? className(matching) : className,

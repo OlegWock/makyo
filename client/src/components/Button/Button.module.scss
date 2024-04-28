@@ -29,7 +29,6 @@
     --color-btn-background-hover: var(--gray-2);
     --color-btn-background-loading: var(--gray-3);
 
-    padding: 0.75rem 1.5rem;
     background-color: var(--color-btn-background);
     color: inherit;
     border: 1px solid var(--color-btn-border);
@@ -52,9 +51,52 @@
     color: white;
   }
 
+  &.small {
+    padding: 0.125rem 0.25rem;
+
+    &.onlyIcon {
+      padding: 0.125rem;
+    }
+
+    .icon {
+      width: 1rem;
+      height: auto;
+    }
+  }
+
+  &.medium {
+    padding: 0.35rem 0.75rem;
+
+    &.onlyIcon {
+      padding: 0.35rem;
+    }
+
+    .icon {
+      width: 1.25rem;
+      height: auto;
+    }
+  } 
+
+  &.large {
+    padding: 0.75rem 1.5rem;
+
+    &.onlyIcon {
+      padding: 0.75rem;
+
+      .icon {
+        width: 1.5rem;
+      }
+    }
+
+    .icon {
+      width: 1.25rem;
+      height: auto;
+    }
+  }
+
   &.text {
     background: transparent;
-    padding: 0;
+    padding: 0 !important;
     color: var(--jade-11);
   }
 
@@ -65,13 +107,5 @@
 
   &.withIcon {}
 
-  &.onlyIcon {
-    padding: 0.75rem;
-  }
-
-  .icon {
-    // width: 1.25rem;
-    width: 1rem;
-    height: auto;
-  }
+  
 }

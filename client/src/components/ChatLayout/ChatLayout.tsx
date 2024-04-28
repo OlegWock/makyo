@@ -8,6 +8,8 @@ import { createComponentWithSlotsFactory, SlotsPropsFromFactory } from '@client/
 const componentFactory = createComponentWithSlotsFactory({
   'MessagesArea': { required: false },
   'Title': { required: false },
+  'TitleRightActions': { required: false },
+  'TitleLeftActions': { required: false },
   'TextareaActions': { required: false },
 });
 
@@ -22,8 +24,14 @@ export const ChatLayout = componentFactory('ChatLayout', ({ onSend, slots }: Cha
   const [text, setText] = useState('');
   return (<div className={styles.ChatLayout}>
     {!!slots.Title && <div className={styles.header}>
+      <div className={styles.leftActions}>
+        {slots.TitleLeftActions}
+      </div>
       <div className={styles.title}>
         {slots.Title}
+      </div>
+      <div className={styles.rightActions}>
+        {slots.TitleRightActions}
       </div>
     </div>}
     <div className={styles.chat}>
@@ -51,6 +59,7 @@ export const ChatLayout = componentFactory('ChatLayout', ({ onSend, slots }: Cha
         <Button
           icon={<HiOutlinePaperAirplane />}
           iconPosition='after'
+          size='large'
           onClick={() => {
             onSend?.(text);
             setText('');

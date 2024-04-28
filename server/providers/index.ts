@@ -1,8 +1,10 @@
-import { anthropicProvider } from "@server/providers/anthropic";
-import { ollamaProvider } from "@server/providers/ollama";
-import { openaiProvider } from "@server/providers/openai";
-import { Provider } from "@server/providers/provider";
+import { anthropicProvider } from "./anthropic";
+import { ollamaProvider } from "./ollama";
+import { openaiProvider } from "./openai";
+import { Provider } from "./provider";
 import { HTTPException } from "hono/http-exception";
+
+export type * from './provider'
 
 export const allProviders = [
   ollamaProvider,

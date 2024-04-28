@@ -1,0 +1,19 @@
+.Card {
+  border: 1px solid var(--gray-4);
+  border-radius: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden auto;
+
+  &.flexGrow {
+    flex-grow: 1;
+  }
+
+  &.small {
+    padding: 0.25rem;
+  }
+
+  &.medium {
+    padding: 1rem;
+  }
+}

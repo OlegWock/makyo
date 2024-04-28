@@ -3,6 +3,8 @@ CREATE TABLE `chat` (
 	`title` text NOT NULL,
 	`providerId` text NOT NULL,
 	`modelId` text NOT NULL,
+	`system` text,
+	`temperature` real,
 	`createdAt` integer NOT NULL
 );
 --> statement-breakpoint

@@ -1,4 +1,12 @@
-.RootPage {}
+.RootPage {
+  flex-grow: 1;
+  display: flex;
+  gap: 1rem;
+}
+
+.settingsCard {
+  width: 400px;
+}
 
 .modelSelect {
   width: 200px;

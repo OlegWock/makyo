@@ -23,7 +23,7 @@ export type TextareaProps = {
 
 export const Textarea = ({onValueChange, onChange, className, ...props}: TextareaProps) => {
   return (<textarea 
-    className={clsx(styles.Input, className)} 
+    className={clsx(styles.Input, styles.Textarea, className)} 
     onChange={(e) => {
       onValueChange?.(e.target.value);
       return onChange?.(e);

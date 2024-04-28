@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "e27cf580-ef6e-42df-8982-aad818cff4c4",
+  "id": "53b6995b-1141-4805-a72f-9534ac89b0ff",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "chat": {
@@ -33,6 +33,20 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false
+        },
+        "system": {
+          "name": "system",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "temperature": {
+          "name": "temperature",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         },
         "createdAt": {

@@ -5,6 +5,7 @@
   background: white;
   transition: ease-in-out 0.15s border-color, ease-in-out 0.15s box-shadow;
   background: white;
+  font-size: 1rem;
 
   border: 1px solid var(--gray-4);
   border-radius: 0.25rem;
@@ -22,5 +23,8 @@
 }
 
 .Textarea {
-  
+  &::placeholder {
+    font-size: 1rem !important;
+    transform: none;
+  }
 }

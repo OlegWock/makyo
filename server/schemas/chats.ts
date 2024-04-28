@@ -1,4 +1,5 @@
-import { number, z } from "zod";
+import { ModelParametersSchema } from "@server/schemas/provider";
+import { z } from "zod";
 
 export const ChatSchema = z.object({
   id: z.number(),
@@ -6,6 +7,8 @@ export const ChatSchema = z.object({
   providerId: z.string(),
   modelId: z.string(),
   createdAt: z.number(),
+  system: z.string().nullable(),
+  temperature: z.number().nullable(),
 }).openapi('Chat');
 
 export type ChatSchemaType = z.infer<typeof ChatSchema>;
@@ -14,9 +17,17 @@ export const NewChatSchema = z.object({
   providerId: z.string(),
   modelId: z.string(),
   text: z.string(),
+  parameters: ModelParametersSchema.partial().optional(),
 });
 
 export type NewChatSchemaType = z.infer<typeof NewChatSchema>;
+
+export const UpdateChatSchema = z.object({
+  title: z.string().optional(),
+  parameters: ModelParametersSchema.partial().optional(),
+});
+
+export type UpdateChatSchemaType = z.infer<typeof UpdateChatSchema>;
 
 export const MessageSchema = z.object({
   id: z.number(),

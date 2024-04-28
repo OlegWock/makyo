@@ -1,6 +1,13 @@
 .ChatPage {
-  
+  flex-grow: 1;
+  display: flex;
+  gap: 1rem;
 }
+
+.settingsCard {
+  width: 400px;
+}
+
 
 .MessagesHistory {
   padding: 2rem;

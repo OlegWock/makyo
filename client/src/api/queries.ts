@@ -1,7 +1,7 @@
 import { ApiClient } from "@client/api/client";
 import { useApiClient } from "@client/api/context";
 import { throwExceptionOnFailedResponse } from "@client/api/exceptions";
-import { ChatSchemaType, ChatWithMessagesSchemaType, MessageSchemaType, NewChatSchemaType, NewMessageSchemaType } from "@shared/api";
+import { ChatSchemaType, ChatWithMessagesSchemaType, MessageSchemaType, NewChatSchemaType, NewMessageSchemaType, UpdateChatSchemaType } from "@shared/api";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { ClientResponse } from "hono/client";
 import { produce } from "immer";
@@ -43,6 +43,22 @@ export const useNewChatMutation = () => {
     onSuccess(data) {
       client.setQueryData(['chats'], (old: ChatSchemaType[]) => [data, ...(old || [])]);
       client.invalidateQueries({ queryKey: ['chats'] });
+    },
+  });
+};
+export const useEditChatMutation = (chatId: number) => {
+  const api = useApiClient();
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: UpdateChatSchemaType) => {
+      const resp = await api.chats[":chatId"].$patch({
+        param: { chatId: chatId.toString() },
+        json: payload,
+      });
+      return resp.json();
+    },
+    onSuccess(data) {
+      client.setQueryData(['chats', chatId], () => data);
     },
   });
 };

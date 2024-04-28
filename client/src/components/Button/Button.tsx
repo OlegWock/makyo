@@ -6,12 +6,13 @@ import { motion } from 'framer-motion';
 export type ButtonProps = {
   loading?: boolean,
   variant?: 'primary' | 'normal' | 'borderless' | 'text',
+  size?: 'small' | 'medium' | 'large',
   icon?: ReactElement,
   iconPosition?: 'before' | 'after',
   children?: ReactNode;
 } & Omit<ComponentPropsWithRef<typeof motion.button>, 'children'>;
 
-export const Button = ({ loading = false, variant = 'normal', iconPosition = 'before', onClick, className, style = {}, icon, children, ...props }: ButtonProps) => {
+export const Button = ({ loading = false, variant = 'normal', iconPosition = 'before', onClick, className, style = {}, icon, children, size = 'medium', ...props }: ButtonProps) => {
   const localOnClick: MouseEventHandler<HTMLButtonElement> = (e) => {
     if (loading) return;
     if (onClick) return onClick(e);
@@ -25,6 +26,7 @@ export const Button = ({ loading = false, variant = 'normal', iconPosition = 'be
       variant === 'borderless' && styles.borderless,
       variant === 'primary' && styles.primary,
       variant === 'text' && styles.text,
+      styles[size],
       !!icon && styles.withIcon,
       (!!icon && !children) && styles.onlyIcon,
       className
