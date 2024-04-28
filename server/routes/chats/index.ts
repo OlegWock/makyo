@@ -8,7 +8,7 @@ import { ChatSchema, ChatWithMessagesSchema, EditMessageSchema, MessageSchema, N
 import { generateName } from "@server/utils/misc";
 import { createTitlePrompt } from "@server/utils/prompts";
 import { omit, serialize } from "@server/utils/serialization";
-import { broadcastWSMessage } from "@server/utils/websockets";
+import { broadcastSubscriptionMessage } from "@server/utils/subscriptions";
 import { transformStringToNumber } from "@server/utils/zod";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
@@ -282,7 +282,7 @@ export const chatsRouter = new OpenAPIHono()
     const [newChat] = await db.insert(chat).values({ title: tmpName, providerId, modelId, lastMessageAt: new Date() }).returning();
 
     provider.chat(modelId, [{ sender: 'user', text: createTitlePrompt(text) }]).then((newTitle) => {
-      broadcastWSMessage({
+      broadcastSubscriptionMessage({
         type: 'updateChat',
         data: {
           chatId: newChat.id,

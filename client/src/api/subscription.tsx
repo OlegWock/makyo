@@ -2,14 +2,20 @@ import { useApiClient } from "@client/api";
 import { createStrictContext } from "@client/utils/context";
 import { ChatSchemaType, ChatWithMessagesSchemaType } from "@shared/api";
 import { safeCall } from "@shared/utils";
-import { WSMessage } from "@shared/websockets";
+import { SubscriptionMessage } from "@shared/subscription";
 import { useQueryClient } from "@tanstack/react-query";
 import { produce } from "immer";
 import { ReactNode, useEffect, useMemo } from "react";
 
 
-const wrapWebSocket = (websocket: WebSocket) => {
-  const messageCallbacks = new Set<(val: WSMessage) => void>();
+type SubscriptionClient = {
+  onMessage: (cb: (val: SubscriptionMessage) => void) => VoidFunction;
+  onClose: (cb: (e: CloseEvent) => void) => VoidFunction;
+  close: VoidFunction,
+}
+
+const wrapWebSocket = (websocket: WebSocket): SubscriptionClient => {
+  const messageCallbacks = new Set<(val: SubscriptionMessage) => void>();
   const closeCallbacks = new Set<(e: CloseEvent) => void>();
 
   websocket.onopen = () => {
@@ -17,7 +23,7 @@ const wrapWebSocket = (websocket: WebSocket) => {
   };
   websocket.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    messageCallbacks.forEach(cb => safeCall(() => cb(data as WSMessage)));
+    messageCallbacks.forEach(cb => safeCall(() => cb(data as SubscriptionMessage)));
   };
   websocket.onerror = (err) => {
     console.log('Websocker error', err);
@@ -26,7 +32,7 @@ const wrapWebSocket = (websocket: WebSocket) => {
     closeCallbacks.forEach(cb => safeCall(() => cb(e)));
   };
 
-  const onMessage = (cb: (val: WSMessage) => void): VoidFunction => {
+  const onMessage = (cb: (val: SubscriptionMessage) => void): VoidFunction => {
     messageCallbacks.add(cb);
     return () => messageCallbacks.delete(cb);
   };
@@ -37,35 +43,68 @@ const wrapWebSocket = (websocket: WebSocket) => {
 
   const close = () => {
     websocket.close();
-  }
+  };
 
   return {
     onMessage,
     onClose,
     close,
-  }
+  };
 };
 
-type KatukoWebsocket = ReturnType<typeof wrapWebSocket>;
+const wrapEventsSource = (evtSource: EventSource): SubscriptionClient => {
+  const messageCallbacks = new Set<(val: SubscriptionMessage) => void>();
+  const closeCallbacks = new Set<(e: CloseEvent) => void>();
+
+  evtSource.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    messageCallbacks.forEach(cb => safeCall(() => cb(data as SubscriptionMessage)));
+  };
+  evtSource.onerror = (err) => {
+    console.log('SSE error', err);
+  };
+
+  const onMessage = (cb: (val: SubscriptionMessage) => void): VoidFunction => {
+    messageCallbacks.add(cb);
+    return () => messageCallbacks.delete(cb);
+  };
+  const onClose = (cb: (e: CloseEvent) => void): VoidFunction => {
+    closeCallbacks.add(cb);
+    return () => closeCallbacks.delete(cb);
+  };
+
+  const close = () => {
+    evtSource.close();
+  };
+
+  return {
+    onMessage,
+    onClose,
+    close,
+  };
+};
 
 
-const [WebsocketProviderInner, useWebSocket] = createStrictContext<KatukoWebsocket>('WebsocketsContext');
+const [SubscriptionProviderInner, useSubscriptionClient] = createStrictContext<SubscriptionClient>('SubscriptionContext');
 
-export { useWebSocket };
+export { useSubscriptionClient };
 
-export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
+const USE_SSE = true;
+
+export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   const api = useApiClient();
   const queryClient = useQueryClient();
+
   const client = useMemo(() => {
-    return wrapWebSocket(api.subscribe.$ws());
+    if (USE_SSE) {
+      return wrapEventsSource(new EventSource(api.subscribe.sse.$url()))
+    }
+    return wrapWebSocket(api.subscribe.ws.$ws());
   }, [api]);
 
   useEffect(() => {
-    client.onClose((e) => {
-      console.log('Websocket closed', e);
-    });
     return client.onMessage((message) => {
-      console.log('WebSocket message', message);
+      console.log('Subscription message', message);
 
       if (message.type === 'updateMessage') {
         queryClient.setQueryData(['chats', message.data.chatId], (old: ChatWithMessagesSchemaType | undefined): ChatWithMessagesSchemaType | undefined => {
@@ -106,7 +145,7 @@ export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
     });
   }, [client]);
 
-  return <WebsocketProviderInner value={client}>
+  return <SubscriptionProviderInner value={client}>
     {children}
-  </WebsocketProviderInner>
+  </SubscriptionProviderInner>
 };

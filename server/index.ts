@@ -6,7 +6,7 @@ import { authRouter, cookieAuthMiddleware } from '@server/routes/auth';
 import { configurationRouter } from '@server/routes/configuration';
 import { providersRouter } from '@server/routes/providers';
 import { chatsRouter } from '@server/routes/chats';
-import { bunWebSocket, websocketsRouter } from '@server/routes/websockets';
+import { bunWebSocket, subscriptionsRouter } from '@server/routes/subscription';
 import { Context, Env } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
@@ -26,7 +26,7 @@ const router = app
   .route('/', authRouter)
   .route('/', providersRouter)
   .route('/', chatsRouter)
-  .route('/', websocketsRouter)
+  .route('/', subscriptionsRouter)
   .route('/', configurationRouter);
 
 app.openAPIRegistry.registerComponent('securitySchemes', 'CookieAuth', {

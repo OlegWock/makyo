@@ -4,7 +4,7 @@ import { chat, message } from "@server/db/schema";
 import { Provider } from "@server/providers/provider"
 import { ChatWithMessagesSchemaType } from "@server/schemas/chats";
 import { omit, serialize } from "@server/utils/serialization";
-import { broadcastWSMessage } from "@server/utils/websockets";
+import { broadcastSubscriptionMessage } from "@server/utils/subscriptions";
 import { throttle } from "@shared/utils";
 import { and, eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
@@ -48,7 +48,7 @@ export const sendMessageAndSave = async ({ parentId, provider, modelId, text, ch
     messagesHistory,
     {
       onProgress: throttle((response) => {
-        broadcastWSMessage({
+        broadcastSubscriptionMessage({
           type: 'updateMessage',
           data: {
             messageId: responseMessage.id,
@@ -64,7 +64,7 @@ export const sendMessageAndSave = async ({ parentId, provider, modelId, text, ch
       isGenerating: false,
     }).where(eq(message.id, responseMessage.id)).returning();
   }).then(([responseMessage]) => {
-    broadcastWSMessage({
+    broadcastSubscriptionMessage({
       type: 'updateMessage',
       data: {
         messageId: responseMessage.id,
@@ -101,7 +101,7 @@ export const regenerateResponseForMessage = async ({ chatId, parentId, modelId, 
     messagesHistory,
     {
       onProgress: throttle((response) => {
-        broadcastWSMessage({
+        broadcastSubscriptionMessage({
           type: 'updateMessage',
           data: {
             messageId: responseMessage.id,
@@ -117,7 +117,7 @@ export const regenerateResponseForMessage = async ({ chatId, parentId, modelId, 
       isGenerating: false,
     }).where(eq(message.id, responseMessage.id)).returning();
   }).then(([responseMessage]) => {
-    broadcastWSMessage({
+    broadcastSubscriptionMessage({
       type: 'updateMessage',
       data: {
         messageId: responseMessage.id,

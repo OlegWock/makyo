@@ -10,14 +10,14 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@client/api";
 import { Suspense } from "react";
 import { ChatPage } from "@client/routes/ChatPage";
-import { WebsocketProvider } from "@client/api/websockets";
+import { SubscriptionProvider } from "./api/subscription";
 import { ErrorBoundary } from "@client/components/ErrorBoundary";
 
 export const App = () => {
   return (
     <AuthGate>
       <QueryClientProvider client={queryClient}>
-        <WebsocketProvider>
+        <SubscriptionProvider>
           <Layout>
             <Suspense>
               <ErrorBoundary>
@@ -32,7 +32,7 @@ export const App = () => {
               </ErrorBoundary>
             </Suspense>
           </Layout>
-        </WebsocketProvider>
+        </SubscriptionProvider>
       </QueryClientProvider>
     </AuthGate >
   )

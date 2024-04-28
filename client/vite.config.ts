@@ -4,10 +4,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  // Unfortunately, we can't run Vite with Bun because of https://github.com/oven-sh/bun/issues/10441
-  // root: import.meta.dir,
-
-  root: __dirname,
+  root: import.meta.dir,
   plugins: [react(), tsconfigPaths()],
   envPrefix: 'VITE_KATUKO_',
   server: {
