@@ -10,25 +10,27 @@ import { ReactNode, useEffect, useMemo } from "react";
 
 const wrapWebSocket = (websocket: WebSocket) => {
   const messageCallbacks = new Set<(val: WSMessage) => void>();
-  const closeCallbacks = new Set<VoidFunction>();
+  const closeCallbacks = new Set<(e: CloseEvent) => void>();
 
   websocket.onopen = () => {
 
-  }
+  };
   websocket.onmessage = (event) => {
     const data = JSON.parse(event.data);
     messageCallbacks.forEach(cb => safeCall(() => cb(data as WSMessage)));
-  }
-
-  websocket.onclose = () => {
-    closeCallbacks.forEach(cb => safeCall(() => cb()));
-  }
+  };
+  websocket.onerror = (err) => {
+    console.log('Websocker error', err);
+  };
+  websocket.onclose = (e) => {
+    closeCallbacks.forEach(cb => safeCall(() => cb(e)));
+  };
 
   const onMessage = (cb: (val: WSMessage) => void): VoidFunction => {
     messageCallbacks.add(cb);
     return () => messageCallbacks.delete(cb);
   };
-  const onClose = (cb: VoidFunction): VoidFunction => {
+  const onClose = (cb: (e: CloseEvent) => void): VoidFunction => {
     closeCallbacks.add(cb);
     return () => closeCallbacks.delete(cb);
   };
@@ -59,6 +61,9 @@ export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
   }, [api]);
 
   useEffect(() => {
+    client.onClose((e) => {
+      console.log('Websocket closed', e);
+    });
     return client.onMessage((message) => {
       console.log('WebSocket message', message);
 

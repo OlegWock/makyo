@@ -83,6 +83,7 @@ const validateToken = (token: string | null) => {
 
 export const cookieAuthMiddleware = (): MiddlewareHandler => async (c, next) => {
   const tokenFromCookie = getCookie(c, AUTH_COOKIE) ?? null;
+  console.log('Request to', c.req.url, 'cookie value', tokenFromCookie);
   validateToken(tokenFromCookie);
 
   return next();

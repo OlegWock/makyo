@@ -390,7 +390,17 @@ export const chatsRouter = new OpenAPIHono()
         isNull(message.parentId),
       ));
       if (rootMessages.length === 1) {
-        throw new HTTPException(400, {message: `can't delete single root message`});
+        throw new HTTPException(400, { message: `can't delete single root message` });
+      }
+    }
+    if (messageFromDb.sender === 'ai') {
+      const parentId = messageFromDb.parentId!;
+      const messagesWithSameParent = await db.select().from(message).where(and(
+        eq(message.chatId, chatId),
+        eq(message.parentId, parentId),
+      ));
+      if (messagesWithSameParent.length === 1) {
+        throw new HTTPException(400, { message: `can't delete AI message if there are no alternative messages` });
       }
     }
     const history = await getMessageHistoryDownwards(messageId);

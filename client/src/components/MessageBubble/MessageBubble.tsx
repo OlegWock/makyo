@@ -70,6 +70,7 @@ const MessageBubbleActions = () => {
       </div>}
       <div className={styles.spacer} />
       <div className={styles.actions}>
+        {/* TODO: show tooltip for each action */}
         <Button onClick={onCopy} variant="borderless"><PiCopyLight /></Button>
         {!!onRegenerate && <Button onClick={onRegenerate} variant="borderless"><HiArrowPath /></Button>}
         {!!onDuplicate && <Button onClick={onDuplicate} variant="borderless"><PiArrowsSplit /></Button>}
