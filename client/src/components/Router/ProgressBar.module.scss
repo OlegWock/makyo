@@ -1,0 +1,22 @@
+.root {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  pointer-events: none;
+}
+
+.bar {
+  background: var(--jade-10);
+  height: 3px;
+  border-radius:  0 99px 99px 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.highlight {
+  width: 100px;
+  box-shadow: 0 0 10px var(--jade-10), 0 0 5px var(--jade-10);
+  transform: rotate(3deg) translate(0px, -4px);
+}

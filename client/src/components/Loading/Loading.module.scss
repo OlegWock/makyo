@@ -1,0 +1,24 @@
+.Loading {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+  align-self: stretch;
+  height: 100%;
+  width: 100%;
+  font-size: 2rem;
+  font-weight: 500;
+  color: var(--gray-8);
+
+  .wrapper {
+    position: relative;
+
+    .text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+}

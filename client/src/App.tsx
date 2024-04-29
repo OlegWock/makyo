@@ -6,20 +6,21 @@ import { NotFound } from "@client/routes/NotFound";
 import { SettingsPage } from "@client/routes/SettingsPage";
 import { ChatsPage } from "@client/routes/ChatsPage";
 import { PresetsPage } from "@client/routes/PresetsPage";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "@client/api";
-import { Suspense } from "react";
+import { QueryClientProvider } from "@client/api";
 import { ChatPage } from "@client/routes/ChatPage";
 import { SubscriptionProvider } from "./api/subscription";
 import { ErrorBoundary } from "@client/components/ErrorBoundary";
+import { Router } from "./components/Router/Router";
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+
 
 export const App = () => {
   return (
-    <AuthGate>
-      <QueryClientProvider client={queryClient}>
-        <SubscriptionProvider>
-          <Layout>
-            <Suspense>
+    <QueryClientProvider>
+      <Router>
+        <AuthGate>
+          <SubscriptionProvider>
+            <Layout>
               <ErrorBoundary>
                 <Switch>
                   <Route path="/" component={RootPage} />
@@ -30,10 +31,11 @@ export const App = () => {
                   <Route component={NotFound} />
                 </Switch>
               </ErrorBoundary>
-            </Suspense>
-          </Layout>
-        </SubscriptionProvider>
-      </QueryClientProvider>
-    </AuthGate >
-  )
+            </Layout>
+          </SubscriptionProvider>
+        </AuthGate>
+        {/* <ReactQueryDevtools /> */}
+      </Router>
+    </QueryClientProvider>
+  );
 };

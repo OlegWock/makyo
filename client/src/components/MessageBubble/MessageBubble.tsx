@@ -42,12 +42,13 @@ const MessageBubbleActions = () => {
   const onCopy = () => {
     // TODO: show feedback on copy
     // TODO: consider copying rich text along with plaintext (so when pasted in Google Docs for example, it will preserve formatting)
-    navigator.clipboard.writeText(message.text);
+    navigator.clipboard.writeText(message.text).then(() => {
+      console.log('Copied');
+    });
   };
 
   const { actions = {}, message, initiateEditing } = useBubbleContext();
   const { variants, editing, onRegenerate, onDuplicate, onDelete } = actions;
-
 
   return (
     <div className={styles.actionsWrapper}>
@@ -101,7 +102,7 @@ export const MessageBubble = (props: MessageBubbleProps) => {
         <div className={styles.senderName}>{senderName}</div>
         {iife(() => {
           if (showPlaceholder) {
-            return (<SyncLoader loading className={styles.loader} color='var(--gray-4)' size={'0.5rem'} />);
+            return (<SyncLoader loading className={styles.loader} color='var(--gray-4)' size='0.5rem' />);
           }
 
           if (isEditing && !!actions?.editing) {

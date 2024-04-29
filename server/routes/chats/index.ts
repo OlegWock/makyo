@@ -5,12 +5,11 @@ import { chat, message } from "@server/db/schema";
 import { getProviderById } from "@server/providers";
 import { augmentChatWithLastMessage, getChatWithMessagesFromDb, getMessageFromDb, regenerateResponseForMessage, sendMessageAndSave } from "@server/routes/chats/utils";
 import { ChatSchema, ChatWithMessagesSchema, EditMessageSchema, MessageSchema, NewChatSchema, NewMessageSchema, UpdateChatSchema } from "@server/schemas/chats";
-import { generateName } from "@server/utils/misc";
 import { createTitlePrompt } from "@server/utils/prompts";
 import { omit, serialize } from "@server/utils/serialization";
 import { broadcastSubscriptionMessage } from "@server/utils/subscriptions";
 import { transformStringToNumber } from "@server/utils/zod";
-import { and, eq, inArray, isNull, InferInsertModel, param } from "drizzle-orm";
+import { and, eq, inArray, isNull, InferInsertModel } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
 const getChats = createRoute({

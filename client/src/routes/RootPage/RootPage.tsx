@@ -1,5 +1,3 @@
-
-import { navigate } from 'wouter/use-browser-location';
 import { ChatLayout } from '@client/components/ChatLayout';
 import styles from './RootPage.module.scss';
 import { useModels, useNewChatMutation } from '@client/api';
@@ -15,6 +13,7 @@ import { Card } from '@client/components/Card';
 import { ChatSettings, useChatSettings } from '@client/components/ChatSettings';
 import { usePageTitle } from '@client/utils/hooks';
 import { AnthropicLogoIcon, OllamaLogoIcon, OpenaiLogoIcon, ProviderIcon } from '@client/components/icons';
+import { useLocation } from 'wouter';
 
 export const RootPage = withErrorBoundary(() => {
   const newChat = useNewChatMutation();
@@ -36,9 +35,10 @@ export const RootPage = withErrorBoundary(() => {
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [chatSettings, updateChatSettings] = useChatSettings(selectedModel.defaultParameters);
 
+  const [_, navigate] = useLocation();
+
   usePageTitle('New chat');
 
-  // TODO: when redirecting to /chats/{id}, there is a flick of white screen (from Suspense) and also text area loses focus
   return (<div className={styles.RootPage}>
     <Card flexGrow>
       <ChatLayout
@@ -52,9 +52,7 @@ export const RootPage = withErrorBoundary(() => {
               system: chatSettings.system.enabled ? chatSettings.system.value : undefined,
             }
           }).then((res) => {
-            startTransition(() => {
-              navigate(`/chats/${res.id}`);
-            });
+            navigate(`/chats/${res.id}`);
           })
         }}
       >

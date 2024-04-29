@@ -3,6 +3,7 @@ import styles from './AuthGate.module.scss';
 import { AuthProvider, createApiClient, createHttpClient } from '@client/api';
 import { Input } from '@client/components/Input';
 import { Button } from '@client/components/Button';
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 
 export type AuthGateProps = {
   children: ReactNode
@@ -21,7 +22,7 @@ export const AuthGate = ({ children }: AuthGateProps) => {
       setIsLoading(false);
       setError('');
       setApiKeyDraft('');
-      setIsAuthenticated(true);
+      queryClient.setQueryData(['auth'], true);
     } catch (err) {
       console.log(err);
       setError('Incorrect password');
@@ -30,19 +31,25 @@ export const AuthGate = ({ children }: AuthGateProps) => {
     }
   };
   const apiClient = useMemo(() => createApiClient(), []);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const queryClient = useQueryClient();
+
+  const authQuery = useSuspenseQuery({
+    queryKey: ['auth'],
+    queryFn: async () => {
+      console.log('Making auth verify request');
+      const resp = await apiClient.auth.verify.$get();
+      if (!resp.ok) return false;
+      return true;
+    }
+  });
+
+  console.log('Auth query', authQuery);
+
+  const [isLoading, setIsLoading] = useState(false);
   const [apiKeyDraft, setApiKeyDraft] = useState('');
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    apiClient.auth.verify.$get().then((res) => {
-      setIsAuthenticated(res.ok);
-      setIsLoading(false);
-    });
-  }, []);
-
-  if (isLoading || !isAuthenticated) {
+  if (isLoading || !authQuery.data) {
     console.log('Render authgate, is loading', isLoading);
     return (<div className={styles.AuthGate}>
       <div className={styles.card}>

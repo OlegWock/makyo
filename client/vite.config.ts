@@ -4,7 +4,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  root: import.meta.dir,
+  root: __dirname,
   plugins: [react(), tsconfigPaths()],
   envPrefix: 'VITE_KATUKO_',
   server: {

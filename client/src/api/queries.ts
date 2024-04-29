@@ -20,6 +20,8 @@ const createQueryHook = <Out, In = void>(key: Key<In>, func: (api: ApiClient, ar
   });
 };
 
+export const useAuthStatus = createQueryHook(['auth'], (api) => api.auth.verify.$get());
+
 export const useSettings = createQueryHook(['settings'], (api) => api.configuration.$get());
 
 export const useModels = createQueryHook(['models'], (api) => api.providers.models.$get());

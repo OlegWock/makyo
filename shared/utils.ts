@@ -20,3 +20,7 @@ export function throttle<A extends any[], R>(func: (...args: A) => R, timeFrame:
 export const iife = <T>(cb: () => T): T => {
   return cb();
 };
+
+export const getRandomInt = (min: number, max: number) => {
+  return Math.floor(Math.random() * (max - min)) + min;
+};
