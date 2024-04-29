@@ -8,6 +8,7 @@ import { minmax } from '@client/utils/animations';
 import { mapOverMessagesTree, MessageTreeNode } from '@client/routes/ChatPage/tree';
 import useMotionMeasure from 'react-use-motion-measure';
 import { useMotionValueEvent } from 'framer-motion';
+import { ProviderIcon } from '@client/components/icons';
 
 export type MessagesHistoryProps = {
   modelName?: string;
@@ -32,7 +33,7 @@ export const MessagesHistory = ({ modelName }: MessagesHistoryProps) => {
     });
   };
 
-  const { chatId, messagesTree, treeChoices, setTreeChoices } = useChatPageContext();
+  const { chatId, messagesTree, treeChoices, setTreeChoices, providerId } = useChatPageContext();
   const regenerateMessage = useRegenerateMessageMutation(chatId);
   const duplicateMessage = useDuplicateMessageMutation(chatId);
   const editMessage = useEditMessageMutation(chatId);
@@ -57,7 +58,10 @@ export const MessagesHistory = ({ modelName }: MessagesHistoryProps) => {
     const isSingleRootMessage = !parent && totalVariants === 1;
     const isSingleAiMessage = message.sender === 'ai' && totalVariants === 1;
 
-    const sender = message.sender === 'user' ? 'User' : modelName ?? 'LLM';
+    const sender = <>
+      {message.sender === 'ai' && <ProviderIcon provider={providerId} />}
+      {message.sender === 'user' ? 'User' : modelName ?? 'LLM'}
+    </>;
 
     const sharedActions: Partial<MessageBubbleActionsProp> = {
       variants: {

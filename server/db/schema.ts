@@ -16,7 +16,6 @@ export const chat = sqliteTable('chat', {
   system: text('system'),
   temperature: real('temperature'),
   createdAt: integer('createdAt', { mode: 'timestamp_ms' }).notNull().default(sql`(unixepoch() * 1000)`),
-  lastMessageAt: integer('createdAt', { mode: 'timestamp_ms' }).notNull(),
 });
 
 export const message = sqliteTable('message', {

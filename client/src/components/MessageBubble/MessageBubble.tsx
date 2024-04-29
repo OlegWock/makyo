@@ -8,7 +8,7 @@ import { Button } from '@client/components/Button';
 import { HiArrowPath, HiChevronLeft, HiChevronRight, HiOutlinePencil, HiOutlineTrash } from 'react-icons/hi2';
 import { PiArrowsSplit, PiCopyLight } from "react-icons/pi";
 import { createStrictContext } from '@client/utils/context';
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { iife } from '@shared/utils';
 import { Textarea } from '@client/components/Input';
 
@@ -30,7 +30,7 @@ export type MessageBubbleActionsProp = {
 
 export type MessageBubbleProps = {
   message: MessageSchemaType;
-  senderName: string;
+  senderName: ReactNode;
   actions?: MessageBubbleActionsProp;
 }
 

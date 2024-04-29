@@ -5,7 +5,7 @@ CREATE TABLE `chat` (
 	`modelId` text NOT NULL,
 	`system` text,
 	`temperature` real,
-	`createdAt` integer NOT NULL
+	`createdAt` integer DEFAULT (unixepoch() * 1000) NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `message` (

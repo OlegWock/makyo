@@ -2,11 +2,11 @@ import { db } from "@server/db";
 import { getMessageHistoryUpwards } from "@server/db/queries/messages";
 import { chat, message } from "@server/db/schema";
 import { ModelParameters, Provider } from "@server/providers/provider"
-import { ChatWithMessagesSchemaType } from "@server/schemas/chats";
+import { ChatSchemaType, ChatWithMessagesSchemaType } from "@server/schemas/chats";
 import { omit, serialize } from "@server/utils/serialization";
 import { broadcastSubscriptionMessage } from "@server/utils/subscriptions";
 import { throttle } from "@shared/utils";
-import { and, eq } from "drizzle-orm";
+import { and, eq, desc, InferSelectModel } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
 
@@ -26,7 +26,6 @@ export const sendMessageAndSave = async ({ parentId, provider, modelId, text, ch
       isGenerating: false,
       createdAt: new Date(),
     }).returning();
-    await tx.update(chat).set({ lastMessageAt: new Date() }).where(eq(chat.id, chatId));
 
     const messagesHistory = await getMessageHistoryUpwards(userMessage.id);
 
@@ -38,7 +37,6 @@ export const sendMessageAndSave = async ({ parentId, provider, modelId, text, ch
       isGenerating: true,
       createdAt: new Date(Date.now() + 1),
     }).returning();
-    await tx.update(chat).set({ lastMessageAt: new Date() }).where(eq(chat.id, chatId));
 
     return { messagesHistory, responseMessage };
   });
@@ -96,7 +94,6 @@ export const regenerateResponseForMessage = async ({ chatId, parentId, modelId, 
     isGenerating: true,
     createdAt: new Date(),
   }).returning();
-  await db.update(chat).set({ lastMessageAt: new Date() }).where(eq(chat.id, chatId));
 
   const messagesHistory = await getMessageHistoryUpwards(parentId);
 
@@ -139,6 +136,15 @@ export const regenerateResponseForMessage = async ({ chatId, parentId, modelId, 
   return responseMessage;
 };
 
+export const augmentChatWithLastMessage = async (chatFromDb: InferSelectModel<typeof chat>): Promise<ChatSchemaType> => {
+  const [lastMessage] = await db.select().from(message).where(eq(message.chatId, chatFromDb.id)).orderBy(desc(message.createdAt)).limit(1);
+  return serialize({
+    ...chatFromDb,
+    lastMessageAt: lastMessage.createdAt,
+    lastMessageText: lastMessage.text,
+  });
+};
+
 export const getChatWithMessagesFromDb = async (chatId: number): Promise<ChatWithMessagesSchemaType> => {
   const chatFromDb = await db.query.chat.findFirst({
     where: eq(chat.id, chatId)
@@ -146,10 +152,14 @@ export const getChatWithMessagesFromDb = async (chatId: number): Promise<ChatWit
   if (!chatFromDb) {
     throw new HTTPException(404, { message: 'unknown chat' });
   }
-  const messages = await db.select().from(message).where(eq(message.chatId, chatId));
+  const messages = await db.select().from(message).where(eq(message.chatId, chatId)).orderBy(desc(message.createdAt));
 
   return {
-    chat: serialize(chatFromDb),
+    chat: serialize({
+      ...chatFromDb,
+      lastMessageAt: messages[0].createdAt,
+      lastMessageText: messages[0].text,
+    }),
     messages: messages.map(m => serialize(omit(m, ['chatId'])))
   };
 };

@@ -60,6 +60,7 @@ export const ChatLayout = componentFactory('ChatLayout', ({ onSend, slots }: Cha
           icon={<HiOutlinePaperAirplane />}
           iconPosition='after'
           size='large'
+          variant='primary'
           onClick={() => {
             onSend?.(text);
             setText('');

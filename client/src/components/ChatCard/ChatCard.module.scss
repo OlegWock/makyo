@@ -1,0 +1,30 @@
+.ChatCard {
+  border: 1px solid var(--gray-4);
+  border-radius: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.5rem 1rem;
+  text-decoration: none !important;
+
+  &:hover {
+    background: var(--gray-2);
+  }
+
+  .title {
+    font-size: 1.25rem;
+  }
+
+  .message {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--gray-11);
+  }
+
+  .datetime {
+    align-self: flex-end;
+    color: var(--gray-8);
+    font-size: 0.875rem;
+  }
+}

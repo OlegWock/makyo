@@ -11,6 +11,7 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
   - [ ] search + go to message
 - [ ] Better 'New chat' screen: suggest user some pre-defined questions or continue one of recent chats
 - [ ] Docker deployment
+- [ ] Better error handling (e.g. when provider fails)
 - [ ] Support for snippets
   - [ ] Snippets management (add/edit/delete)
   - [ ] Snippets handling (insert snippet when user types `/keyword`)
@@ -20,6 +21,9 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 - [ ] Support for personas
   - [ ] Essentially just a preset with name, icon and chat settings (model, temperature, system prompt)
   - [ ] When creating new chat, parameters are copied + chat is associated with persona, but user can change any parameter
+- [ ] Semantic/vector search across messages
+- [ ] Browser proxy for Ollama (proxy calls from webserver through browser to Ollama) to allow hosting frontend on remote domain but accessing local Ollama
+  Might be useful: https://github.com/lobehub/lobe-chat/pull/2168
 
 ## Deploy
 
@@ -39,6 +43,12 @@ Setup database:
 bun run drizzle:schema
 bun run drizzle:migrate
 bun run drizzle:seed
+```
+
+To delete DB and all drizzle files and then generate them from scratch:
+
+```bash
+bun run drizzle:nuke
 ```
 
 To run:

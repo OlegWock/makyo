@@ -11,7 +11,7 @@ import { buildTreeFromMessages, getLastMessage, PreferredTreeBranchesMap } from 
 import { withErrorBoundary } from '@client/components/ErrorBoundary';
 import { Card } from '@client/components/Card';
 import { ChatSettings, useChatSettings } from '@client/components/ChatSettings';
-import { HiOutlineCog6Tooth } from 'react-icons/hi2';
+import { HiChevronRight, HiOutlineCog6Tooth } from 'react-icons/hi2';
 import { Button } from '@client/components/Button';
 import { usePageTitle } from '@client/utils/hooks';
 
@@ -38,7 +38,7 @@ export const ChatPage = withErrorBoundary(() => {
   const [chatSettings, updateChatSettings] = useChatSettings(chatInfo.chat);
 
 
-  return (<ChatPageContextProvider value={{ chatId: id, messagesTree: tree, treeChoices, setTreeChoices }}>
+  return (<ChatPageContextProvider value={{ chatId: id, messagesTree: tree, treeChoices, setTreeChoices, providerId: chatInfo.chat.providerId }}>
     <div className={styles.ChatPage}>
       <Card flexGrow>
         <ChatLayout
@@ -54,7 +54,7 @@ export const ChatPage = withErrorBoundary(() => {
             <Button
               onClick={() => setSettingsVisible(p => !p)}
               variant='borderless'
-              icon={<HiOutlineCog6Tooth />}
+              icon={settingsVisible ? <HiChevronRight /> : <HiOutlineCog6Tooth />}
             />
           </ChatLayout.TitleRightActions>
           <ChatLayout.MessagesArea>

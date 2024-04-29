@@ -40,6 +40,7 @@ export type ChatSettingsProps = {
 };
 
 export const ChatSettings = ({ settings, settingsUpdater, isSubmitting, onSubmit }: ChatSettingsProps) => {
+  // TODO: might be a good idea to move model select here too (disabled on chat details route)
   return (<div className={styles.ChatSettings}>
     <div className={styles.title}>Chat settings</div>
     <div className={styles.row}>

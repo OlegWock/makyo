@@ -3,7 +3,7 @@ import { db } from "@server/db";
 import { getMessageHistoryDownwards } from "@server/db/queries/messages";
 import { chat, message } from "@server/db/schema";
 import { getProviderById } from "@server/providers";
-import { getChatWithMessagesFromDb, getMessageFromDb, regenerateResponseForMessage, sendMessageAndSave } from "@server/routes/chats/utils";
+import { augmentChatWithLastMessage, getChatWithMessagesFromDb, getMessageFromDb, regenerateResponseForMessage, sendMessageAndSave } from "@server/routes/chats/utils";
 import { ChatSchema, ChatWithMessagesSchema, EditMessageSchema, MessageSchema, NewChatSchema, NewMessageSchema, UpdateChatSchema } from "@server/schemas/chats";
 import { generateName } from "@server/utils/misc";
 import { createTitlePrompt } from "@server/utils/prompts";
@@ -303,7 +303,9 @@ const deleteMessage = createRoute({
 export const chatsRouter = new OpenAPIHono()
   .openapi(getChats, async (c) => {
     const chats = await db.select().from(chat);
-    return c.json(chats.map(c => serialize(c)));
+    const augmented = await Promise.all(chats.map(c => augmentChatWithLastMessage(c)));
+    augmented.sort((a, b) => b.lastMessageAt - a.lastMessageAt);
+    return c.json(augmented);
   })
   .openapi(createChat, async (c) => {
     const { providerId, modelId, text, parameters } = c.req.valid('json');
@@ -316,32 +318,29 @@ export const chatsRouter = new OpenAPIHono()
     if (parameters && Object.keys(parameters).some(key => !model.availableParameters.includes(key))) {
       throw new HTTPException(400, { message: `selected model doesn't support one or more provided parameters` });
     }
-
-    const tmpName = text.length > 40 ? text.slice(0, 39) + '…' : text;
+    const tmpName = text.length > 70 ? text.slice(0, 70) + '…' : text;
     const [newChat] = await db.insert(chat).values({
       title: tmpName,
       providerId,
       modelId,
       temperature: parameters?.temperature,
       system: parameters?.system,
-      lastMessageAt: new Date()
     }).returning();
-
+    const { system, message: prompt } = createTitlePrompt(text);
     provider.chat(modelId, {
-      messages: [{ sender: 'user', text: createTitlePrompt(text) }],
-      system: parameters?.system,
-      temperature: parameters?.temperature,
+      messages: [{ sender: 'user', text: prompt }],
+      system: system,
     }).then((newTitle) => {
+      const title = newTitle.length > 70 ? newTitle.slice(0, 70) + '…' : newTitle;
       broadcastSubscriptionMessage({
         type: 'updateChat',
         data: {
           chatId: newChat.id,
-          title: newTitle,
+          title: title,
         }
       });
-      return db.update(chat).set({ title: newTitle }).where(eq(chat.id, newChat.id)).returning();
+      return db.update(chat).set({ title }).where(eq(chat.id, newChat.id)).returning();
     });
-
     await sendMessageAndSave({
       provider,
       modelId,
@@ -351,8 +350,7 @@ export const chatsRouter = new OpenAPIHono()
       temperature: parameters?.temperature,
       parentId: null,
     });
-
-    return c.json(serialize(newChat));
+    return c.json(serialize(await augmentChatWithLastMessage(newChat)));
   })
   .openapi(getChatWithMessages, async (c) => {
     const { chatId } = c.req.valid('param');
@@ -424,7 +422,6 @@ export const chatsRouter = new OpenAPIHono()
     }
 
     const [messageCopy] = await db.insert(message).values(omit(messageFromDb, ['id', 'createdAt'])).returning();
-
     return c.json(serialize(messageCopy));
   })
   .openapi(editMessage, async (c) => {

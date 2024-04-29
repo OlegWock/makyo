@@ -10,7 +10,8 @@
     "scaffold": "bunx --bun hygen",
     "drizzle:schema": "bunx drizzle-kit generate:sqlite",
     "drizzle:migrate": "bun run ./server/db/migrate.ts",
-    "drizzle:seed": "bun run ./server/db/seed.ts"
+    "drizzle:seed": "bun run ./server/db/seed.ts",
+    "drizzle:nuke": "rm -f katuko.db && rm -rf ./server/db/drizzle && bun run drizzle:schema && bun run drizzle:migrate"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.20.6",
@@ -24,6 +25,7 @@
     "@scalar/hono-api-reference": "^0.5.3",
     "@tanstack/react-query": "^5.29.2",
     "clsx": "^2.1.0",
+    "dayjs": "^1.11.11",
     "drizzle-orm": "^0.30.8",
     "framer-motion": "^11.1.7",
     "highlight.js": "^11.9.0",

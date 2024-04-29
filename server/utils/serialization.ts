@@ -8,7 +8,7 @@ export const serialize = <T extends Record<string, any>>(obj: T): Serialized<T> 
     if (copy.hasOwnProperty(key)) {
       const value = copy[key] as any;
       if (value instanceof Date) {
-        // @ts-ignore I know I am doing
+        // @ts-ignore I know what I am doing
         copy[key] = value.valueOf();
       }
     }

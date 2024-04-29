@@ -48,8 +48,8 @@ export const AuthGate = ({ children }: AuthGateProps) => {
       <div className={styles.card}>
         <div className={styles.title}>Please enter the password</div>
         <div className={styles.inputWrapper}>
-          <Input className={styles.input} value={apiKeyDraft} onValueChange={setApiKeyDraft} />
-          <Button onClick={tryLogin} loading={isLoading}>Log in</Button>
+          <Input type='password' className={styles.input} value={apiKeyDraft} onValueChange={setApiKeyDraft} />
+          <Button variant='primary' size='large' onClick={tryLogin} loading={isLoading}>Log in</Button>
         </div>
         {!!error && <div className={styles.error}>{error}</div>}
       </div>

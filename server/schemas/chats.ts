@@ -7,6 +7,8 @@ export const ChatSchema = z.object({
   providerId: z.string(),
   modelId: z.string(),
   createdAt: z.number(),
+  lastMessageText: z.string(),
+  lastMessageAt: z.number(),
   system: z.string().nullable(),
   temperature: z.number().nullable(),
 }).openapi('Chat');

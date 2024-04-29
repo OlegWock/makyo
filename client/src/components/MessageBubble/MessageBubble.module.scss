@@ -17,6 +17,16 @@
 
   .senderName {
     font-weight: 600;
+    display: flex;
+    gap: 0.35rem;
+    align-items: center;
+
+    svg {
+      max-width: 1rem;
+      max-height: 1rem;
+      width: auto;
+      height: auto;
+    }
   }
 
   .loader {

@@ -3,17 +3,18 @@ import { navigate } from 'wouter/use-browser-location';
 import { ChatLayout } from '@client/components/ChatLayout';
 import styles from './RootPage.module.scss';
 import { useModels, useNewChatMutation } from '@client/api';
-import { useMemo, useState } from 'react';
+import { startTransition, useMemo, useState } from 'react';
 import { Select } from '@client/components/Select';
 import { WithLabel } from '@client/components/WithLabel';
 import { useAtom } from 'jotai/react';
 import { lastUsedModelAtom } from '@client/atoms/chat';
 import { withErrorBoundary } from '@client/components/ErrorBoundary';
 import { Button } from '@client/components/Button';
-import { HiOutlineCog6Tooth } from 'react-icons/hi2';
+import { HiChevronRight, HiOutlineCog6Tooth } from 'react-icons/hi2';
 import { Card } from '@client/components/Card';
 import { ChatSettings, useChatSettings } from '@client/components/ChatSettings';
 import { usePageTitle } from '@client/utils/hooks';
+import { AnthropicLogoIcon, OllamaLogoIcon, OpenaiLogoIcon, ProviderIcon } from '@client/components/icons';
 
 export const RootPage = withErrorBoundary(() => {
   const newChat = useNewChatMutation();
@@ -25,7 +26,6 @@ export const RootPage = withErrorBoundary(() => {
         ...m,
         providerId: p.provider.id,
         modelId: m.id,
-        name: `${p.provider.name} > ${m.name}`,
       };
     }));
   }, [providers]);
@@ -52,7 +52,9 @@ export const RootPage = withErrorBoundary(() => {
               system: chatSettings.system.enabled ? chatSettings.system.value : undefined,
             }
           }).then((res) => {
-            navigate(`/chats/${res.id}`);
+            startTransition(() => {
+              navigate(`/chats/${res.id}`);
+            });
           })
         }}
       >
@@ -61,7 +63,7 @@ export const RootPage = withErrorBoundary(() => {
           <Button
             onClick={() => setSettingsVisible(p => !p)}
             variant='borderless'
-            icon={<HiOutlineCog6Tooth />}
+            icon={settingsVisible ? <HiChevronRight /> : <HiOutlineCog6Tooth />}
           />
         </ChatLayout.TitleRightActions>
         <ChatLayout.MessagesArea>
@@ -74,14 +76,19 @@ export const RootPage = withErrorBoundary(() => {
               value={selectedModel}
               onChange={setLastUsedModel}
               getOptionKey={o => o.providerId + o.modelId}
-              getOptionLabel={o => o.name}
+              getOptionLabel={o => {
+                return (<div className={styles.modelOption}>
+                  <div className={styles.iconWrapper}><ProviderIcon provider={o.providerId} /></div>
+                  {o.name}
+                </div>)
+              }}
             />
           </WithLabel>
         </ChatLayout.TextareaActions>
       </ChatLayout>
     </Card>
     {settingsVisible && <Card className={styles.settingsCard}>
-      <ChatSettings settings={chatSettings} settingsUpdater={updateChatSettings} />  
+      <ChatSettings settings={chatSettings} settingsUpdater={updateChatSettings} />
     </Card>}
   </div>);
 });

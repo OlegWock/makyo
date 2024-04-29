@@ -15,6 +15,10 @@
 
   .active {
     --color-btn-background: var(--gray-2) !important;
+
+    svg {
+      color: var(--jade-11) !important;
+    }
   }
 
   .spacer {
