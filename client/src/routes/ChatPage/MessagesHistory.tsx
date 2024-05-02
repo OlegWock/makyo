@@ -9,6 +9,7 @@ import { mapOverMessagesTree, MessageTreeNode } from '@client/routes/ChatPage/tr
 import useMotionMeasure from 'react-use-motion-measure';
 import { useMotionValueEvent } from 'framer-motion';
 import { ProviderIcon } from '@client/components/icons';
+import { ScrollArea } from '@client/components/ScrollArea';
 
 export type MessagesHistoryProps = {
   modelName?: string;
@@ -121,10 +122,11 @@ export const MessagesHistory = ({ modelName }: MessagesHistoryProps) => {
     wrapperRef.current?.scrollTo({ top: wrapperRef.current.scrollHeight });
   })
 
-  return (<div className={styles.MessagesHistory} onScroll={onScroll} ref={wrapperRef}>
+
+  return (<ScrollArea className={styles.MessagesHistory} onScroll={onScroll} viewportRef={wrapperRef}>
     <div className={styles.messagesWrapper} ref={messagesContainerRef}>
       {bubbles}
     </div>
     {/* <pre>{JSON.stringify(messages, null, 4)}</pre> */}
-  </div>);
+  </ScrollArea>);
 };

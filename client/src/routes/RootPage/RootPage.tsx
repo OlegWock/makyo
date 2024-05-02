@@ -12,7 +12,7 @@ import { HiChevronRight, HiOutlineCog6Tooth } from 'react-icons/hi2';
 import { Card } from '@client/components/Card';
 import { ChatSettings, useChatSettings } from '@client/components/ChatSettings';
 import { usePageTitle } from '@client/utils/hooks';
-import { AnthropicLogoIcon, OllamaLogoIcon, OpenaiLogoIcon, ProviderIcon } from '@client/components/icons';
+import { ProviderIcon } from '@client/components/icons';
 import { useLocation } from 'wouter';
 
 export const RootPage = withErrorBoundary(() => {
@@ -40,7 +40,7 @@ export const RootPage = withErrorBoundary(() => {
   usePageTitle('New chat');
 
   return (<div className={styles.RootPage}>
-    <Card flexGrow>
+    <Card flexGrow withScrollArea={false}>
       <ChatLayout
         onSend={(text) => {
           newChat.mutateAsync({

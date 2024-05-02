@@ -6,9 +6,25 @@
 @import '@radix-ui/colors/blue.css';
 @import '@radix-ui/colors/red.css';
 
-@import 'highlight.js/scss/tokyo-night-dark.scss';
+* {
+  *::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
 
-// TODO: would be good to make scrollbars a bit thinner and more in style with rest of app
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 2px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: #999;
+  }
+}
 
 :root {
   font-family: 'Work Sans', 'Seravek', 'Gill Sans Nova', 'Ubuntu', 'Calibri', 'DejaVu Sans', 'source-sans-pro', sans-serif;
@@ -22,7 +38,8 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-html, body {
+html,
+body {
   height: 100%;
 }
 
@@ -36,7 +53,9 @@ body {
   max-height: 100%;
 }
 
-*, *::after, *::before {
+*,
+*::after,
+*::before {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
@@ -45,8 +64,9 @@ body {
   color: inherit;
 }
 
-code, pre {
-  font-family: 'Source Code Pro', monospace;
+code,
+pre {
+  font-family: 'Source Code Pro', Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
   font-size: 0.9rem;
 }
 

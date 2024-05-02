@@ -23,6 +23,8 @@
 }
 
 .Textarea {
+  line-height: 1.5;
+  
   &::placeholder {
     font-size: 1rem !important;
     transform: none;

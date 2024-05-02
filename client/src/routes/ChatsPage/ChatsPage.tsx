@@ -4,6 +4,7 @@ import { withErrorBoundary } from '@client/components/ErrorBoundary';
 import { Card } from '@client/components/Card';
 import { usePageTitle } from '@client/utils/hooks';
 import { ChatCard } from '@client/components/ChatCard';
+import { ScrollArea } from '@client/components/ScrollArea';
 
 export const ChatsPage = withErrorBoundary(() => {
   const { data: chats } = useChats();

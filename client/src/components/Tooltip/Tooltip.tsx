@@ -1,6 +1,6 @@
 import * as RadixTooltip from '@radix-ui/react-tooltip';
 import styles from './Tooltip.module.scss';
-import { ReactNode, useState } from 'react';
+import { ReactNode, Ref, useState } from 'react';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
 
 type Side = 'top' | 'right' | 'left' | 'bottom';
@@ -11,6 +11,7 @@ export type TooltipProps = {
   side?: Side;
   delayDuration?: number,
   sideOffset?: number,
+  ref?: Ref<HTMLButtonElement>,
 };
 
 const variants = {
@@ -26,12 +27,12 @@ const variants = {
   },
 } satisfies Variants;
 
-export const Tooltip = ({ children, text, side = 'top', delayDuration = 300, sideOffset = 2 }: TooltipProps) => {
+export const Tooltip = ({ children, text, side = 'top', delayDuration = 300, sideOffset = 5, ref }: TooltipProps) => {
   const [open, setOpen] = useState(false);
   return (
     <RadixTooltip.Provider>
       <RadixTooltip.Root delayDuration={delayDuration} open={open} onOpenChange={setOpen}>
-        <RadixTooltip.Trigger asChild>
+        <RadixTooltip.Trigger asChild ref={ref}>
           {children}
         </RadixTooltip.Trigger>
         <RadixTooltip.Portal forceMount>

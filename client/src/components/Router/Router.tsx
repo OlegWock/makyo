@@ -31,7 +31,6 @@ export type RouterProps = {
 
 export const Router = ({ children }: RouterProps) => {
   const [isPending, startTransition] = useTransition();
-  console.log('Is transition pending', isPending);
 
   return (
     <Suspense fallback={<Loading />}>

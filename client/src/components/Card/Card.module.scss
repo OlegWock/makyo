@@ -5,6 +5,8 @@
   flex-direction: column;
   overflow: hidden auto;
 
+  --scrollbar-size: 14px !important;
+
   &.flexGrow {
     flex-grow: 1;
   }
@@ -14,6 +16,12 @@
   }
 
   &.medium {
-    padding: 1rem;
+    padding: 0.75rem;
+  }
+
+  .scrollbar {
+    padding-right: 8px;
+    padding-top: 8px;
+    padding-bottom: 8px;
   }
 }

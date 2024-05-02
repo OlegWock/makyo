@@ -3,14 +3,14 @@
   font-style: normal;
   font-weight: 200 900;
   font-display: swap;
-  src: url(/fonts/SourceCodePro-VariableFont_wght.ttf) format('truetype-variations');
+  src: url(/fonts/SourceCodePro-VariableFont_wght.woff2) format('woff2-variations');
 }
 @font-face {
   font-family: 'Source Code Pro';
   font-style: italic;
   font-weight: 200 900;
   font-display: swap;
-  src: url(/fonts/SourceCodePro-Italic-VariableFont_wght.ttf) format('truetype-variations');
+  src: url(/fonts/SourceCodePro-Italic-VariableFont_wght.woff2) format('woff2-variations');
 }
 
 @font-face {
@@ -18,7 +18,7 @@
   font-style: normal;
   font-weight: 100 900;
   font-display: swap;
-  src: url(/fonts/WorkSans-VariableFont_wght.ttf) format('truetype-variations');
+  src: url(/fonts/WorkSans-VariableFont_wght.woff2) format('woff2-variations');
 }
 
 @font-face {
@@ -26,5 +26,5 @@
   font-style: italic;
   font-weight: 100 900;
   font-display: swap;
-  src: url(/fonts/WorkSans-Italic-VariableFont_wght.ttf) format('truetype-variations');
+  src: url(/fonts/WorkSans-Italic-VariableFont_wght.woff2) format('woff2-variations');
 }

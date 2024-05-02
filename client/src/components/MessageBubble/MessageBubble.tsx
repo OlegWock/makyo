@@ -1,4 +1,3 @@
-import Markdown from 'markdown-to-jsx';
 import SyncLoader from "react-spinners/SyncLoader";
 import { MessageSchemaType } from "@shared/api";
 import styles from './MessageBubble.module.scss';
@@ -8,10 +7,13 @@ import { Button } from '@client/components/Button';
 import { HiArrowPath, HiChevronLeft, HiChevronRight, HiOutlinePencil, HiOutlineTrash } from 'react-icons/hi2';
 import { PiArrowsSplit, PiCopyLight } from "react-icons/pi";
 import { createStrictContext } from '@client/utils/context';
-import { ReactNode, useState } from 'react';
+import { ReactNode, RefObject, useRef, useState } from 'react';
 import { iife } from '@shared/utils';
 import { Textarea } from '@client/components/Input';
 import { LocalToastTarget, useLocalToast } from 'react-local-toast';
+import { Tooltip } from '@client/components/Tooltip';
+import ReactMarkdown from 'react-markdown';
+import { rehypePlugins, remarkPlugins } from '@client/components/MessageBubble/markdown';
 
 
 export type MessageBubbleActionsProp = {
@@ -37,24 +39,31 @@ export type MessageBubbleProps = {
 
 const [Provider, useBubbleContext] = createStrictContext<MessageBubbleProps & {
   initiateEditing: VoidFunction,
+  ref: RefObject<HTMLDivElement>,
 }>('MessageBubbleContext');
 
 const MessageBubbleActions = () => {
-  const onCopy = () => {
-    // TODO: show feedback on copy
-    // TODO: consider copying rich text along with plaintext (so when pasted in Google Docs for example, it will preserve formatting)
-    navigator.clipboard.writeText(message.text).then(() => {
-      console.log('Copied');
-      showToast(`copy-${message.id}`, 'Copied!');
-    });
+  const onCopy = async () => {
+    const isFirefox = navigator.userAgent.includes('Firefox');
+    if (isFirefox) {
+      // Firefox doesn't fully supports clipboard api
+      await navigator.clipboard.writeText(message.text)
+    } else {
+      const payload: Record<string, Blob> = {
+        "text/plain": new Blob([message.text], { type: "text/plain" }),
+      };
+      if (ref.current) {
+        payload['text/html'] = new Blob([ref.current.innerHTML], { type: "text/html" });
+      }
+      const data = new ClipboardItem(payload);
+      await navigator.clipboard.write([data]);
+    }
+    showToast(`copy-${message.id}`, 'Copied!', { placement: 'bottom' });
   };
 
-  const { actions = {}, message, initiateEditing } = useBubbleContext();
+  const { actions = {}, message, initiateEditing, ref } = useBubbleContext();
   const { variants, editing, onRegenerate, onDuplicate, onDelete } = actions;
   const { showToast } = useLocalToast();
-
-  // TODO: when switching to editing, message bubble should stay same size as before (but at least 3 textarea rows),
-  // so longer messages won't suddenly collapse when editing
 
   return (
     <div className={styles.actionsWrapper}>
@@ -77,15 +86,36 @@ const MessageBubbleActions = () => {
       </div>}
       <div className={styles.spacer} />
       <div className={styles.actions}>
-        {/* TODO: show tooltip for each action */}
         <LocalToastTarget name={`copy-${message.id}`}>
-          <Button onClick={onCopy} variant="borderless"><PiCopyLight /></Button>
+          <Tooltip text='Copy message' side='bottom'>
+            <Button onClick={onCopy} variant="borderless"><PiCopyLight /></Button>
+          </Tooltip>
         </LocalToastTarget>
-        {!!onRegenerate && <Button onClick={onRegenerate} variant="borderless"><HiArrowPath /></Button>}
-        {!!onDuplicate && <Button onClick={onDuplicate} variant="borderless"><PiArrowsSplit /></Button>}
-        {!!editing && <Button onClick={initiateEditing} variant="borderless"><HiOutlinePencil /></Button>}
-        {/* TODO: maybe require some kind of confirmation? */}
-        {!!onDelete && <Button onClick={onDelete} variant="borderless"><HiOutlineTrash /></Button>}
+        {!!onRegenerate && <Tooltip
+          side='bottom'
+          text='Regenerate response'
+        >
+          <Button onClick={onRegenerate} variant="borderless"><HiArrowPath /></Button>
+        </Tooltip>}
+        {!!onDuplicate && <Tooltip
+          side='bottom'
+          text='Duplicate message'
+        >
+          <Button onClick={onDuplicate} variant="borderless"><PiArrowsSplit /></Button>
+        </Tooltip>}
+        {!!editing && <Tooltip
+          side='bottom'
+          text='Edit message'
+        >
+          <Button onClick={initiateEditing} variant="borderless"><HiOutlinePencil /></Button>
+        </Tooltip>}
+        {/* TODO: maybe require some kind of confirmation? Local toast with button? */}
+        {!!onDelete && <Tooltip
+          side='bottom'
+          text='Delete message and its descendants'
+        >
+          <Button onClick={onDelete} variant="borderless"><HiOutlineTrash /></Button>
+        </Tooltip>}
       </div>
     </div>)
 }
@@ -95,12 +125,12 @@ export const MessageBubble = (props: MessageBubbleProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [messageDraft, setMessageDraft] = useState(() => message.text);
   const showPlaceholder = message.isGenerating && !message.text;
-
-  // TODO: markdown-to-jsx doesn't have option to preserve line breaks, need to either hack something or replace it with another library
+  const ref = useRef<HTMLDivElement>(null);
 
   return (
     <Provider value={{
       ...props,
+      ref,
       initiateEditing: () => {
         setMessageDraft(message.text);
         setIsEditing(true);
@@ -120,7 +150,7 @@ export const MessageBubble = (props: MessageBubbleProps) => {
                 className={styles.textarea}
                 value={messageDraft}
                 onValueChange={setMessageDraft}
-                rows={10}
+                minRows={3}
               />
               <div className={styles.editingActions}>
                 <Button
@@ -151,20 +181,22 @@ export const MessageBubble = (props: MessageBubbleProps) => {
           }
 
           return (<>
-            <Markdown
+            <div
+              ref={ref}
               className={styles.content}
-              options={{
-                overrides: {
-                  code: CodeBlock,
-                }
-              }}
             >
-              {message.text}
-            </Markdown>
+              <ReactMarkdown
+                remarkPlugins={remarkPlugins}
+                rehypePlugins={rehypePlugins}
+                children={message.text}
+                components={{
+                  code: CodeBlock,
+                }}
+              />
+            </div>
             <MessageBubbleActions />
           </>);
         })}
-        {/* TODO: show datetime of the message */}
       </div>
     </Provider>)
 };

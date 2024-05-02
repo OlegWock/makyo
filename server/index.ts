@@ -54,7 +54,7 @@ app.get(
 );
 
 app.get('*', (c) => {
-  // TODO:
+  // TODO: Should serve static resources!
   return c.text('Should serve static resources!');
 });
 

@@ -40,7 +40,7 @@ export const ChatPage = withErrorBoundary(() => {
 
   return (<ChatPageContextProvider value={{ chatId: id, messagesTree: tree, treeChoices, setTreeChoices, providerId: chatInfo.chat.providerId }}>
     <div className={styles.ChatPage}>
-      <Card flexGrow>
+      <Card flexGrow withScrollArea={false}>
         <ChatLayout
           onSend={(text) => {
             sendMessage.mutate({

@@ -17,6 +17,7 @@ import { LocalToastProvider } from 'react-local-toast';
 
 export const App = () => {
   return (
+    // TODO: need to make custom design for local toasts
     <LocalToastProvider>
       <QueryClientProvider>
         <Router>

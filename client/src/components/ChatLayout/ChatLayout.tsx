@@ -37,39 +37,50 @@ export const ChatLayout = componentFactory('ChatLayout', ({ onSend, slots }: Cha
     <div className={styles.chat}>
       {slots.MessagesArea}
     </div>
+
+    {/* ---------------------------- */}
+
     <div className={styles.messageArea}>
-      <div className={styles.secondaryActions}>
-        {slots.TextareaActions}
+      <div className={styles.contentWrapper}>
+        {!!slots.TextareaActions && <div className={styles.secondaryActions}>
+          {slots.TextareaActions}
+        </div>}
+
+        <div className={styles.textareaWrapper}>
+
+          <Textarea
+            className={styles.textarea}
+            autoFocus
+            minRows={1}
+            maxRows={20}
+            value={text}
+            placeholder='Enter your message...'
+            onValueChange={setText}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                onSend?.(text);
+                setText('');
+              }
+            }}
+          />
+          <Button
+            icon={<HiOutlinePaperAirplane />}
+            iconPosition='after'
+            size='large'
+            variant='primary'
+            onClick={() => {
+              onSend?.(text);
+              setText('');
+            }}
+          >
+            Send
+          </Button>
+        </div>
       </div>
-      {/* TODO: Make message textarea 1 row by default, but auto expand up to limit */}
-      <Textarea
-        className={styles.textarea}
-        autoFocus
-        rows={4}
-        value={text}
-        onValueChange={setText}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            onSend?.(text);
-            setText('');
-          }
-        }}
-      />
-      <div className={styles.messageActions}>
-        <Button
-          icon={<HiOutlinePaperAirplane />}
-          iconPosition='after'
-          size='large'
-          variant='primary'
-          onClick={() => {
-            onSend?.(text);
-            setText('');
-          }}
-        >
-          Send
-        </Button>
-      </div>
+
+
+
     </div>
   </div>);
 });

@@ -1,19 +1,26 @@
-import hljs from 'highlight.js';
-import { ComponentPropsWithoutRef, useEffect, useRef } from 'react';
+import { ComponentPropsWithoutRef} from 'react';
+import type { Element } from 'hast';
 
-export type CodeBlockProps = ComponentPropsWithoutRef<"code">;
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
+
+export type CodeBlockProps = ComponentPropsWithoutRef<"code"> & { node?: Element | undefined };
 
 export const CodeBlock = (props: CodeBlockProps) => {
-  const ref = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    if (ref.current && props.className?.includes('lang-')) {
-      hljs.highlightElement(ref.current)
-
-      // hljs won't reprocess the element unless this attribute is removed
-      ref.current.removeAttribute('data-highlighted')
-    }
-  }, [props.className, props.children])
-
-  return <code {...props} ref={ref} />
+  const { children, className, node, ...rest } = props;
+  const match = /language-(\w+)/.exec(className || '');
+  return match ? (
+    <SyntaxHighlighter
+      {...rest}
+      PreTag="div"
+      children={String(children).replace(/\n$/, '')}
+      language={match[1]}
+      style={oneDark}
+      codeTagProps={{style: {fontFamily: `'Source Code Pro', Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace`} }}
+    />
+  ) : (
+    <code {...rest} className={className}>
+      {children}
+    </code>
+  );
 };

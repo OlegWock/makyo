@@ -10,11 +10,9 @@
 
 
 .MessagesHistory {
-  padding: 2rem;
   max-height: 100%;
-  overflow: auto;
-  display: flex;
-  // flex-direction: column-reverse;
+
+
 
   .messagesWrapper {
     display: flex;
@@ -26,5 +24,6 @@
     height: fit-content;
     margin: 0 auto;
     overflow-anchor: none;
+    padding: 2rem;
   }
 }

@@ -1,5 +1,5 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
-import { connectWebsocket, disconnectWebsocket, sseController } from "@server/utils/subscriptions";
+import { sseEmitter } from "@server/utils/subscriptions";
 import { createBunWebSocket } from 'hono/bun';
 import { streamSSE } from 'hono/streaming';
 import { v4 as uuid4 } from 'uuid';
@@ -47,15 +47,20 @@ export const subscriptionsRouter = openAPIHonoInstance
     '/api/subscribe/ws',
     upgradeWebSocket((c) => {
       const id = uuid4();
+      let eventListener: (messageStr: string) => void;
+      
       return {
         onOpen(evt, ws) {
-          connectWebsocket(id, ws);
+          eventListener = (messageStr) => {
+            ws.send(messageStr);
+          };
+          sseEmitter.addListener('message', eventListener);
         },
         onMessage(evt, ws) {
-            console.log('Got WS message', evt.data);
+          console.log('Got WS message', evt.data);
         },
         onClose(evt, ws) {
-          disconnectWebsocket(id, ws);
+          sseEmitter.removeListener('message', eventListener);
         },
       };
     }),
@@ -64,8 +69,15 @@ export const subscriptionsRouter = openAPIHonoInstance
     '/api/subscribe/sse',
     async (c) => {
       return streamSSE(c, async (stream) => {
-        await stream.writeln('retry: 1000\n\n');
-        stream.pipe(sseController.getStreamCopy());
+        await stream.write('retry: 1000\n\n');
+        const eventHandler = (messageStr: string) => {
+          if (c.req.raw.signal.aborted) {
+            sseEmitter.removeListener('message', eventHandler);
+            return;
+          }
+          stream.write(`data: ${messageStr}\n\n`);
+        };
+        sseEmitter.addListener('message', eventHandler);
       });
     }
   );
