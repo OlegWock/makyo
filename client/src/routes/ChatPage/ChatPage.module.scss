@@ -4,6 +4,34 @@
   gap: 1rem;
 }
 
+.titleWrapper {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0 2rem;
+  position: relative;
+
+
+  &:hover {
+    .editButton {
+      visibility: visible;
+    }
+  }
+
+  .editButton {
+    visibility: hidden;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .titleInput {
+    padding: 0.25rem 0.5rem;
+    width: 300px;
+  }
+}
+
 .settingsCard {
   width: 400px;
 }

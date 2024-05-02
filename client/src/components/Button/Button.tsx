@@ -37,8 +37,8 @@ export const Button = ({ loading = false, variant = 'normal', iconPosition = 'be
     onClick={localOnClick}
     {...props}
   >
-    {!!icon && iconPosition === 'before' && cloneElement(icon, { className: styles.icon })}
+    {!!icon && iconPosition === 'before' && cloneElement(icon, { className: clsx(styles.icon, icon.props.className) })}
     {children}
-    {!!icon && iconPosition === 'after' && cloneElement(icon, { className: styles.icon })}
+    {!!icon && iconPosition === 'after' && cloneElement(icon, { className: clsx(styles.icon, icon.props.className) })}
   </motion.button>);
 };

@@ -5,6 +5,10 @@
   padding: 1rem;
   gap: 1rem;
 
+  .navigationCard {
+    flex-shrink: 0;
+  }
+
   .content {
     display: flex;
     align-items: stretch;
