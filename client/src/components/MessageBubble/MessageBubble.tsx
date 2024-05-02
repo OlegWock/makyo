@@ -11,6 +11,7 @@ import { createStrictContext } from '@client/utils/context';
 import { ReactNode, useState } from 'react';
 import { iife } from '@shared/utils';
 import { Textarea } from '@client/components/Input';
+import { LocalToastTarget, useLocalToast } from 'react-local-toast';
 
 
 export type MessageBubbleActionsProp = {
@@ -44,11 +45,16 @@ const MessageBubbleActions = () => {
     // TODO: consider copying rich text along with plaintext (so when pasted in Google Docs for example, it will preserve formatting)
     navigator.clipboard.writeText(message.text).then(() => {
       console.log('Copied');
+      showToast(`copy-${message.id}`, 'Copied!');
     });
   };
 
   const { actions = {}, message, initiateEditing } = useBubbleContext();
   const { variants, editing, onRegenerate, onDuplicate, onDelete } = actions;
+  const { showToast } = useLocalToast();
+
+  // TODO: when switching to editing, message bubble should stay same size as before (but at least 3 textarea rows),
+  // so longer messages won't suddenly collapse when editing
 
   return (
     <div className={styles.actionsWrapper}>
@@ -72,7 +78,9 @@ const MessageBubbleActions = () => {
       <div className={styles.spacer} />
       <div className={styles.actions}>
         {/* TODO: show tooltip for each action */}
-        <Button onClick={onCopy} variant="borderless"><PiCopyLight /></Button>
+        <LocalToastTarget name={`copy-${message.id}`}>
+          <Button onClick={onCopy} variant="borderless"><PiCopyLight /></Button>
+        </LocalToastTarget>
         {!!onRegenerate && <Button onClick={onRegenerate} variant="borderless"><HiArrowPath /></Button>}
         {!!onDuplicate && <Button onClick={onDuplicate} variant="borderless"><PiArrowsSplit /></Button>}
         {!!editing && <Button onClick={initiateEditing} variant="borderless"><HiOutlinePencil /></Button>}

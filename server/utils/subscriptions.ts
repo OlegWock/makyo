@@ -19,6 +19,7 @@ export const disconnectWebsocket = (id: string, ws: WSContext) => {
 };
 
 
+// TODO: when new client connects, it also receives old messages already in stream. We need to send events that happened after user connected to the endpoint
 export const sseController = iife(() => {
   let streamController: null | ReadableStreamDefaultController<string> = null;
 

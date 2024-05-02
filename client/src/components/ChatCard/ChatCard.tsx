@@ -10,6 +10,8 @@ export type ChatCardProps = {
 
 export const ChatCard = ({ chat }: ChatCardProps) => {
   const date = useMemo(() => dayjs(chat.lastMessageAt).fromNow(), [chat.lastMessageAt]);
+
+  // TODO: three dots with dropdown menu with actions (rename, delete)
   return (<Link href={`/chats/${chat.id}`} className={styles.ChatCard}>
     <div className={styles.title}>{chat.title}</div>
     <div className={styles.message}>{chat.lastMessageText || '\xa0'}</div>

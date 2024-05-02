@@ -34,29 +34,30 @@ export const Tooltip = ({ children, text, side = 'top', delayDuration = 300, sid
         <RadixTooltip.Trigger asChild>
           {children}
         </RadixTooltip.Trigger>
-        <AnimatePresence>
-          {open && <RadixTooltip.Portal forceMount>
-            <RadixTooltip.Content
-              forceMount
-              className={styles.content}
-              sideOffset={sideOffset}
-              side={side}
-              asChild
-            >
-              <motion.div
-                transition={{ duration: 0.15 }}
-                variants={variants}
-                custom={side}
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
+        <RadixTooltip.Portal forceMount>
+          <AnimatePresence>
+            {open &&
+              <RadixTooltip.Content
+                forceMount
+                className={styles.content}
+                sideOffset={sideOffset}
+                side={side}
+                asChild
               >
-                {text}
-              </motion.div>
-            </RadixTooltip.Content>
-
-          </RadixTooltip.Portal>}
-        </AnimatePresence>
+                <motion.div
+                  transition={{ duration: 0.15 }}
+                  variants={variants}
+                  custom={side}
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                >
+                  {text}
+                </motion.div>
+              </RadixTooltip.Content>
+            }
+          </AnimatePresence>
+        </RadixTooltip.Portal>
       </RadixTooltip.Root>
     </RadixTooltip.Provider>
   );

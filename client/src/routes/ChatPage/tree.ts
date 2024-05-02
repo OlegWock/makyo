@@ -9,6 +9,7 @@ export type MessageTreeNode = {
 export type PreferredTreeBranchesMap = Map<number | 'root', number>;
 
 export const buildTreeFromMessages = (messages: MessageSchemaType[]) => {
+  // TODO: sort childs by id/createdAt, otherwise they might change places between renders
   const messageMap = new Map<number, MessageSchemaType>();
   const childsMap = new Map<number, Array<MessageSchemaType>>();
 

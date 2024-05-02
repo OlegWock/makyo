@@ -41,6 +41,7 @@ export const ChatLayout = componentFactory('ChatLayout', ({ onSend, slots }: Cha
       <div className={styles.secondaryActions}>
         {slots.TextareaActions}
       </div>
+      {/* TODO: Make message textarea 1 row by default, but auto expand up to limit */}
       <Textarea
         className={styles.textarea}
         autoFocus

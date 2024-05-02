@@ -326,20 +326,22 @@ export const chatsRouter = new OpenAPIHono()
       system: parameters?.system,
     }).returning();
     const { system, message: prompt } = createTitlePrompt(text);
-    provider.chat(modelId, {
-      messages: [{ sender: 'user', text: prompt }],
-      system: system,
-    }).then((newTitle) => {
-      const title = newTitle.length > 70 ? newTitle.slice(0, 70) + '…' : newTitle;
-      broadcastSubscriptionMessage({
-        type: 'updateChat',
-        data: {
-          chatId: newChat.id,
-          title: title,
-        }
+    if (text.length > 70) {
+      provider.chat(modelId, {
+        messages: [{ sender: 'user', text: prompt }],
+        system: system,
+      }).then((newTitle) => {
+        const title = newTitle.length > 70 ? newTitle.slice(0, 70) + '…' : newTitle;
+        broadcastSubscriptionMessage({
+          type: 'updateChat',
+          data: {
+            chatId: newChat.id,
+            title: title,
+          }
+        });
+        return db.update(chat).set({ title }).where(eq(chat.id, newChat.id)).returning();
       });
-      return db.update(chat).set({ title }).where(eq(chat.id, newChat.id)).returning();
-    });
+    }
     await sendMessageAndSave({
       provider,
       modelId,

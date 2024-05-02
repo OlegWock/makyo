@@ -9,9 +9,9 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 - [ ] Better chats management screen
   - [ ] rename/delete
   - [ ] search + go to message
-- [ ] Better 'New chat' screen: suggest user some pre-defined questions or continue one of recent chats
-- [ ] Docker deployment
 - [ ] Better error handling (e.g. when provider fails)
+- [ ] Docker deployment
+- [ ] Better 'New chat' screen: suggest user some pre-defined questions or continue one of recent chats
 - [ ] Support for snippets
   - [ ] Snippets management (add/edit/delete)
   - [ ] Snippets handling (insert snippet when user types `/keyword`)
@@ -22,8 +22,10 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
   - [ ] Essentially just a preset with name, icon and chat settings (model, temperature, system prompt)
   - [ ] When creating new chat, parameters are copied + chat is associated with persona, but user can change any parameter
 - [ ] Semantic/vector search across messages
+- [ ] Support for perplexity.ai provider
 - [ ] Browser proxy for Ollama (proxy calls from webserver through browser to Ollama) to allow hosting frontend on remote domain but accessing local Ollama
   Might be useful: https://github.com/lobehub/lobe-chat/pull/2168
+  Doc: [LOCAL_PROXY.md](/LOCAL_PROXY.md)
 
 ## Deploy
 
