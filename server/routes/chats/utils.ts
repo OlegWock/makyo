@@ -75,6 +75,22 @@ export const sendMessageAndSave = async ({ parentId, provider, modelId, text, ch
         isGenerating: responseMessage.isGenerating,
       }
     });
+  }).catch((err) => {
+    broadcastSubscriptionMessage({
+      type: 'updateMessage',
+      data: {
+        messageId: responseMessage.id,
+        chatId,
+        text: '',
+        error: err.toString(),
+        isGenerating: false,
+      }
+    });
+    return db.update(message).set({
+      text: '',
+      isGenerating: false,
+      error: err.toString(),
+    }).where(eq(message.id, responseMessage.id)).returning();
   });
 
   return responseMessage;
@@ -131,6 +147,22 @@ export const regenerateResponseForMessage = async ({ chatId, parentId, modelId, 
         isGenerating: responseMessage.isGenerating,
       }
     });
+  }).catch((err) => {
+    broadcastSubscriptionMessage({
+      type: 'updateMessage',
+      data: {
+        messageId: responseMessage.id,
+        chatId,
+        text: '',
+        error: err.toString(),
+        isGenerating: false,
+      }
+    });
+    return db.update(message).set({
+      text: '',
+      isGenerating: false,
+      error: err.toString(),
+    }).where(eq(message.id, responseMessage.id)).returning();
   });
 
   return responseMessage;

@@ -12,7 +12,4 @@ export const sseEmitter = iife(() => {
 export const broadcastSubscriptionMessage = (message: SubscriptionMessage) => {
   const serialized = JSON.stringify(message);
   sseEmitter.emit('message', serialized);
-  // Object.values(connectedWebsockets).forEach((ws) => {
-  //   ws.send(serialized);
-  // });
 };

@@ -51,6 +51,7 @@ class OllamaProvider extends Provider {
       }
     });
     let response = '';
+
     for await (const part of responseGenerator) {
       response += part.message.content;
       options?.onProgress?.(response);

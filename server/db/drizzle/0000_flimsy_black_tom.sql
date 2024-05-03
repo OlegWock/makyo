@@ -11,6 +11,7 @@ CREATE TABLE `chat` (
 CREATE TABLE `message` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`text` text NOT NULL,
+	`error` text,
 	`isGenerating` integer DEFAULT false NOT NULL,
 	`sender` text NOT NULL,
 	`chatId` integer NOT NULL,

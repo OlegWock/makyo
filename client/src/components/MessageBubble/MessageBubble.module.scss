@@ -35,6 +35,15 @@
     margin-bottom: 0.25rem;
   }
 
+  .errorAlert {
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    background: var(--tomato-3);
+    color: var(--tomato-11);
+    border: 1px solid var(--tomato-8);
+    margin-top: 0.5rem;
+  }
+
   .content {
     margin-top: 0.5rem;
   }

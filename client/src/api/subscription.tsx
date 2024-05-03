@@ -118,6 +118,9 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
               if (message.data.isGenerating !== undefined) {
                 m.isGenerating = message.data.isGenerating;
               }
+              if (message.data.error !== undefined) {
+                m.error = message.data.error;
+              }
             })
           });
         });

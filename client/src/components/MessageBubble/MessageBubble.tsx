@@ -15,6 +15,7 @@ import { ToastTarget, useLocalToast } from "@client/components/LocalToast";
 
 
 export type MessageBubbleActionsProp = {
+  copy?: boolean;
   variants?: {
     total: number;
     current: number;
@@ -60,7 +61,7 @@ const MessageBubbleActions = () => {
   };
 
   const { actions = {}, message, initiateEditing, ref } = useBubbleContext();
-  const { variants, editing, onRegenerate, onDuplicate, onDelete } = actions;
+  const { variants, editing, onRegenerate, onDuplicate, onDelete, copy = true } = actions;
   const { showToast, showConfirm } = useLocalToast();
 
   return (
@@ -84,11 +85,11 @@ const MessageBubbleActions = () => {
       </div>}
       <div className={styles.spacer} />
       <div className={styles.actions}>
-        <ToastTarget name={`copy-${message.id}`}>
+        {copy && <ToastTarget name={`copy-${message.id}`}>
           <Tooltip text='Copy message' side='bottom'>
             <Button onClick={onCopy} variant="borderless"><PiCopyLight /></Button>
           </Tooltip>
-        </ToastTarget>
+        </ToastTarget>}
         {!!onRegenerate && <Tooltip
           side='bottom'
           text='Regenerate response'
@@ -189,7 +190,10 @@ export const MessageBubble = (props: MessageBubbleProps) => {
               ref={ref}
               className={styles.content}
             >
-              <Markdown content={message.text} />
+              {message.error
+                ? <div className={styles.errorAlert}>{message.error}</div>
+                : <Markdown content={message.text} />
+              }
             </div>
             <MessageBubbleActions />
           </>);

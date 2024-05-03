@@ -9,6 +9,7 @@ export type SubscriptionMessage =
     chatId: number,
     text: string,
     isGenerating?: boolean,
+    error?: string,
   }>
   | SubscriptionMessageGeneric<"updateChat", {
     chatId: number,

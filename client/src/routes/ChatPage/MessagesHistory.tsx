@@ -66,6 +66,7 @@ export const MessagesHistory = ({ modelName, defaultScrollTo }: MessagesHistoryP
     </>;
 
     const sharedActions: Partial<MessageBubbleActionsProp> = {
+      copy: !message.error,
       variants: {
         current: currentVariantIndex,
         total: totalVariants,
@@ -78,7 +79,7 @@ export const MessagesHistory = ({ modelName, defaultScrollTo }: MessagesHistoryP
           });
         },
       },
-      editing: {
+      editing: message.error ? undefined : {
         allowRegenerateResponse: message.sender === 'user',
         onEdit: (text, regenerateMessage) => onEditMessage(node, text, regenerateMessage),
       },
@@ -102,7 +103,7 @@ export const MessagesHistory = ({ modelName, defaultScrollTo }: MessagesHistoryP
           draft.set(parent!.message.id, parent!.children.length);
         });
       },
-      onDuplicate: async () => {
+      onDuplicate: message.error ? undefined : async () => {
         await duplicateMessage.mutateAsync({ messageId: message.id })
         setTreeChoices((draft) => {
           draft.set(parent!.message.id, parent!.children.length);

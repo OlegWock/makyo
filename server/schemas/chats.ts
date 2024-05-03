@@ -35,6 +35,7 @@ export const MessageSchema = z.object({
   id: z.number(),
   text: z.string(),
   isGenerating: z.boolean(),
+  error: z.string().nullable(),
   sender: z.enum(['user', 'ai']),
   parentId: z.number().nullable(),
   createdAt: z.number(),

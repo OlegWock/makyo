@@ -5,7 +5,6 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 
 ## Roadmap
 
-- [ ] Better error handling (e.g. when provider fails)
 - [ ] Browser proxy for Ollama (proxy calls from webserver through browser to Ollama) to allow hosting frontend on remote domain but accessing local Ollama
   Might be useful: https://github.com/lobehub/lobe-chat/pull/2168
   Doc: [LOCAL_PROXY.md](/LOCAL_PROXY.md)

@@ -21,6 +21,7 @@ export const chat = sqliteTable('chat', {
 export const message = sqliteTable('message', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   text: text('text').notNull(),
+  error: text('error'),
   isGenerating: integer('isGenerating', { mode: 'boolean' }).notNull().default(false),
   sender: text('sender', { enum: ['user', 'ai'] }).notNull(),
   chatId: integer('chatId').references((): AnySQLiteColumn => chat.id, { onDelete: 'cascade' }).notNull(),
