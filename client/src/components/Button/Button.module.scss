@@ -10,6 +10,7 @@
   border: none;
   line-height: 1;
   display: flex;
+  justify-content: center;
   gap: 0.5rem;
   align-items: center;
 
@@ -23,7 +24,8 @@
 
   &.normal,
   &.borderless,
-  &.primary {
+  &.primary,
+  &.danger {
     --color-btn-background: white;
     --color-btn-border: var(--gray-4);
     --color-btn-background-hover: var(--gray-2);
@@ -48,6 +50,13 @@
     --color-btn-border: var(--jade-4);
     --color-btn-background-hover: var(--jade-9);
     --color-btn-background-loading: var(--jade-9);
+    color: white;
+  }
+  &.danger {
+    --color-btn-background: var(--tomato-10);
+    --color-btn-border: var(--tomato-4);
+    --color-btn-background-hover: var(--tomato-9);
+    --color-btn-background-loading: var(--tomato-9);
     color: white;
   }
 

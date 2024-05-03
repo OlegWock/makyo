@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 
 export type ButtonProps = {
   loading?: boolean,
-  variant?: 'primary' | 'normal' | 'borderless' | 'text',
+  variant?: 'primary' | 'danger' | 'normal' | 'borderless' | 'text',
   size?: 'small' | 'medium' | 'large',
   icon?: ReactElement,
   iconPosition?: 'before' | 'after',
@@ -25,6 +25,7 @@ export const Button = ({ loading = false, variant = 'normal', iconPosition = 'be
       variant === 'normal' && styles.normal,
       variant === 'borderless' && styles.borderless,
       variant === 'primary' && styles.primary,
+      variant === 'danger' && styles.danger,
       variant === 'text' && styles.text,
       styles[size],
       !!icon && styles.withIcon,

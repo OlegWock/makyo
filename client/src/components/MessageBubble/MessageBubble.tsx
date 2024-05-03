@@ -10,10 +10,10 @@ import { createStrictContext } from '@client/utils/context';
 import { ReactNode, RefObject, useRef, useState } from 'react';
 import { iife } from '@shared/utils';
 import { Textarea } from '@client/components/Input';
-import { LocalToastTarget, useLocalToast } from 'react-local-toast';
 import { Tooltip } from '@client/components/Tooltip';
 import ReactMarkdown from 'react-markdown';
 import { rehypePlugins, remarkPlugins } from '@client/components/MessageBubble/markdown';
+import { ToastTarget, useLocalToast } from "@client/components/LocalToast";
 
 
 export type MessageBubbleActionsProp = {
@@ -58,12 +58,12 @@ const MessageBubbleActions = () => {
       const data = new ClipboardItem(payload);
       await navigator.clipboard.write([data]);
     }
-    showToast(`copy-${message.id}`, 'Copied!', { placement: 'bottom' });
+    showToast(`copy-${message.id}`, 'success', 'Copied!', { placement: 'bottom' });
   };
 
   const { actions = {}, message, initiateEditing, ref } = useBubbleContext();
   const { variants, editing, onRegenerate, onDuplicate, onDelete } = actions;
-  const { showToast } = useLocalToast();
+  const { showToast, showConfirm } = useLocalToast();
 
   return (
     <div className={styles.actionsWrapper}>
@@ -86,11 +86,11 @@ const MessageBubbleActions = () => {
       </div>}
       <div className={styles.spacer} />
       <div className={styles.actions}>
-        <LocalToastTarget name={`copy-${message.id}`}>
+        <ToastTarget name={`copy-${message.id}`}>
           <Tooltip text='Copy message' side='bottom'>
             <Button onClick={onCopy} variant="borderless"><PiCopyLight /></Button>
           </Tooltip>
-        </LocalToastTarget>
+        </ToastTarget>
         {!!onRegenerate && <Tooltip
           side='bottom'
           text='Regenerate response'
@@ -109,15 +109,21 @@ const MessageBubbleActions = () => {
         >
           <Button onClick={initiateEditing} variant="borderless"><HiOutlinePencil /></Button>
         </Tooltip>}
-        {/* TODO: maybe require some kind of confirmation? Local toast with button? */}
-        {!!onDelete && <Tooltip
+        {!!onDelete && <ToastTarget name={`delete-${message.id}`}><Tooltip
           side='bottom'
-          text='Delete message and its descendants'
+          text='Delete message'
         >
-          <Button onClick={onDelete} variant="borderless"><HiOutlineTrash /></Button>
-        </Tooltip>}
+          <Button onClick={() => {
+            showConfirm(`delete-${message.id}`, 'Please confirm you want to delete this message and all its descendants', {
+              onConfirm: () => onDelete(),
+              destructive: true,
+              duration: 5000,
+            });
+          }} variant="borderless"><HiOutlineTrash /></Button>
+        </Tooltip>
+        </ToastTarget>}
       </div>
-    </div>)
+    </div >)
 }
 
 export const MessageBubble = (props: MessageBubbleProps) => {

@@ -12,13 +12,12 @@ import { SubscriptionProvider } from "./api/subscription";
 import { ErrorBoundary } from "@client/components/ErrorBoundary";
 import { Router } from "./components/Router/Router";
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { LocalToastProvider } from 'react-local-toast';
+import { ToastProvider } from "@client/components/LocalToast";
 
 
 export const App = () => {
   return (
-    // TODO: need to make custom design for local toasts
-    <LocalToastProvider>
+    <ToastProvider animationDuration={200}>
       <QueryClientProvider>
         <Router>
           <AuthGate>
@@ -40,6 +39,6 @@ export const App = () => {
           {/* <ReactQueryDevtools /> */}
         </Router>
       </QueryClientProvider>
-    </LocalToastProvider>
+    </ToastProvider>
   );
 };
