@@ -1,3 +1,5 @@
+@use "../../styles/utils.scss" as *;
+
 .ChatPage {
   flex-grow: 1;
   display: flex;
@@ -53,5 +55,9 @@
     margin: 0 auto;
     overflow-anchor: none;
     padding: 2rem;
+
+    @include mobile {
+      padding: 1rem 0.25rem;
+    }
   }
 }

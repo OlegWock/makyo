@@ -1,8 +1,14 @@
+@use "../../styles/utils.scss" as *;
+
 .TopNav {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
   height: 100%;
+
+  @include mobile {
+    flex-direction: row;
+  }
 
   .item {
     text-decoration: none;

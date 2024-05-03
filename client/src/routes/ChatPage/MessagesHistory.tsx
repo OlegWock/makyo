@@ -10,6 +10,7 @@ import useMotionMeasure from 'react-use-motion-measure';
 import { useMotionValueEvent } from 'framer-motion';
 import { ProviderIcon } from '@client/components/icons';
 import { ScrollArea } from '@client/components/ScrollArea';
+import { produce } from 'immer';
 
 export type MessagesHistoryProps = {
   modelName?: string;
@@ -28,9 +29,9 @@ export const MessagesHistory = ({ modelName, defaultScrollTo }: MessagesHistoryP
       if (regenerateResponse) {
         const parentId = node.parent ? node.parent.message.id : 'root';
         const parentChildren = node.parent ? node.parent.children : messagesTree;
-        setTreeChoices((draft) => {
-          draft.set(parentId, parentChildren.length);
-        });
+        setTreeChoices((p) => produce(p, (draft) => {
+          draft[parentId] = parentChildren.length;
+        }));
       }
     });
   };
@@ -56,7 +57,7 @@ export const MessagesHistory = ({ modelName, defaultScrollTo }: MessagesHistoryP
     const parentId = parent?.message.id ?? 'root';
     const parentChildren = parent?.children ?? messagesTree;
     const totalVariants = parentChildren.length ?? 1;
-    const currentVariantIndex = (treeChoices.get(parentId) ?? 0) + 1;
+    const currentVariantIndex = (treeChoices[parentId] ?? 0) + 1;
     const isSingleRootMessage = !parent && totalVariants === 1;
     const isSingleAiMessage = message.sender === 'ai' && totalVariants === 1;
 
@@ -72,11 +73,11 @@ export const MessagesHistory = ({ modelName, defaultScrollTo }: MessagesHistoryP
         total: totalVariants,
         onSwitchVariant(forward) {
           // Here we need to modify parent preferred branch
-          setTreeChoices((draft) => {
-            const current = draft.get(parentId) ?? 0;
+          setTreeChoices((p) => produce(p, (draft) => {
+            const current = draft[parentId] ?? 0;
             const target = current + (forward ? 1 : -1);
-            draft.set(parentId, minmax(target, 0, parentChildren.length - 1));
-          });
+            draft[parentId] = minmax(target, 0, parentChildren.length - 1);
+          }));
         },
       },
       editing: message.error ? undefined : {
@@ -85,11 +86,11 @@ export const MessagesHistory = ({ modelName, defaultScrollTo }: MessagesHistoryP
       },
       onDelete: (isSingleRootMessage || isSingleAiMessage) ? undefined : async () => {
         await deleteMessage.mutateAsync(message.id);
-        const treeChoiceOutOfBounds = (treeChoices.get(parentId) ?? 0) > (parentChildren.length - 2) && parentChildren.length > 1;
+        const treeChoiceOutOfBounds = (treeChoices[parentId] ?? 0) > (parentChildren.length - 2) && parentChildren.length > 1;
         if (treeChoiceOutOfBounds) {
-          setTreeChoices(draft => {
-            draft.set(parentId, parentChildren.length - 2);
-          });
+          setTreeChoices((p) => produce(p, (draft) => {
+            draft[parentId] = parentChildren.length - 2;
+          }));
         }
       }
     };
@@ -99,15 +100,15 @@ export const MessagesHistory = ({ modelName, defaultScrollTo }: MessagesHistoryP
       ...sharedActions,
       onRegenerate: async () => {
         await regenerateMessage.mutateAsync({ messageId: message.id });
-        setTreeChoices((draft) => {
-          draft.set(parent!.message.id, parent!.children.length);
-        });
+        setTreeChoices((p) => produce(p, (draft) => {
+          draft[parent!.message.id] = parent!.children.length;
+        }));
       },
       onDuplicate: message.error ? undefined : async () => {
         await duplicateMessage.mutateAsync({ messageId: message.id })
-        setTreeChoices((draft) => {
-          draft.set(parent!.message.id, parent!.children.length);
-        });
+        setTreeChoices((p) => produce(p, (draft) => {
+          draft[parent!.message.id] = parent!.children.length;
+        }));
       },
     };
     return (
@@ -121,16 +122,8 @@ export const MessagesHistory = ({ modelName, defaultScrollTo }: MessagesHistoryP
   });
 
   useMount(() => {
-    if (defaultScrollTo) {
-      wrapperRef.current?.querySelector(`[data-message-id="${defaultScrollTo}"]`)?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-        inline: 'center',
-      });
-    } else {
-      wrapperRef.current?.scrollTo({ top: wrapperRef.current.scrollHeight });
-    }
-  })
+    wrapperRef.current?.scrollTo({ top: wrapperRef.current.scrollHeight });
+  });
 
 
   return (<ScrollArea className={styles.MessagesHistory} onScroll={onScroll} viewportRef={wrapperRef}>

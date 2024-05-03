@@ -1,3 +1,5 @@
+@use "../../styles/utils.scss" as *;
+
 .ChatLayout {
   display: flex;
   flex-direction: column;
@@ -36,6 +38,10 @@
     grid-template-columns: 1fr minmax(0, 800px) 1fr;
     gap: 0.5rem;
 
+    @include mobile { 
+      grid-template-columns: 1fr;
+    }
+
 
 
     .contentWrapper {
@@ -43,6 +49,10 @@
       flex-direction: column;
       gap: 0.5rem;
       grid-column: 2/2;
+
+      @include mobile {
+        grid-column: 1/1;
+      }
 
       .secondaryActions {
         display: flex;
@@ -60,7 +70,15 @@
           resize: none;
           padding: 0.6rem;
         }
+      }
 
+      .sendButton {
+        @include mobile {
+          svg {
+            width: auto;
+            height: 1.20rem !important;
+          }
+        }
       }
     }
 

@@ -8,12 +8,12 @@ import { Suspense, useDeferredValue } from 'react';
 import { Input } from '@client/components/Input';
 import { MessageCard } from '@client/components/MessageCard';
 import { useSearchParams } from '@client/components/Router/hooks';
+import { Empty } from '@client/components/Empty';
 
 const SearchResults = ({ query }: { query: string }) => {
   const search = useSearch(query);
   return <>
-    {/* TODO: empty state */}
-    {search.data.length === 0 && <div>No results...</div>}
+    {search.data.length === 0 && <Empty />}
     {search.data.map(r => {
       if (r.type === 'chat') {
         return (<ChatCard

@@ -1,7 +1,10 @@
+@use "../../styles/utils.scss" as *;
+
 .ChatsPage {
-  padding: 2px 0;
+  padding: 2px;
 
   .content {
+    width: 100%;
     max-width: 800px;
     margin: 0 auto;
     display: flex;
@@ -12,8 +15,13 @@
   .title {
     font-size: 2rem;
     margin-top: 6rem;
+
+    @include mobile {
+      margin-top: 0;
+    }
   }
 
   .search {
+    flex-grow: 0;
   }
 }

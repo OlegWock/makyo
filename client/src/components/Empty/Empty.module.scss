@@ -1,0 +1,21 @@
+.Empty {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem;
+  align-self: stretch;
+  flex-grow: 1;
+
+  svg {
+    width: 6rem;
+    height: auto;
+    color: var(--gray-3);
+    stroke-width: 0.75px;
+  }
+
+  .text {
+    font-size: 2rem;
+    color: var(--gray-5);
+  }
+}

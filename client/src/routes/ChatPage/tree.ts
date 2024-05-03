@@ -6,7 +6,7 @@ export type MessageTreeNode = {
   children: MessageTreeNode[];
 };
 
-export type PreferredTreeBranchesMap = Map<number | 'root', number>;
+export type PreferredTreeBranchesMap = Record<number | 'root', number>;
 
 export const buildTreeFromMessages = (messages: MessageSchemaType[]) => {
   const messageMap = new Map<number, MessageSchemaType>();
@@ -50,10 +50,10 @@ export const buildTreeFromMessages = (messages: MessageSchemaType[]) => {
 };
 
 export const getLastMessage = (tree: MessageTreeNode[], treeChoices: PreferredTreeBranchesMap) => {
-  const branchIndex = treeChoices.get('root') ?? 0;
+  const branchIndex = treeChoices['root'] ?? 0;
   let currentNode = tree[branchIndex];
   while (currentNode.children.length) {
-    const branchIndex = treeChoices.get(currentNode.message.id) ?? 0;
+    const branchIndex = treeChoices[currentNode.message.id] ?? 0;
     currentNode = currentNode.children[branchIndex];
   }
 
@@ -61,11 +61,11 @@ export const getLastMessage = (tree: MessageTreeNode[], treeChoices: PreferredTr
 };
 
 export const walkOverMessagesTree = (tree: MessageTreeNode[], treeChoices: PreferredTreeBranchesMap, cb: (node: MessageTreeNode) => void | boolean) => {
-  const branchIndex = treeChoices.get('root') ?? 0;
+  const branchIndex = treeChoices['root'] ?? 0;
   let currentNode = tree[branchIndex];
   while (currentNode) {
     const node = currentNode;
-    const selectedBranch = treeChoices.get(node.message.id) ?? 0;
+    const selectedBranch = treeChoices[node.message.id] ?? 0;
 
     const result = cb(node);
     if (result === false) {
@@ -73,6 +73,20 @@ export const walkOverMessagesTree = (tree: MessageTreeNode[], treeChoices: Prefe
     }
 
     currentNode = currentNode.children[selectedBranch];
+  }
+};
+
+export const walkOverAllMessagesInTree = (tree: MessageTreeNode[], cb: (node: MessageTreeNode) => void | boolean) => {
+  let nodesToWalk = tree;
+  while (nodesToWalk.length) {
+    for (const node of nodesToWalk) {
+      const result = cb(node);
+      if (result === false) {
+        break;
+      }
+    }
+
+    nodesToWalk = nodesToWalk.flatMap(n => n.children);
   }
 };
 

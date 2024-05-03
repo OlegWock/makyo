@@ -4,6 +4,7 @@ import { HiOutlinePaperAirplane } from 'react-icons/hi2';
 import styles from './ChatLayout.module.scss';
 import { ReactNode, useState } from 'react';
 import { createComponentWithSlotsFactory, SlotsPropsFromFactory } from '@client/components/slots';
+import { useIsMobile } from '@client/utils/responsive';
 
 const componentFactory = createComponentWithSlotsFactory({
   'MessagesArea': { required: false },
@@ -22,6 +23,8 @@ type ChatLayoutPropsWithSlots = ChatLayoutProps & SlotsPropsFromFactory<typeof c
 
 export const ChatLayout = componentFactory('ChatLayout', ({ onSend, slots }: ChatLayoutPropsWithSlots) => {
   const [text, setText] = useState('');
+  const isMobile = useIsMobile();
+
   return (<div className={styles.ChatLayout}>
     {!!slots.Title && <div className={styles.header}>
       <div className={styles.leftActions}>
@@ -65,6 +68,7 @@ export const ChatLayout = componentFactory('ChatLayout', ({ onSend, slots }: Cha
             }}
           />
           <Button
+            className={styles.sendButton}
             icon={<HiOutlinePaperAirplane />}
             iconPosition='after'
             size='large'
@@ -73,9 +77,8 @@ export const ChatLayout = componentFactory('ChatLayout', ({ onSend, slots }: Cha
               onSend?.(text);
               setText('');
             }}
-          >
-            Send
-          </Button>
+            children={isMobile ? undefined : 'Send'}
+          />
         </div>
       </div>
 

@@ -85,6 +85,8 @@ export const RootPage = withErrorBoundary(() => {
         </ChatLayout.TextareaActions>
       </ChatLayout>
     </Card>
+
+    {/* TODO: looks ugly on mobile  */}
     {settingsVisible && <Card className={styles.settingsCard}>
       <ChatSettings settings={chatSettings} settingsUpdater={updateChatSettings} />
     </Card>}

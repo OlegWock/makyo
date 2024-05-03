@@ -3,20 +3,26 @@ import styles from './ChatPage.module.scss';
 import { useStrictRouteParams } from '@client/utils/routing';
 import { z } from 'zod';
 import { useChat, useSendMessageMutation, useModels, useEditChatMutation } from '@client/api';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { MessagesHistory } from './MessagesHistory';
 import { ChatPageContextProvider } from './context';
-import { useImmer } from 'use-immer';
-import { buildTreeFromMessages, getLastMessage, PreferredTreeBranchesMap } from './tree';
+import { buildTreeFromMessages, getLastMessage, PreferredTreeBranchesMap, walkOverAllMessagesInTree } from './tree';
 import { withErrorBoundary } from '@client/components/ErrorBoundary';
 import { Card } from '@client/components/Card';
 import { ChatSettings, useChatSettings } from '@client/components/ChatSettings';
 import { HiChevronRight, HiOutlineCog6Tooth, HiOutlinePencil } from 'react-icons/hi2';
 import { Button } from '@client/components/Button';
-import { usePageTitle } from '@client/utils/hooks';
+import { useMount, usePageTitle } from '@client/utils/hooks';
 import { Input } from '@client/components/Input';
 import { useSearchParams } from '@client/components/Router/hooks';
+import { atomWithStorage } from 'jotai/utils';
+import { useAtom } from 'jotai/react';
+import { WritableAtom } from 'jotai';
+import { produce } from 'immer';
 
+
+
+const treeChoicesAtom = atomWithStorage<PreferredTreeBranchesMap>('messageChoices', {} as PreferredTreeBranchesMap, undefined, { getOnInit: true }) as unknown as WritableAtom<PreferredTreeBranchesMap, [(prev: PreferredTreeBranchesMap) => PreferredTreeBranchesMap], void>;
 
 export const ChatPage = withErrorBoundary(() => {
   const { id } = useStrictRouteParams({ id: z.coerce.number() });
@@ -26,6 +32,8 @@ export const ChatPage = withErrorBoundary(() => {
   const editChat = useEditChatMutation(id);
 
   const [searchParams] = useSearchParams();
+  const defaultScrollTo = searchParams.messageId ? parseInt(searchParams.messageId) : undefined;
+  const ref = useRef<HTMLDivElement>(null);
 
   usePageTitle(chatInfo.chat.title);
 
@@ -36,7 +44,8 @@ export const ChatPage = withErrorBoundary(() => {
   }, [providers, chatInfo.chat.modelId, chatInfo.chat.providerId]);
 
   const tree = useMemo(() => buildTreeFromMessages(chatInfo.messages), [chatInfo.messages]);
-  const [treeChoices, setTreeChoices] = useImmer<PreferredTreeBranchesMap>(() => new Map<number, number>());
+  const [treeChoices, setTreeChoices] = useAtom(treeChoicesAtom);
+  console.log('Render chat page with tree choices', JSON.stringify(treeChoices, null, 4));
   const lastMessage = getLastMessage(tree, treeChoices);
 
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -45,9 +54,38 @@ export const ChatPage = withErrorBoundary(() => {
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [chatSettings, updateChatSettings] = useChatSettings(chatInfo.chat);
 
+  useMount(() => {
+    if (defaultScrollTo) {
+      // TODO: walk tree upwards from defaultScrollTo and switch all preffered routes in treeChoices so this message will be visible
+      walkOverAllMessagesInTree(tree, (node) => {
+        if (node.message.id === defaultScrollTo) {
+          console.log('Scroll to node', node);
+          const nodeIndex = node.parent?.children.indexOf(node) ?? -1;
+          console.log('Parent id', node.parent!.message.id);
+          console.log('Index', nodeIndex);
+          if (nodeIndex !== -1) {
+            setTreeChoices((p) => produce(p, (draft) => {
+              draft[node.parent!.message.id] = nodeIndex;
+            }));
+          }
+          return false;
+        }
+      });
+
+      setTimeout(() => {
+        console.log('Triggering scrollt o message');
+        ref.current?.querySelector(`[data-message-id="${defaultScrollTo}"]`)?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'center',
+        });
+      }, 50);
+    }
+  })
+
 
   return (<ChatPageContextProvider value={{ chatId: id, messagesTree: tree, treeChoices, setTreeChoices, providerId: chatInfo.chat.providerId }}>
-    <div className={styles.ChatPage}>
+    <div className={styles.ChatPage} ref={ref}>
       <Card flexGrow withScrollArea={false}>
         <ChatLayout
           onSend={(text) => {
@@ -106,7 +144,7 @@ export const ChatPage = withErrorBoundary(() => {
           <ChatLayout.MessagesArea>
             <MessagesHistory
               modelName={usedModel}
-              defaultScrollTo={searchParams.messageId ? parseInt(searchParams.messageId) : undefined}
+              defaultScrollTo={defaultScrollTo}
             />
           </ChatLayout.MessagesArea>
 
