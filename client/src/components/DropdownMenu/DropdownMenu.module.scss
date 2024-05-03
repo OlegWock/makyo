@@ -1,0 +1,35 @@
+.DropdownMenu {
+  min-width: 160px;
+  background-color: white;
+  border-radius: 0.35rem;
+  padding: 0.25rem;
+  box-shadow:rgba(0, 0, 0, 0.15) 0px 0px 2px 1px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.DropdownMenuItem {
+  padding: 0.5rem 0.75rem;
+  background: white;
+  outline: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  line-height: 1;
+
+  &[data-highlighted] {
+    background: var(--gray-2);
+  }
+
+  &.danger {
+    color: var(--tomato-11);
+
+    &[data-highlighted] {
+      background: var(--tomato-2);
+    }
+  }
+}

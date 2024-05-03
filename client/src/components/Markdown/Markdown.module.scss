@@ -1,0 +1,17 @@
+.Markdown {
+  ul,
+  ol {
+    li {
+      margin-left: 1.25rem;
+    }
+  }
+
+  pre>code {
+    border-radius: 0.35rem;
+    display: block;
+    overflow-x: auto;
+    padding: 1em;
+    background: #1a1b26;
+    color: #9aa5ce;
+  }
+}

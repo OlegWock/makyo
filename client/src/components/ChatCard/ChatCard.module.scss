@@ -5,14 +5,30 @@
   flex-direction: column;
   gap: 0.25rem;
   padding: 0.5rem 1rem;
-  text-decoration: none !important;
 
-  &:hover {
-    background: var(--gray-2);
+  &.ghost {
+    pointer-events: none;
+    opacity: 0.65;
   }
 
-  .title {
-    font-size: 1.25rem;
+  .titleWrapper {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+
+    .title {
+      font-size: 1.25rem;
+      flex-grow: 1;
+      text-underline-offset: 6px;
+
+      &:hover {
+        text-decoration: underline 2px;
+      }
+    }
+
+    .menuButton {
+      color: var(--gray-8);
+    }
   }
 
   .message {

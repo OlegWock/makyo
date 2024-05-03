@@ -26,6 +26,7 @@
       max-height: 1rem;
       width: auto;
       height: auto;
+      margin-left: 0.2rem;
     }
   }
 
@@ -82,32 +83,5 @@
     display: flex;
     justify-content: flex-end;
     gap: 0.5rem;
-  }
-
-
-  p,
-  ul,
-  ol {
-    margin-top: 1rem;
-
-    &:first-child {
-      margin-top: 0;
-    }
-  }
-
-  ul,
-  ol {
-    li {
-      margin-left: 1.25rem;
-    }
-  }
-
-  pre>code {
-    border-radius: 0.35rem;
-    display: block;
-    overflow-x: auto;
-    padding: 1em;
-    background: #1a1b26;
-    color: #9aa5ce;
   }
 }

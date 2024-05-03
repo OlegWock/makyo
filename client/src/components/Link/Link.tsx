@@ -11,10 +11,11 @@ export type LinkProps = {
   variant?: Variant,
   size?: 'small' | 'medium' | 'large',
   icon?: ReactElement,
+  iconPosition?: 'before' | 'after',
   ref?: Ref<HTMLAnchorElement>;
 } & WouterLinkProps;
 
-export const Link = ({ className, children, icon, variant = "underline", asChild, ref, size = 'medium', ...props }: LinkProps) => {
+export const Link = ({ className, children, icon, variant = "underline", iconPosition = 'before', asChild, ref, size = 'medium', ...props }: LinkProps) => {
   return (<WouterLink 
     className={(matching) => clsx(
     styles.Link,
@@ -33,7 +34,8 @@ export const Link = ({ className, children, icon, variant = "underline", asChild
   ref={ref}
   {...props}
   >
-    {!!icon && cloneElement(icon, { className: buttonStyles.icon })}
+    {!!icon && iconPosition === 'before' && cloneElement(icon, { className: buttonStyles.icon })}
     {children}
+    {!!icon && iconPosition === 'after' && cloneElement(icon, { className: buttonStyles.icon })}
   </WouterLink>);
 };

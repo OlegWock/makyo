@@ -16,8 +16,8 @@ CREATE TABLE `message` (
 	`chatId` integer NOT NULL,
 	`parentId` integer,
 	`createdAt` integer DEFAULT (unixepoch() * 1000) NOT NULL,
-	FOREIGN KEY (`chatId`) REFERENCES `chat`(`id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`parentId`) REFERENCES `message`(`id`) ON UPDATE no action ON DELETE no action
+	FOREIGN KEY (`chatId`) REFERENCES `chat`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`parentId`) REFERENCES `message`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `setting` (

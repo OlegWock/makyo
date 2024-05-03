@@ -1,29 +1,11 @@
-import { useAtom } from "jotai/react";
-import { atomWithLocation } from "jotai-location";
+
 import { ReactNode, Suspense, useTransition } from "react";
-import { BaseLocationHook, Router as Wouter } from "wouter";
+import { Router as Wouter } from "wouter";
 import { ProgressBar } from "./ProgressBar";
-import { RouterPrivateContextProvider, RouterTransitionContextProvider, useRouterPrivate } from "./context";
+import { RouterPrivateContextProvider, RouterTransitionContextProvider } from "./context";
 import { Loading } from "@client/components/Loading";
+import { useLocationWithTransition } from "@client/components/Router/hooks";
 
-const locationAtom = atomWithLocation();
-
-const useLocationWithTransition: BaseLocationHook = () => {
-  const [loc, setLoc] = useAtom(locationAtom);
-
-  const startTransition = useRouterPrivate();
-
-  return [
-    loc.pathname ?? '/',
-    (to: string, replace = false) => {
-      startTransition(() => {
-        setLoc({
-          pathname: to,
-        }, { replace });
-      });
-    }
-  ];
-};
 
 export type RouterProps = {
   children: ReactNode;

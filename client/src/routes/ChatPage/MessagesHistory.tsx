@@ -13,9 +13,10 @@ import { ScrollArea } from '@client/components/ScrollArea';
 
 export type MessagesHistoryProps = {
   modelName?: string;
+  defaultScrollTo?: number;
 };
 
-export const MessagesHistory = ({ modelName }: MessagesHistoryProps) => {
+export const MessagesHistory = ({ modelName, defaultScrollTo }: MessagesHistoryProps) => {
   const onScroll: UIEventHandler<HTMLDivElement> = (e) => {
     const diff = Math.abs((e.currentTarget.scrollTop + e.currentTarget.clientHeight) - e.currentTarget.scrollHeight);
     const scrolledToBottom = diff < 40;
@@ -48,7 +49,7 @@ export const MessagesHistory = ({ modelName }: MessagesHistoryProps) => {
     if (shouldControlScrollRef.current) {
       wrapperRef.current?.scrollTo({ top: wrapperRef.current.scrollHeight });
     }
-  })
+  });
 
   const bubbles = mapOverMessagesTree(messagesTree, treeChoices, (node) => {
     const { parent, message } = node;
@@ -119,7 +120,15 @@ export const MessagesHistory = ({ modelName }: MessagesHistoryProps) => {
   });
 
   useMount(() => {
-    wrapperRef.current?.scrollTo({ top: wrapperRef.current.scrollHeight });
+    if (defaultScrollTo) {
+      wrapperRef.current?.querySelector(`[data-message-id="${defaultScrollTo}"]`)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'center',
+      });
+    } else {
+      wrapperRef.current?.scrollTo({ top: wrapperRef.current.scrollHeight });
+    }
   })
 
 

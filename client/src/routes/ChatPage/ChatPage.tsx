@@ -15,6 +15,7 @@ import { HiChevronRight, HiOutlineCog6Tooth, HiOutlinePencil } from 'react-icons
 import { Button } from '@client/components/Button';
 import { usePageTitle } from '@client/utils/hooks';
 import { Input } from '@client/components/Input';
+import { useSearchParams } from '@client/components/Router/hooks';
 
 
 export const ChatPage = withErrorBoundary(() => {
@@ -23,6 +24,8 @@ export const ChatPage = withErrorBoundary(() => {
   const { data: providers } = useModels();
   const sendMessage = useSendMessageMutation(id);
   const editChat = useEditChatMutation(id);
+
+  const [searchParams] = useSearchParams();
 
   usePageTitle(chatInfo.chat.title);
 
@@ -103,6 +106,7 @@ export const ChatPage = withErrorBoundary(() => {
           <ChatLayout.MessagesArea>
             <MessagesHistory
               modelName={usedModel}
+              defaultScrollTo={searchParams.messageId ? parseInt(searchParams.messageId) : undefined}
             />
           </ChatLayout.MessagesArea>
 

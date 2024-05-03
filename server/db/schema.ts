@@ -23,7 +23,7 @@ export const message = sqliteTable('message', {
   text: text('text').notNull(),
   isGenerating: integer('isGenerating', { mode: 'boolean' }).notNull().default(false),
   sender: text('sender', { enum: ['user', 'ai'] }).notNull(),
-  chatId: integer('chatId').references((): AnySQLiteColumn => chat.id).notNull(),
-  parentId: integer('parentId').references((): AnySQLiteColumn => message.id),
+  chatId: integer('chatId').references((): AnySQLiteColumn => chat.id, { onDelete: 'cascade' }).notNull(),
+  parentId: integer('parentId').references((): AnySQLiteColumn => message.id, { onDelete: 'cascade' }),
   createdAt: integer('createdAt', { mode: 'timestamp_ms' }).notNull().default(sql`(unixepoch() * 1000)`),
 });

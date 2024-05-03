@@ -2,7 +2,6 @@ import SyncLoader from "react-spinners/SyncLoader";
 import { MessageSchemaType } from "@shared/api";
 import styles from './MessageBubble.module.scss';
 import clsx from 'clsx';
-import { CodeBlock } from '@client/components/MessageBubble/CodeBlock';
 import { Button } from '@client/components/Button';
 import { HiArrowPath, HiChevronLeft, HiChevronRight, HiOutlinePencil, HiOutlineTrash } from 'react-icons/hi2';
 import { PiArrowsSplit, PiCopyLight } from "react-icons/pi";
@@ -11,8 +10,7 @@ import { ReactNode, RefObject, useRef, useState } from 'react';
 import { iife } from '@shared/utils';
 import { Textarea } from '@client/components/Input';
 import { Tooltip } from '@client/components/Tooltip';
-import ReactMarkdown from 'react-markdown';
-import { rehypePlugins, remarkPlugins } from '@client/components/MessageBubble/markdown';
+import { Markdown } from '@client/components/Markdown';
 import { ToastTarget, useLocalToast } from "@client/components/LocalToast";
 
 
@@ -142,7 +140,7 @@ export const MessageBubble = (props: MessageBubbleProps) => {
         setIsEditing(true);
       },
     }}>
-      <div className={clsx(styles.MessageBubble, styles[message.sender])}>
+      <div className={clsx(styles.MessageBubble, styles[message.sender])} data-message-id={message.id}>
         <div className={styles.senderName}>{senderName}</div>
         {iife(() => {
           if (showPlaceholder) {
@@ -191,14 +189,7 @@ export const MessageBubble = (props: MessageBubbleProps) => {
               ref={ref}
               className={styles.content}
             >
-              <ReactMarkdown
-                remarkPlugins={remarkPlugins}
-                rehypePlugins={rehypePlugins}
-                children={message.text}
-                components={{
-                  code: CodeBlock,
-                }}
-              />
+              <Markdown content={message.text} />
             </div>
             <MessageBubbleActions />
           </>);

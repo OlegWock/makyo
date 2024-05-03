@@ -20,22 +20,10 @@ export type TopNavProps = {
 
 export const TopNav = ({ }: TopNavProps) => {
   return (<div className={styles.TopNav}>
-
-    <Tooltip text='New chat' side='right'>
-      <Item icon={<HiPlus />} href="/" />
-    </Tooltip>
-
-    <Tooltip text='All chats' side='right'>
-      <Item href="/chats" icon={<HiListBullet />} />
-    </Tooltip>
-
-    <Tooltip text='Presets' side='right'>
-      <Item href="/presets" icon={<HiOutlineUser />} />
-    </Tooltip>
-
+    <Item icon={<HiPlus />} href="/" />
+    <Item href="/chats" icon={<HiListBullet />} />
+    <Item href="/presets" icon={<HiOutlineUser />} />
     <div className={styles.spacer} />
-    <Tooltip text='Settings' side='right'>
-      <Item href="/settings" icon={<HiOutlineCog6Tooth />} />
-    </Tooltip>
+    <Item href="/settings" icon={<HiOutlineCog6Tooth />} />
   </div >);
 };

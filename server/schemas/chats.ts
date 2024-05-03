@@ -62,3 +62,23 @@ export const EditMessageSchema = z.object({
 });
 
 export type EditMessageSchemaType = z.infer<typeof EditMessageSchema>;
+
+
+export const MessageSearchResultSchema = MessageSchema.extend({
+  type: z.literal('message'),
+  providerId: z.string(),
+  modelId: z.string(),
+  chatTitle: z.string(),
+  chatId: z.number(),
+});
+
+export type MessageSearchResultSchemaType = z.infer<typeof MessageSearchResultSchema>;
+
+export const SearchResultSchema = z.union([
+  ChatSchema.extend({
+    type: z.literal('chat'),
+  }),
+  MessageSearchResultSchema,
+]);
+
+export type SearchResultSchemaType = z.infer<typeof SearchResultSchema>;

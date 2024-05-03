@@ -2,34 +2,50 @@ import { ApiClient } from "@client/api/client";
 import { useApiClient } from "@client/api/context";
 import { throwExceptionOnFailedResponse } from "@client/api/exceptions";
 import { ChatSchemaType, ChatWithMessagesSchemaType, MessageSchemaType, NewChatSchemaType, NewMessageSchemaType, UpdateChatSchemaType } from "@shared/api";
-import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, UseQueryOptions, UseQueryResult, useSuspenseQuery, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
 import { ClientResponse } from "hono/client";
 import { produce } from "immer";
 
 type Key<T> = (string | number)[] | ((arg: T) => (string | number)[]);
 
-const createQueryHook = <Out, In = void>(key: Key<In>, func: (api: ApiClient, arg: In) => Promise<ClientResponse<Out>>) => (arg: In) => {
+type Result<S, Out> = S extends true ? UseSuspenseQueryResult<Out> : UseQueryResult<Out>
+type Options<S, Out> = Omit<S extends true ? UseSuspenseQueryOptions<Out> : UseQueryOptions<Out>, 'queryKey' | 'queryFn'>
+
+const createHookFactory = <S extends boolean>(suspense: S) => <Out, In = void>(
+  key: Key<In>, 
+  func: (api: ApiClient, arg: In) => Promise<ClientResponse<Out>>
+) => (arg: In, opts: Partial<Options<S, Out>> = {}): Result<S, Out> => {
   const api = useApiClient();
-  return useSuspenseQuery({
+  // @ts-ignore
+  return (suspense ? useSuspenseQuery : useQuery)({
     queryKey: typeof key === 'function' ? key(arg) : key,
     queryFn: () => func(api, arg).then(r => {
       throwExceptionOnFailedResponse(r);
 
       return r.json() as Promise<Out>;
     }),
+    ...opts,
   });
 };
 
-export const useAuthStatus = createQueryHook(['auth'], (api) => api.auth.verify.$get());
+const createSuspenseQueryHook = createHookFactory(true);
+const createQueryHook = createHookFactory(false);
 
-export const useSettings = createQueryHook(['settings'], (api) => api.configuration.$get());
+export const useAuthStatus = createSuspenseQueryHook(['auth'], (api) => api.auth.verify.$get());
 
-export const useModels = createQueryHook(['models'], (api) => api.providers.models.$get());
-export const useChats = createQueryHook(['chats'], (api) => api.chats.$get());
+export const useSettings = createSuspenseQueryHook(['settings'], (api) => api.configuration.$get());
 
-export const useChat = createQueryHook(
+export const useModels = createSuspenseQueryHook(['models'], (api) => api.providers.models.$get());
+export const useChats = createSuspenseQueryHook(['chats'], (api) => api.chats.$get());
+
+export const useChat = createSuspenseQueryHook(
   (id: number) => ['chats', id],
   (api, id) => api.chats[":chatId"].$get({ param: { chatId: id.toString() } })
+);
+
+export const useSearch = createSuspenseQueryHook(
+  (searchQuery: string) => ['search', searchQuery],
+  (api, searchQuery) => api.chats.search.$get({ query: { searchQuery } })
 );
 
 export const useNewChatMutation = () => {
@@ -48,6 +64,26 @@ export const useNewChatMutation = () => {
     },
   });
 };
+
+export const useDeleteChatMutation = (chatId: number) => {
+  const api = useApiClient();
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const resp = await api.chats[":chatId"].$delete({
+        param: { chatId: chatId.toString() }
+      });
+      return resp.json();
+    },
+    onSuccess(data) {
+      client.setQueryData(['chats'], (old: ChatSchemaType[]) => {
+        if (!old) return old;
+        return old.filter(c => c.id !== chatId);
+      });
+    },
+  });
+};
+
 export const useEditChatMutation = (chatId: number) => {
   const api = useApiClient();
   const client = useQueryClient();

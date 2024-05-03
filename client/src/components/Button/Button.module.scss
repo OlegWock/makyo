@@ -5,7 +5,6 @@
   font-family: inherit;
   font-size: 1rem;
   text-align: left;
-  transition: 0.1s ease-in-out;
   border-radius: .25rem;
   border: none;
   line-height: 1;
@@ -13,13 +12,18 @@
   justify-content: center;
   gap: 0.5rem;
   align-items: center;
+  outline: none;
 
   user-select: none;
   -webkit-user-select: none;
-  transition: ease-in-out 0.15s;
+  transition: background-color ease-in-out 0.15s, color ease-in-out 0.15s, border ease-in-out 0.15s;
 
   &:not(:disabled) {
     cursor: pointer;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--jade-10);
   }
 
   &.normal,
@@ -42,6 +46,7 @@
 
   &.borderless {
     --color-btn-border: transparent;
+    --color-btn-background: transparent;
   }
 
 

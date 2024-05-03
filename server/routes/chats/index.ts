@@ -3,13 +3,13 @@ import { db } from "@server/db";
 import { getMessageHistoryDownwards } from "@server/db/queries/messages";
 import { chat, message } from "@server/db/schema";
 import { getProviderById } from "@server/providers";
-import { augmentChatWithLastMessage, getChatWithMessagesFromDb, getMessageFromDb, regenerateResponseForMessage, sendMessageAndSave } from "@server/routes/chats/utils";
-import { ChatSchema, ChatWithMessagesSchema, EditMessageSchema, MessageSchema, NewChatSchema, NewMessageSchema, UpdateChatSchema } from "@server/schemas/chats";
+import { augmentChatWithLastMessage, augmentMessagesWithModelAndChatTitle, getChatWithMessagesFromDb, getMessageFromDb, regenerateResponseForMessage, sendMessageAndSave } from "@server/routes/chats/utils";
+import { ChatSchema, ChatWithMessagesSchema, EditMessageSchema, MessageSchema, NewChatSchema, NewMessageSchema, SearchResultSchema, UpdateChatSchema } from "@server/schemas/chats";
 import { createTitlePrompt } from "@server/utils/prompts";
 import { omit, serialize } from "@server/utils/serialization";
 import { broadcastSubscriptionMessage } from "@server/utils/subscriptions";
 import { transformStringToNumber } from "@server/utils/zod";
-import { and, eq, inArray, isNull, InferInsertModel } from "drizzle-orm";
+import { and, eq, inArray, isNull, InferInsertModel, like } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
 const getChats = createRoute({
@@ -23,6 +23,34 @@ const getChats = createRoute({
       content: {
         'application/json': {
           schema: z.array(ChatSchema),
+        },
+      },
+      description: '',
+    },
+  },
+});
+
+const search = createRoute({
+  method: 'get',
+  path: '/api/chats/search',
+  summary: 'Search chats and messages',
+  tags: ['Chats'],
+  security: [{ CookieAuth: [] }],
+  request: {
+    query: z.object({
+      searchQuery: z.string().openapi({
+        param: {
+          name: 'searchQuery',
+          in: 'query',
+        },
+      })
+    })
+  },
+  responses: {
+    200: {
+      content: {
+        'application/json': {
+          schema: z.array(SearchResultSchema),
         },
       },
       description: '',
@@ -113,6 +141,34 @@ const editChat = createRoute({
       content: {
         'application/json': {
           schema: ChatWithMessagesSchema,
+        },
+      },
+      description: '',
+    },
+  },
+});
+
+const deleteChat = createRoute({
+  method: 'delete',
+  path: '/api/chats/{chatId}',
+  summary: 'Delete chat',
+  tags: ['Chats'],
+  security: [{ CookieAuth: [] }],
+  request: {
+    params: z.object({
+      chatId: z.string().openapi({
+        param: {
+          name: 'chatId',
+          in: 'path',
+        },
+      }).transform(transformStringToNumber)
+    }),
+  },
+  responses: {
+    200: {
+      content: {
+        'application/json': {
+          schema: z.object({}),
         },
       },
       description: '',
@@ -306,6 +362,20 @@ export const chatsRouter = new OpenAPIHono()
     augmented.sort((a, b) => b.lastMessageAt - a.lastMessageAt);
     return c.json(augmented);
   })
+  .openapi(search, async (c) => {
+    const { searchQuery } = c.req.valid('query');
+    const [rawChats, rawMessages] = await Promise.all([
+      db.select().from(chat).where(like(chat.title, `%${searchQuery}%`)),
+      db.select().from(message).where(like(message.text, `%${searchQuery}%`)),
+    ]);
+    const chats = await Promise.all(rawChats.map(augmentChatWithLastMessage));
+    const messages = await augmentMessagesWithModelAndChatTitle(rawMessages);
+    const response = [
+      ...chats.map(c => ({...c, type: 'chat' as const})),
+      ...messages,
+    ];
+    return c.json(response);
+  })
   .openapi(createChat, async (c) => {
     const { providerId, modelId, text, parameters } = c.req.valid('json');
     const provider = getProviderById(providerId);
@@ -370,6 +440,11 @@ export const chatsRouter = new OpenAPIHono()
     await db.update(chat).set(payload).where(eq(chat.id, chatId)).returning();
 
     return c.json(await getChatWithMessagesFromDb(chatId));
+  })
+  .openapi(deleteChat, async (c) => {
+    const { chatId } = c.req.valid('param');
+    await db.delete(chat).where(eq(chat.id, chatId));
+    return c.json({});
   })
   .openapi(sendMessage, async (c) => {
     const { chatId } = c.req.valid('param');
@@ -453,7 +528,7 @@ export const chatsRouter = new OpenAPIHono()
   })
   .openapi(deleteMessage, async (c) => {
     const { chatId, messageId } = c.req.valid('param');
-    const { chatFromDb, messageFromDb } = await getMessageFromDb(chatId, messageId);
+    const { messageFromDb } = await getMessageFromDb(chatId, messageId);
     if (!messageFromDb.parentId) {
       const rootMessages = await db.select().from(message).where(and(
         eq(message.chatId, chatId),
@@ -473,8 +548,7 @@ export const chatsRouter = new OpenAPIHono()
         throw new HTTPException(400, { message: `can't delete AI message if there are no alternative messages` });
       }
     }
-    const history = await getMessageHistoryDownwards(messageId);
-    await db.delete(message).where(inArray(message.id, history.map(m => m.id)));
+    await db.delete(message).where(eq(message.id, messageId));
     return c.json(await getChatWithMessagesFromDb(chatId));
   });
 

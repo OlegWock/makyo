@@ -9,7 +9,7 @@
     text-decoration-thickness: 2px;
     text-decoration-color: var(--green-7);
     text-underline-offset: 2px;
-    transition: 0.2s ease-in-out;
+    transition: text-decoration-color 0.2s ease-in-out;
 
     &:hover {
       text-decoration-color: var(--green-9);

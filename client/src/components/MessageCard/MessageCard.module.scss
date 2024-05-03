@@ -1,0 +1,53 @@
+.MessageCard {
+  border: 1px solid var(--gray-4);
+  border-radius: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem 1rem;
+
+  &.collapsed {
+    max-height: 410px;
+    position: relative;
+    overflow: hidden;
+
+    .gradient {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 100px;
+      background: linear-gradient(to top, var(--gray-2) 40%, transparent);
+      padding: 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+
+      .showAllButton {
+        --color-btn-background-hover: var(--gray-4);
+      }
+    }
+  }
+
+  .senderWrapper {
+    display: flex;
+    align-items: center;
+
+    .sender {
+      flex-grow: 1;
+      font-weight: 600;
+      display: flex;
+      gap: 0.35rem;
+      align-items: center;
+  
+      svg {
+        max-width: 1rem;
+        max-height: 1rem;
+        width: auto;
+        height: auto;
+        margin-left: 0.2rem;
+      }
+    }
+  }
+  
+}

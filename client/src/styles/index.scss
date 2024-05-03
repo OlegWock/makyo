@@ -8,21 +8,34 @@
 @import '@radix-ui/colors/tomato.css';
 
 * {
-  *::-webkit-scrollbar {
+  outline-color: var(--jade-10);
+
+  &,
+  &::after,
+  &::before {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+  }
+
+  &::-webkit-scrollbar {
     width: 4px;
     height: 4px;
   }
 
-  *::-webkit-scrollbar-track {
+  &::-webkit-scrollbar-track {
     background: transparent;
   }
 
-  *::-webkit-scrollbar-thumb {
+  &::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.15);
     border-radius: 2px;
   }
 
-  *::-webkit-scrollbar-thumb:hover {
+  &::-webkit-scrollbar-thumb:hover {
     background: #999;
   }
 }
@@ -52,17 +65,6 @@ body {
 #root {
   height: 100%;
   max-height: 100%;
-}
-
-*,
-*::after,
-*::before {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-  font-family: inherit;
-  font-size: inherit;
-  color: inherit;
 }
 
 code,

@@ -2,11 +2,11 @@ import { db } from "@server/db";
 import { getMessageHistoryUpwards } from "@server/db/queries/messages";
 import { chat, message } from "@server/db/schema";
 import { ModelParameters, Provider } from "@server/providers/provider"
-import { ChatSchemaType, ChatWithMessagesSchemaType } from "@server/schemas/chats";
+import { ChatSchemaType, ChatWithMessagesSchemaType, MessageSchemaType, MessageSearchResultSchemaType } from "@server/schemas/chats";
 import { omit, serialize } from "@server/utils/serialization";
 import { broadcastSubscriptionMessage } from "@server/utils/subscriptions";
 import { throttle } from "@shared/utils";
-import { and, eq, desc, InferSelectModel } from "drizzle-orm";
+import { and, eq, desc, InferSelectModel, inArray } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
 
@@ -142,6 +142,22 @@ export const augmentChatWithLastMessage = async (chatFromDb: InferSelectModel<ty
     ...chatFromDb,
     lastMessageAt: lastMessage.createdAt,
     lastMessageText: lastMessage.text,
+  });
+};
+
+export const augmentMessagesWithModelAndChatTitle = async (messages: InferSelectModel<typeof message>[]): Promise<MessageSearchResultSchemaType[]> => {
+  if (messages.length === 0) return [];
+  const chatIds = [...new Set(messages.map(m => m.chatId))];
+  const chats = await db.select().from(chat).where(inArray(chat.id, chatIds));
+  const chatsMap = Object.fromEntries(chats.map(c => [c.id, c]));
+  return messages.map(m => {
+    return {
+      ...serialize(m),
+      chatTitle: chatsMap[m.chatId].title,
+      providerId: chatsMap[m.chatId].providerId,
+      modelId: chatsMap[m.chatId].modelId,
+      type: 'message',
+    }
   });
 };
 
