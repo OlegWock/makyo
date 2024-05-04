@@ -5,7 +5,9 @@ import { EventEmitter } from 'node:events';
 export const sseEmitter = iife(() => {
   class ServerSentEventsEmitter extends EventEmitter {};
 
-  return new ServerSentEventsEmitter();
+  const emmiter = new ServerSentEventsEmitter();
+  emmiter.setMaxListeners(200);
+  return emmiter;
 });
 
 

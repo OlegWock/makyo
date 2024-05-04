@@ -15,6 +15,7 @@ class AnthropicProvider extends Provider {
     const patchedMessages = convertKatukoMessagesForLLM(messages);
     const stream = await anthropic.messages.stream({
       max_tokens: 2048,
+      // @ts-ignore
       messages: patchedMessages,
       model: modelId,
     });

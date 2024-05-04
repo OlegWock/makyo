@@ -7,8 +7,9 @@ import { configurationRouter } from '@server/routes/configuration';
 import { providersRouter } from '@server/routes/providers';
 import { chatsRouter } from '@server/routes/chats';
 import { bunWebSocket, subscriptionsRouter } from '@server/routes/subscription';
-import { Context, Env } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+import { serveStatic } from './static';
+import { resolve } from 'path';
 
 const app = new OpenAPIHono();
 
@@ -53,12 +54,16 @@ app.get(
   }),
 );
 
-app.get('*', (c) => {
-  // TODO: Should serve static resources!
-  return c.text('Should serve static resources!');
-});
+app.get('*', serveStatic({
+  root: resolve(import.meta.dirname, '../client/dist'),
+  fallbackPath: 'index.html',
+  onNotFound(path, c) {
+    console.log('Not found', path);
+  },
+}));
 
 app.onError((err, c) => {
+  console.log('Err', err);
   if (err instanceof HTTPException) {
     return c.json({
       code: err.status,
@@ -66,7 +71,7 @@ app.onError((err, c) => {
     }, err.status);
   }
   return c.res;
-})
+});
 
 export type ApiType = typeof router;
 
