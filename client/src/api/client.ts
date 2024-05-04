@@ -1,7 +1,7 @@
 import { ApiType } from '@shared/api';
 import { hc } from 'hono/client';
 
-export const API_HOST = import.meta.env.VITE_KATUKO_API_HOST || window.location.origin;
+export const API_HOST = window.location.origin;
 console.log('API host', API_HOST);
 
 export const createApiClient = () => {

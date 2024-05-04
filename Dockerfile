@@ -1,40 +1,40 @@
-# Build process
-# 1. Install dependencies in temporary container
-# 2. Compile front-end in temporary container
-# 3. Copy compiled frontend into production container
-# 4. Install production dependnecies
-# 5. Run service
+# Platform is important, as we have SQLite extension compiled for ARM
+FROM --platform=linux/arm64 oven/bun:1 as base
+  WORKDIR /usr/src/app
 
-# TODO: Check that secrets aren't included in container
-# TODO: Allow configuring frontend root via ENV
-# TODO: make docker compose file too
+FROM base AS install-dev
+  RUN mkdir -p /temp/dev
+  COPY package.json bun.lockb /temp/dev/
+  RUN cd /temp/dev && bun install --frozen-lockfile
 
-FROM oven/bun:1 as base
-WORKDIR /usr/src/app
+FROM base AS install-production
+  RUN mkdir -p /temp/production
+  COPY package.json bun.lockb /temp/production/
+  RUN cd /temp/production && bun install --frozen-lockfile --production
 
-# install dependencies into temp directory
-# this will cache them and speed up future builds
-FROM base AS install
-RUN mkdir -p /temp/dev
-COPY package.json bun.lockb /temp/dev/
-RUN cd /temp/dev && bun install --frozen-lockfile
-
-# copy node_modules from temp directory
-# then copy all (non-ignored) project files into the image
 FROM base AS prerelease
-COPY --from=install /temp/dev/node_modules node_modules
-COPY . .
-ENV NODE_ENV=production
-RUN bun run client:build
+  COPY --from=install-dev /temp/dev/node_modules node_modules
+  COPY . .
+  ENV NODE_ENV=production
+  # Might be good idea to bundle backend into single file, but this doesn't seem to work for some reason
+  # RUN bun build --target=bun server/index.ts --outdir ./server/dist
+  RUN bun run client:build
 
-
-# copy production dependencies and source code into final image
 FROM base AS release
-COPY --from=install /temp/prod/node_modules node_modules
-COPY --from=prerelease /usr/src/app/index.ts .
-COPY --from=prerelease /usr/src/app/package.json .
+  ENV NODE_ENV=production
 
-# run the app
-USER bun
-EXPOSE 3000/tcp
-ENTRYPOINT [ "bun", "run", "index.ts" ]
+  COPY --from=install-production /temp/production/node_modules node_modules
+  COPY --from=prerelease /usr/src/app/package.json .
+  COPY --from=prerelease /usr/src/app/drizzle.config.ts .
+  COPY --from=prerelease /usr/src/app/entrypoint.sh .
+  COPY --from=prerelease /usr/src/app/server ./server
+  COPY --from=prerelease /usr/src/app/shared ./shared
+  COPY --from=prerelease /usr/src/app/client/dist ./client
+  
+  RUN bun install --frozen-lockfile --production
+  RUN chown -R bun:bun /usr/src/app
+  RUN chmod 755 /usr/src/app
+
+  USER bun
+  EXPOSE 8440/tcp
+  ENTRYPOINT [ "/usr/src/app/entrypoint.sh" ]

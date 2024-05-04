@@ -69,15 +69,23 @@ export const subscriptionsRouter = openAPIHonoInstance
     '/api/subscribe/sse',
     async (c) => {
       return streamSSE(c, async (stream) => {
+        let canceled = false;
         await stream.write('retry: 1000\n\n');
         const eventHandler = (messageStr: string) => {
           if (c.req.raw.signal.aborted) {
             sseEmitter.removeListener('message', eventHandler);
+            canceled = true;
             return;
           }
           stream.write(`data: ${messageStr}\n\n`);
         };
         sseEmitter.addListener('message', eventHandler);
+
+        // Fun fact: on Linux (in Docker) connection will be closed once function returns
+        // so we need to have sleep cycle here (but on Mac, everything works without it!)
+        while (!canceled) {
+          await Bun.sleep(2000);
+        }
       });
     }
   );

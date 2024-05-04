@@ -179,4 +179,5 @@ dist
 
 katuko.db
 .env.local
+.env.docker
 .env

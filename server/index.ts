@@ -14,10 +14,9 @@ import { resolve } from 'path';
 const app = new OpenAPIHono();
 
 app.use('/*', cors({
-  origin: ['http://localhost:8441'],
+  origin: '*',
   allowHeaders: ['Content-Type'],
   allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-  credentials: true,
 }));
 app.use('/*', prettyJSON());
 app.use('/api/*', cookieAuthMiddleware());
@@ -54,8 +53,9 @@ app.get(
   }),
 );
 
+console.log('Will be serving content of', resolve(import.meta.dirname, process.env.KATUKO_FRONTEND_FILES_PATH!), 'as static files');
 app.get('*', serveStatic({
-  root: resolve(import.meta.dirname, '../client/dist'),
+  root: resolve(import.meta.dirname, process.env.KATUKO_FRONTEND_FILES_PATH!),
   fallbackPath: 'index.html',
   onNotFound(path, c) {
     console.log('Not found', path);

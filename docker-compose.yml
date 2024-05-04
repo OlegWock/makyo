@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  katuko:
+    build:
+      context: .
+    ports:
+      - "8440:8440" 
+    restart: unless-stopped 
+
+    volumes:
+      - ./katuko.db:/usr/src/app/katuko.db
+
+
+    # Create your own .env.docker based on .env.docker.example
+    env_file:
+      - .env.docker
+    environment:
+      # TODO: we definetely need better way to manage paths, esp. that some paths are relative to file, and other to working dir
+      - KATUKO_FRONTEND_FILES_PATH=../client
+      - KATUKO_DB_PATH=katuko.db
