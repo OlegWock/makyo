@@ -19,6 +19,7 @@ export const AuthGate = ({ children }: AuthGateProps) => {
       const http = createHttpClient();
       const resp = await http.authenticate.$post({ json: { token: apiKeyDraft } });
       const json = await resp.json();
+      if (!resp.ok || !json.valid) throw new Error('Wrong password');
       setIsLoading(false);
       setError('');
       setApiKeyDraft('');

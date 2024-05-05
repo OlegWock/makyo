@@ -26,7 +26,8 @@ export const ChatLayout = componentFactory('ChatLayout', ({ onSend, slots }: Cha
   const isMobile = useIsMobile();
 
   return (<div className={styles.ChatLayout}>
-    {!!slots.Title && <div className={styles.header}>
+    {/* TODO: on mobile, show actions in another place (near textarea?) */}
+    {!!(slots.Title || slots.TitleLeftActions || slots.TitleRightActions) && !isMobile && <div className={styles.header}>
       <div className={styles.leftActions}>
         {slots.TitleLeftActions}
       </div>
@@ -50,10 +51,9 @@ export const ChatLayout = componentFactory('ChatLayout', ({ onSend, slots }: Cha
         </div>}
 
         <div className={styles.textareaWrapper}>
-
           <Textarea
             className={styles.textarea}
-            autoFocus
+            autoFocus={!isMobile}
             minRows={1}
             maxRows={20}
             value={text}

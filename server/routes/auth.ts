@@ -3,6 +3,9 @@ import { MiddlewareHandler } from "hono";
 import { getCookie, setCookie, setSignedCookie } from 'hono/cookie';
 import { HTTPException } from 'hono/http-exception'
 
+// TODO: current cookie auth requires site being hosted either on localhost or on http. Since we send token plaintext
+// that's actually good, but might want to include check in AuthGate to show user a message
+
 const AuthCheckSchema = z
   .object({
     valid: z.literal(true),

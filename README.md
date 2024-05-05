@@ -9,6 +9,7 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
   Might be useful: https://github.com/lobehub/lobe-chat/pull/2168
   Doc: [LOCAL_PROXY.md](/LOCAL_PROXY.md)
 - [ ] Better 'New chat' screen: suggest user some pre-defined questions or continue one of recent chats
+- [ ] Readme about dev and deployment
 - [ ] Support for snippets
   - [ ] Snippets management (add/edit/delete)
   - [ ] Snippets handling (insert snippet when user types `/keyword`)
