@@ -33,6 +33,18 @@ const atomWithLocation = () => {
     pathname: location.pathname,
     params: searchParamsToMap(new URLSearchParams(location.search)),
   });
+
+  storage.onMount = (set) => {
+    const handler = () => {
+      set({
+        pathname: location.pathname,
+        params: searchParamsToMap(new URLSearchParams(location.search)),
+      });
+    };
+
+    window.addEventListener('popstate', handler);
+    return () => window.removeEventListener('popstate', handler);
+  };
   return atom<JotaiLocation, [JotaiLocationSetPayload, JotaiLocationSetOptions] | [JotaiLocationSetPayload], void>(
     (get) => get(storage),
     (get, set, ...[payload, options]) => {
@@ -71,9 +83,10 @@ export const useLocationWithTransition: BaseLocationHook = () => {
 
   return [
     loc.pathname ?? '/',
-    (to: string, replace = false) => {
+    (to: string, ...args) => {
+      console.log('Set loc args', args);
       startTransition(() => {
-        setLoc(to, { replace });
+        setLoc(to);
       });
     }
   ];
