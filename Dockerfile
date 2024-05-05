@@ -22,6 +22,7 @@ FROM base AS prerelease
 FROM base AS release
   ENV NODE_ENV=production
   ENV KATUKO_FRONTEND_FILES_PATH=./client
+  ENV KATUKO_DB_PATH=/usr/src/data/katuko.db
 
   COPY --from=install-production /temp/production/node_modules node_modules
   COPY --from=prerelease /usr/src/app/package.json .
@@ -34,6 +35,10 @@ FROM base AS release
   RUN bun install --frozen-lockfile --production
   RUN chown -R bun:bun /usr/src/app
   RUN chmod 755 /usr/src/app
+
+  RUN mkdir /usr/src/data
+  RUN chown -R bun:bun /usr/src/data
+  RUN chmod 755 /usr/src/data
 
   USER bun
   EXPOSE 8440/tcp

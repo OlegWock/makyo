@@ -8,10 +8,7 @@ services:
       - "8440:8440" 
     restart: unless-stopped 
     volumes:
-      - ./katuko.db:/usr/src/app/katuko.db
-    environment:
-      - KATUKO_DB_PATH=./katuko.db
-
+      - ./katuko.db:/usr/src/data/katuko.db
 
     # Create your own .env.docker based on .env.docker.example
     env_file:
