@@ -1,5 +1,4 @@
-# Platform is important, as we have SQLite extension compiled for ARM
-FROM --platform=linux/arm64 oven/bun:1 as base
+FROM oven/bun:1 as base
   WORKDIR /usr/src/app
 
 FROM base AS install-dev
@@ -22,6 +21,7 @@ FROM base AS prerelease
 
 FROM base AS release
   ENV NODE_ENV=production
+  ENV KATUKO_FRONTEND_FILES_PATH=./client
 
   COPY --from=install-production /temp/production/node_modules node_modules
   COPY --from=prerelease /usr/src/app/package.json .

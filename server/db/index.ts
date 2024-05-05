@@ -12,9 +12,9 @@ if (process.env.KATUKO_MACOS_HOMEBREW_SQLITE_PATH) {
   Database.setCustomSQLite(process.env.KATUKO_MACOS_HOMEBREW_SQLITE_PATH);
 }
 const sqlite = new Database(resolve(process.cwd(), process.env.KATUKO_DB_PATH));
-sqlite.loadExtension(resolve(process.cwd(), 'server/db/sqlite/define'));
-sqlite.loadExtension(resolve(process.cwd(), 'server/db/sqlite/fuzzy'));
-sqlite.loadExtension(resolve(process.cwd(), 'server/db/sqlite/regexp'));
-sqlite.loadExtension(resolve(process.cwd(), 'server/db/sqlite/text'));
-sqlite.loadExtension(resolve(process.cwd(), 'server/db/sqlite/unicode'));
+sqlite.loadExtension(resolve(process.cwd(), `server/db/sqlite/${process.platform}-${process.arch}/define`));
+sqlite.loadExtension(resolve(process.cwd(), `server/db/sqlite/${process.platform}-${process.arch}/fuzzy`));
+sqlite.loadExtension(resolve(process.cwd(), `server/db/sqlite/${process.platform}-${process.arch}/regexp`));
+sqlite.loadExtension(resolve(process.cwd(), `server/db/sqlite/${process.platform}-${process.arch}/text`));
+sqlite.loadExtension(resolve(process.cwd(), `server/db/sqlite/${process.platform}-${process.arch}/unicode`));
 export const db = drizzle(sqlite, { schema });

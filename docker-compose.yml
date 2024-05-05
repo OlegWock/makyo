@@ -10,7 +10,6 @@ services:
     volumes:
       - ./katuko.db:/usr/src/app/katuko.db
     environment:
-      - KATUKO_FRONTEND_FILES_PATH=./client
       - KATUKO_DB_PATH=./katuko.db
 
 
