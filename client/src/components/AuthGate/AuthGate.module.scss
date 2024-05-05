@@ -1,3 +1,5 @@
+@use "../../styles/utils.scss" as *;
+
 .AuthGate {
   height: 100%;
   display: flex;
@@ -20,11 +22,16 @@
     justify-content: center;
     align-items: center;
     gap: 1.5rem;
+
+    @include mobile {
+      flex-grow: 1;
+    }
   }
 
   .title {
     font-size: 2.5rem;
     font-weight: 500;
+    text-align: center;
   }
 
   .error {
@@ -35,8 +42,13 @@
     display: flex;
     gap: 1rem;
 
+    @include mobile {
+      flex-direction: column;
+    }
+
     .input {
       width: 300px;
+      max-width: 100%;
       flex-shrink: 1;
     }
   }
