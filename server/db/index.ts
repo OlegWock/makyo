@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { Database } from "bun:sqlite";
-import { join } from "node:path"
+import { resolve } from "node:path"
 import * as schema from './schema';
 
 if (!process.env.KATUKO_DB_PATH) {
@@ -11,10 +11,10 @@ if (!process.env.KATUKO_DB_PATH) {
 if (process.env.KATUKO_MACOS_HOMEBREW_SQLITE_PATH) {
   Database.setCustomSQLite(process.env.KATUKO_MACOS_HOMEBREW_SQLITE_PATH);
 }
-const sqlite = new Database(process.env.KATUKO_DB_PATH);
-sqlite.loadExtension(join(import.meta.dir, 'sqlite', 'define'));
-sqlite.loadExtension(join(import.meta.dir, 'sqlite', 'fuzzy'));
-sqlite.loadExtension(join(import.meta.dir, 'sqlite', 'regexp'));
-sqlite.loadExtension(join(import.meta.dir, 'sqlite', 'text'));
-sqlite.loadExtension(join(import.meta.dir, 'sqlite', 'unicode'));
+const sqlite = new Database(resolve(process.cwd(), process.env.KATUKO_DB_PATH));
+sqlite.loadExtension(resolve(process.cwd(), 'server/db/sqlite/define'));
+sqlite.loadExtension(resolve(process.cwd(), 'server/db/sqlite/fuzzy'));
+sqlite.loadExtension(resolve(process.cwd(), 'server/db/sqlite/regexp'));
+sqlite.loadExtension(resolve(process.cwd(), 'server/db/sqlite/text'));
+sqlite.loadExtension(resolve(process.cwd(), 'server/db/sqlite/unicode'));
 export const db = drizzle(sqlite, { schema });

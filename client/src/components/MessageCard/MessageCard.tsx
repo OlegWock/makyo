@@ -26,8 +26,6 @@ export const MessageCard = ({ message }: MessageCardProps) => {
     return model?.name;
   }, [providers, message.modelId, message.providerId]);
 
-  // TODO: make this look right when shown along with ChatCard
-
   const collapsed = bound.height > 400 && !expaned;
   return (<div className={clsx(styles.MessageCard, collapsed && styles.collapsed)} ref={ref}>
     <div className={styles.senderWrapper}>

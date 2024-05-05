@@ -47,8 +47,7 @@ export const ChatsPage = withErrorBoundary(() => {
         <Suspense>
           {!!params.query ? <SearchResults query={deferredSearchQuery} /> : <>
             {chats.length === 0 && <div>
-              {/* TODO: empty state component */}
-              No chats yet
+              <Empty text='No chats yet' />
             </div>}
             {chats.map((chat) => {
               return (<ChatCard

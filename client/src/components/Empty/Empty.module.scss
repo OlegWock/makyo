@@ -8,7 +8,7 @@
   flex-grow: 1;
 
   svg {
-    width: 6rem;
+    width: 8rem;
     height: auto;
     color: var(--gray-3);
     stroke-width: 0.75px;
@@ -16,6 +16,7 @@
 
   .text {
     font-size: 2rem;
+    margin-top: 0.5rem;
     color: var(--gray-5);
   }
 }

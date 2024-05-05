@@ -1,4 +1,4 @@
-import { Context, Env, MiddlewareHandler } from "hono"
+import { Context, Env, MiddlewareHandler } from "hono";
 
 // Copied from https://github.com/honojs/hono/blob/main/src/middleware/serve-static/index.ts#L20
 // And adapted to allow fallback for SPA
@@ -156,7 +156,6 @@ const pathResolve = (path: string) => {
   return `/${path}`;
 }
 
-// TODO: check if there is no directory traversal
 export const serveStatic = <E extends Env = Env>(
   options: ServeStaticOptions<E>
 ): MiddlewareHandler => {
@@ -168,6 +167,7 @@ export const serveStatic = <E extends Env = Env>(
     }
 
     let filename = options.path ?? decodeURI(c.req.path)
+    console.log('Requesting file', filename);
     filename = options.rewriteRequestPath ? options.rewriteRequestPath(filename) : filename
     const root = options.root
 
@@ -181,20 +181,21 @@ export const serveStatic = <E extends Env = Env>(
       return await next()
     }
 
-    path = pathResolve(path)
-    let content = await getContent(path)
+    path = pathResolve(path);
+    console.log('Resolved path', path);
+    let content = await getContent(path);
     if (!content) {
       let pathWithOutDefaultDocument = getFilePathWithoutDefaultDocument({
         filename,
         root,
-      })
+      });
       if (!pathWithOutDefaultDocument) {
         return await next()
       }
-      pathWithOutDefaultDocument = pathResolve(pathWithOutDefaultDocument)
-      content = await getContent(pathWithOutDefaultDocument)
+      pathWithOutDefaultDocument = pathResolve(pathWithOutDefaultDocument);
+      content = await getContent(pathWithOutDefaultDocument);
       if (content) {
-        path = pathWithOutDefaultDocument
+        path = pathWithOutDefaultDocument;
       }
     }
 

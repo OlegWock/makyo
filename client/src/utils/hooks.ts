@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 
 export const useMount = (cb: () => VoidFunction | void | Promise<void>) => {
   useEffect(() => {
@@ -10,3 +10,13 @@ export const useMount = (cb: () => VoidFunction | void | Promise<void>) => {
 export const usePageTitle = (title: string) => {
   document.title = `${title} | Katuko chat`;
 };
+
+export const useMirrorStateToRef = <T>(val: T) => {
+  const ref = useRef(val);
+  
+  useLayoutEffect(() => {
+    ref.current = val;
+  });
+
+  return ref;
+}

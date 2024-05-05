@@ -6,7 +6,7 @@ import { useChat, useSendMessageMutation, useModels, useEditChatMutation } from 
 import { useMemo, useRef, useState } from 'react';
 import { MessagesHistory } from './MessagesHistory';
 import { ChatPageContextProvider } from './context';
-import { buildTreeFromMessages, getLastMessage, PreferredTreeBranchesMap, walkOverAllMessagesInTree } from './tree';
+import { buildTreeFromMessages, getLastMessage, useTreeChoices, walkOverAllMessagesInTree } from './tree';
 import { withErrorBoundary } from '@client/components/ErrorBoundary';
 import { Card } from '@client/components/Card';
 import { ChatSettings, useChatSettings } from '@client/components/ChatSettings';
@@ -15,14 +15,9 @@ import { Button } from '@client/components/Button';
 import { useMount, usePageTitle } from '@client/utils/hooks';
 import { Input } from '@client/components/Input';
 import { useSearchParams } from '@client/components/Router/hooks';
-import { atomWithStorage } from 'jotai/utils';
 import { useAtom } from 'jotai/react';
-import { WritableAtom } from 'jotai';
 import { produce } from 'immer';
 
-
-
-const treeChoicesAtom = atomWithStorage<PreferredTreeBranchesMap>('messageChoices', {} as PreferredTreeBranchesMap, undefined, { getOnInit: true }) as unknown as WritableAtom<PreferredTreeBranchesMap, [(prev: PreferredTreeBranchesMap) => PreferredTreeBranchesMap], void>;
 
 export const ChatPage = withErrorBoundary(() => {
   const { id } = useStrictRouteParams({ id: z.coerce.number() });
@@ -44,7 +39,7 @@ export const ChatPage = withErrorBoundary(() => {
   }, [providers, chatInfo.chat.modelId, chatInfo.chat.providerId]);
 
   const tree = useMemo(() => buildTreeFromMessages(chatInfo.messages), [chatInfo.messages]);
-  const [treeChoices, setTreeChoices] = useAtom(treeChoicesAtom);
+  const [treeChoices, setTreeChoices] = useTreeChoices(tree);
   console.log('Render chat page with tree choices', JSON.stringify(treeChoices, null, 4));
   const lastMessage = getLastMessage(tree, treeChoices);
 

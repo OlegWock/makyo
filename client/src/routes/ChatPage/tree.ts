@@ -1,4 +1,9 @@
+import { minmax } from "@client/utils/animations";
+import { useMirrorStateToRef } from "@client/utils/hooks";
 import { MessageSchemaType } from "@shared/api";
+import { SetStateAction, useAtom } from "jotai";
+import { atomWithStorage } from "jotai/utils";
+import { useMemo } from "react";
 
 export type MessageTreeNode = {
   message: MessageSchemaType;
@@ -7,6 +12,28 @@ export type MessageTreeNode = {
 };
 
 export type PreferredTreeBranchesMap = Record<number | 'root', number>;
+
+const treeChoicesAtom = atomWithStorage<PreferredTreeBranchesMap>('messageChoices', {} as PreferredTreeBranchesMap, undefined, { getOnInit: true });
+
+export const useTreeChoices = (tree: MessageTreeNode[]) => {
+  const setTreeChoices = (action: SetStateAction<PreferredTreeBranchesMap>) => {
+    const newValue = typeof action === 'function' ? action(normalizedRef.current) : action;
+    setVal(newValue);
+  }
+  const [val, setVal] = useAtom(treeChoicesAtom);
+  const normalized = useMemo(() => {
+    const copy = {...val};
+    walkOverAllMessagesInTree(tree, (node) => {
+      if (copy[node.message.id] === undefined || copy[node.message.id] >= node.children.length) {
+        copy[node.message.id] = 0;
+      }
+    });
+    return copy;
+  }, [tree, val]);
+  const normalizedRef = useMirrorStateToRef(normalized);
+
+  return [normalized, setTreeChoices] as const;
+}
 
 export const buildTreeFromMessages = (messages: MessageSchemaType[]) => {
   const messageMap = new Map<number, MessageSchemaType>();
@@ -49,11 +76,11 @@ export const buildTreeFromMessages = (messages: MessageSchemaType[]) => {
   return rootMessages.map(message => createNode(message, null));
 };
 
-export const getLastMessage = (tree: MessageTreeNode[], treeChoices: PreferredTreeBranchesMap) => {
+export const getLastMessage = (tree: MessageTreeNode[], treeChoices: PreferredTreeBranchesMap): MessageTreeNode => {
   const branchIndex = treeChoices['root'] ?? 0;
   let currentNode = tree[branchIndex];
   while (currentNode.children.length) {
-    const branchIndex = treeChoices[currentNode.message.id] ?? 0;
+    const branchIndex = minmax(treeChoices[currentNode.message.id] ?? 0, 0, currentNode.children.length -1);
     currentNode = currentNode.children[branchIndex];
   }
 
@@ -65,7 +92,7 @@ export const walkOverMessagesTree = (tree: MessageTreeNode[], treeChoices: Prefe
   let currentNode = tree[branchIndex];
   while (currentNode) {
     const node = currentNode;
-    const selectedBranch = treeChoices[node.message.id] ?? 0;
+    const selectedBranch = minmax(treeChoices[node.message.id] ?? 0, 0, node.children.length - 1);
 
     const result = cb(node);
     if (result === false) {
