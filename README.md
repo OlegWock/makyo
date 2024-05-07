@@ -8,8 +8,6 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 - [ ] Browser proxy for Ollama (proxy calls from webserver through browser to Ollama) to allow hosting frontend on remote domain but accessing local Ollama
   Might be useful: https://github.com/lobehub/lobe-chat/pull/2168
   Doc: [LOCAL_PROXY.md](/LOCAL_PROXY.md)
-- [ ] Better 'New chat' screen: suggest user some pre-defined questions or continue one of recent chats
-- [ ] Optimize frontend build size
 - [ ] Support for snippets
   - [ ] Snippets management (add/edit/delete)
   - [ ] Snippets handling (insert snippet when user types `/keyword`)
@@ -19,6 +17,8 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 - [ ] Support for personas
   - [ ] Essentially just a preset with name, icon and chat settings (model, temperature, system prompt)
   - [ ] When creating new chat, parameters are copied + chat is associated with persona, but user can change any parameter
+- [ ] Better 'New chat' screen: suggest user some pre-defined questions or continue one of recent chats
+- [ ] Optimize frontend build size
 - [ ] Semantic/vector search across messages
 - [ ] Support for perplexity.ai provider
 
@@ -36,7 +36,17 @@ docker-compose up -d
 
 ## Local development
 
-To run app without docker, first install dependencies:
+**Due to usage of pre-compiled SQLite extensions, local development only supported for Mac OS on ARM and Linux (ARM/x64).**
+
+On Mac, you'll need to install SQLite from Homberwer:
+
+```bash
+brew install sqlite
+```
+
+If you want to use OpenAI/Anthropic provider, copy `.env.development` and rename it to `.env.local` and put your keys there.
+
+Then to run app locally without docker, first install dependencies:
 
 ```bash
 bun install
