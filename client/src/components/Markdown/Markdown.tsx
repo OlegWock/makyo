@@ -31,38 +31,48 @@ export const CodeBlock = (props: CodeBlockProps) => {
 };
 
 
-export function sequentialNewlinesPlugin(this: any) {
-  // Adapted from https://codesandbox.io/s/create-react-app-forked-h3rmcy?file=/src/sequentialNewlinePlugin.js:0-774
+/////////
+// Adapted from https://codesandbox.io/s/create-react-app-forked-h3rmcy?file=/src/sequentialNewlinePlugin.js:0-774
+function enterLineEndingBlank(this: any, token: any) {
+  this.enter(
+      {
+          type: "break",
+          value: "",
+          data: {},
+          children: []
+      },
+      token
+  );
+}
+
+function exitLineEndingBlank(this: any, token: any) {
+  this.exit(token);
+}
+
+/**
+* MDAST utility for processing the lineEndingBlank token from micromark.
+*/
+const sequentialNewlinesFromMarkdown = {
+  enter: {
+      lineEndingBlank: enterLineEndingBlank
+  },
+  exit: {
+      lineEndingBlank: exitLineEndingBlank
+  }
+};
+
+function sequentialNewlinesPlugin(this: any) {
   const data = this.data();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function add(field: string, value: any) {
-    const list = data[field] ? data[field] : (data[field] = []);
+  function add(field: any, value: any) {
+      const list = data[field] ? data[field] : (data[field] = []);
 
-    list.push(value);
+      list.push(value);
   }
 
-  add('fromMarkdownExtensions', {
-    enter: {
-      lineEndingBlank: function enterLineEndingBlank(this: any, token: unknown) {
-        this.enter(
-          {
-            type: 'break',
-            value: '',
-            data: {},
-            children: [],
-          },
-          token,
-        );
-      },
-    },
-    exit: {
-      lineEndingBlank: function exitLineEndingBlank(this: any, token: unknown) {
-        this.exit(token);
-      },
-    },
-  });
+  add("fromMarkdownExtensions", sequentialNewlinesFromMarkdown);
 }
+
 
 function remarkBreaks() {
   return newlineToBreak;

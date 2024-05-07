@@ -9,7 +9,7 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
   Might be useful: https://github.com/lobehub/lobe-chat/pull/2168
   Doc: [LOCAL_PROXY.md](/LOCAL_PROXY.md)
 - [ ] Better 'New chat' screen: suggest user some pre-defined questions or continue one of recent chats
-- [ ] Readme about dev and deployment
+- [ ] Optimize frontend build size
 - [ ] Support for snippets
   - [ ] Snippets management (add/edit/delete)
   - [ ] Snippets handling (insert snippet when user types `/keyword`)
@@ -21,13 +21,22 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
   - [ ] When creating new chat, parameters are copied + chat is associated with persona, but user can change any parameter
 - [ ] Semantic/vector search across messages
 - [ ] Support for perplexity.ai provider
+
+
 ## Deploy
 
-There will be Docker/docker-compose option.
+Easiest way to deploy is Docker. Copy file `.env.docker.template` and rename it to just `.env.docker`. Edit the file and put password and API keys for services you intend to use there. 
+
+And then run container with docker compose (might require using sudo, depending on Docker setup):
+
+```bash
+# -d to run in background
+docker-compose up -d
+```
 
 ## Local development
 
-To install dependencies:
+To run app without docker, first install dependencies:
 
 ```bash
 bun install
@@ -36,9 +45,27 @@ bun install
 Setup database:
 
 ```bash
-bun run drizzle:schema
 bun run drizzle:migrate
 bun run drizzle:seed
+```
+
+Run dev server and frontend:
+
+```bash
+bun run server
+bun run client
+```
+
+* Backend available on [localhost:8440](http://localhost:8440)
+  * API docs available on [localhost:8440/scalar](http://localhost:8440/scalar)
+* Frontend available on [localhost:8441](http://localhost:8441)
+
+## Development
+
+To generate migration after DB schema change:
+
+```bash
+bun run drizzle:schema
 ```
 
 To delete DB and all drizzle files and then generate them from scratch:
@@ -47,22 +74,13 @@ To delete DB and all drizzle files and then generate them from scratch:
 bun run drizzle:nuke
 ```
 
-To run:
-
-```bash
-bun run server
-bun run client
-```
-
-* Server available on [localhost:8440](http://localhost:8440)
-  * API docs available on [localhost:8440/scalar](http://localhost:8440/scalar)
-* Client available on [localhost:8441](http://localhost:8441)
-
 There is a template to easily create new components and routes:
 
 ```bash
 bun scaffold component new Button
 bun scaffold route new DetailsPage
 ```
+
+---
 
 This project was created using `bun init` in bun v1.1.4. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.

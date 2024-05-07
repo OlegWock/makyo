@@ -40,7 +40,6 @@ export const ChatPage = withErrorBoundary(() => {
 
   const tree = useMemo(() => buildTreeFromMessages(chatInfo.messages), [chatInfo.messages]);
   const [treeChoices, setTreeChoices] = useTreeChoices(tree);
-  console.log('Render chat page with tree choices', JSON.stringify(treeChoices, null, 4));
   const lastMessage = getLastMessage(tree, treeChoices);
 
   const [isEditingTitle, setIsEditingTitle] = useState(false);
