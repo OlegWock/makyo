@@ -53,7 +53,8 @@ export const ChatSettings = ({ settings, settingsUpdater, isSubmitting, onSubmit
       </Switch>
       {settings.system.enabled && <Textarea
         className={styles.textarea}
-        rows={10}
+        minRows={6}
+        maxRows={20}
         placeholder='System prompt'
         value={settings.system.value}
         onValueChange={newVal => settingsUpdater(draft => {

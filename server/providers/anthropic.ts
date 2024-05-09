@@ -7,7 +7,7 @@ class AnthropicProvider extends Provider {
   name = 'Anthropic';
   type: ProviderType = 'cloud';
 
-  async chat(modelId: string, { messages }: ProviderChatParameters, options?: ProviderChatOptions): Promise<string> {
+  async chat(modelId: string, { messages, system }: ProviderChatParameters, options?: ProviderChatOptions): Promise<string> {
     const anthropic = new Anthropic({
       apiKey: process.env.KATUKO_ANTHROPIC_KEY,
     });
@@ -18,6 +18,7 @@ class AnthropicProvider extends Provider {
       // @ts-ignore
       messages: patchedMessages,
       model: modelId,
+      system,
     });
 
     let responseSoFar = '';

@@ -29,14 +29,16 @@ export const ProgressBar = () => {
       };
       animateProgress();
     } else {
-      if (progress.get() !== 0) {
+      const reset = () => {
         animate(progress, 100, transition).then(() => {
           return animate(opacity, 0, { duration: 0.2 });
         }).then(() => {
           progress.jump(0);
           opacity.jump(1);
         });
-      }
+      };
+      reset();
+      timerRefs.current.push(setTimeout(reset, 40));
     }
   }, [isTransitionPending]);
   return (<motion.div

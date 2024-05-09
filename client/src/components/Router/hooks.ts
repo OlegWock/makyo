@@ -84,7 +84,6 @@ export const useLocationWithTransition: BaseLocationHook = () => {
   return [
     loc.pathname ?? '/',
     (to: string, ...args) => {
-      console.log('Set loc args', args);
       startTransition(() => {
         setLoc(to);
       });

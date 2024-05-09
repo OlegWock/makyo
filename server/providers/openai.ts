@@ -7,12 +7,15 @@ class OpenaiProvider extends Provider {
   name = 'OpenAI';
   type: ProviderType = 'cloud';
 
-  async chat(modelId: string, { messages }: ProviderChatParameters, options?: ProviderChatOptions): Promise<string> {
+  async chat(modelId: string, { messages, system }: ProviderChatParameters, options?: ProviderChatOptions): Promise<string> {
     const openai = new OpenAI({
       apiKey: process.env.KATUKO_OPENAI_KEY,
     });
 
-    const patchedMessages = convertKatukoMessagesForLLM(messages);;
+    const patchedMessages = convertKatukoMessagesForLLM(messages);
+    if (system) {
+      patchedMessages.unshift({role: 'system', content: system});
+    }
 
     const stream = await openai.chat.completions.create({
       messages: patchedMessages,

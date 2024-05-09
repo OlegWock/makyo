@@ -1,13 +1,9 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { sseEmitter } from "@server/utils/subscriptions";
-import { createBunWebSocket } from 'hono/bun';
+import { upgradeWebSocket } from "@server/utils/websockets";
 import { streamSSE } from 'hono/streaming';
 import { v4 as uuid4 } from 'uuid';
 
-const { upgradeWebSocket, websocket } = createBunWebSocket();
-
-// There is some problem with not exported types from Hono which doesn't let us export websocket without any
-export const bunWebSocket: any = websocket;
 
 const subscribeWS = createRoute({
   method: 'get',

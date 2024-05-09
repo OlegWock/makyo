@@ -6,10 +6,11 @@ import { authRouter, cookieAuthMiddleware } from '@server/routes/auth';
 import { configurationRouter } from '@server/routes/configuration';
 import { providersRouter } from '@server/routes/providers';
 import { chatsRouter } from '@server/routes/chats';
-import { bunWebSocket, subscriptionsRouter } from '@server/routes/subscription';
+import { subscriptionsRouter } from '@server/routes/subscription';
 import { HTTPException } from 'hono/http-exception';
 import { serveStatic } from './static';
 import { resolve } from 'path';
+import { bunWebSocket } from '@server/utils/websockets';
 
 const app = new OpenAPIHono();
 

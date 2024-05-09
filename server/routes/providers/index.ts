@@ -1,6 +1,7 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { allProviders } from "@server/providers";
 import { ModelResponseSchema } from "@server/schemas/provider";
+import { upgradeWebSocket } from "@server/utils/websockets";
 
 
 const getModels = createRoute({
@@ -38,6 +39,25 @@ export const providersRouter = new OpenAPIHono()
 
     const response = await Promise.all(promises);
     return c.json(response.filter(Boolean));
-  });
+  })
+  .get(
+    '/api/providers/ollama-proxy-ws',
+    upgradeWebSocket((c) => {    
+      return {
+        onOpen(evt, ws) {
+          
+        },
+        onMessage(evt, ws) {
+          
+        },
+        onClose(evt, ws) {
+          
+        },
+        onError(evt, ws) {
+            
+        },
+      };
+    }),
+  );
 
 
