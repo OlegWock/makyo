@@ -1,14 +1,14 @@
 version: '3.8'
 
 services:
-  katuko:
+  makyo:
     build:
       context: .
     ports:
       - "8440:8440" 
     restart: unless-stopped 
     volumes:
-      - ./katuko.db:/usr/src/data/katuko.db
+      - ./makyo.db:/usr/src/data/makyo.db
 
     # Create your own .env.docker based on .env.docker.example
     env_file:

@@ -6,7 +6,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 export default defineConfig({
   root: __dirname,
   plugins: [react(), tsconfigPaths()],
-  envPrefix: 'VITE_KATUKO_',
+  envPrefix: 'VITE_MAKYO_',
   server: {
     port: 8441,
     proxy: {

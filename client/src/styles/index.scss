@@ -41,12 +41,13 @@
 }
 
 :root {
-  font-family: 'Work Sans', 'Seravek', 'Gill Sans Nova', 'Ubuntu', 'Calibri', 'DejaVu Sans', 'source-sans-pro', sans-serif;
-  line-height: 1.5;
+  font-family: 'Work Sans', 'Mulish', 'Seravek', 'Gill Sans Nova', 'Ubuntu', 'Calibri', 'DejaVu Sans', 'source-sans-pro', sans-serif;
   font-weight: 400;
   font-size: 16px;
+  line-height: 1.5;
 
   font-synthesis: none;
+  font-kerning: normal;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

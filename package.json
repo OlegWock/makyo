@@ -1,8 +1,8 @@
 {
-  "name": "katuko-app",
+  "name": "makyo-app",
   "type": "module",
   "scripts": {
-    "server": "KATUKO_API_TOKEN=testtoken bun --watch run server/index.ts",
+    "server": "MAKYO_API_TOKEN=testtoken bun --watch run server/index.ts",
     "client": "bunx --bun vite --config client/vite.config.ts",
     "client:build": "bunx tsc --project client/tsconfig.json && bunx --bun vite --config client/vite.config.ts build",
     "client:preview": "bunx --bun vite --config client/vite.config.ts preview",
@@ -11,7 +11,7 @@
     "drizzle:schema": "bunx drizzle-kit generate:sqlite",
     "drizzle:migrate": "bun run ./server/db/migrate.ts",
     "drizzle:seed": "bun run ./server/db/seed.ts",
-    "drizzle:nuke": "rm -f katuko.db && rm -rf ./server/db/drizzle && bun run drizzle:schema && bun run drizzle:migrate"
+    "drizzle:nuke": "rm -f makyo.db && rm -rf ./server/db/drizzle && bun run drizzle:schema && bun run drizzle:migrate"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.20.6",

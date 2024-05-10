@@ -60,8 +60,8 @@ const verifyRoute = createRoute({
 
 const AUTH_COOKIE = 'token';
 
-if (!process.env.KATUKO_API_TOKEN) {
-  console.error(`You must set KATUKO_API_TOKEN env variable`);
+if (!process.env.MAKYO_API_TOKEN) {
+  console.error(`You must set MAKYO_API_TOKEN env variable`);
   process.exit(1);
 }
 
@@ -76,7 +76,7 @@ const safeCompare = (s1: string, s2: string) => {
 }
 
 const validateToken = (token: string | null) => {
-  if (!token || !safeCompare(token, process.env.KATUKO_API_TOKEN!)) {
+  if (!token || !safeCompare(token, process.env.MAKYO_API_TOKEN!)) {
     const res = new Response("Unauthorized", {
       status: 401,
     });

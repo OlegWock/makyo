@@ -1,6 +1,6 @@
 import { Model, Provider, ProviderChatOptions, ProviderChatParameters, ProviderType } from "@server/providers/provider";
 import Anthropic from '@anthropic-ai/sdk';
-import { convertKatukoMessagesForLLM } from "@server/providers/utils";
+import { convertMakyoMessagesForLLM } from "@server/providers/utils";
 
 class AnthropicProvider extends Provider {
   id = 'anthropic';
@@ -9,10 +9,10 @@ class AnthropicProvider extends Provider {
 
   async chat(modelId: string, { messages, system }: ProviderChatParameters, options?: ProviderChatOptions): Promise<string> {
     const anthropic = new Anthropic({
-      apiKey: process.env.KATUKO_ANTHROPIC_KEY,
+      apiKey: process.env.MAKYO_ANTHROPIC_KEY,
     });
 
-    const patchedMessages = convertKatukoMessagesForLLM(messages);
+    const patchedMessages = convertMakyoMessagesForLLM(messages);
     const stream = await anthropic.messages.stream({
       max_tokens: 2048,
       // @ts-ignore
@@ -32,7 +32,7 @@ class AnthropicProvider extends Provider {
   }
 
   async isEnabled() {
-    return !!process.env.KATUKO_ANTHROPIC_KEY;
+    return !!process.env.MAKYO_ANTHROPIC_KEY;
   }
 
   async getModels(): Promise<Model[]> {

@@ -1,6 +1,6 @@
 import { Ollama } from 'ollama';
 import { MessageForLLM, Model, Provider, ProviderChatOptions, ProviderChatParameters, ProviderType } from "@server/providers/provider";
-import { convertKatukoMessagesForLLM } from '@server/providers/utils';
+import { convertMakyoMessagesForLLM } from '@server/providers/utils';
 
 class OllamaProvider extends Provider {
   id = 'ollama';
@@ -8,7 +8,7 @@ class OllamaProvider extends Provider {
   type: ProviderType = 'local';
 
   async #getConfiguration() {
-    const host = process.env.KATUKO_OLLAMA_HOST ?? '';
+    const host = process.env.MAKYO_OLLAMA_HOST ?? '';
     if (!host) {
       return {
         enabled: false,
@@ -37,8 +37,8 @@ class OllamaProvider extends Provider {
   }
 
   async chat(modelId: string, { messages, system, temperature }: ProviderChatParameters, options?: ProviderChatOptions): Promise<string> {
-    const ollama = new Ollama({ host: process.env.KATUKO_OLLAMA_HOST });
-    const patchedMessages = convertKatukoMessagesForLLM(messages);
+    const ollama = new Ollama({ host: process.env.MAKYO_OLLAMA_HOST });
+    const patchedMessages = convertMakyoMessagesForLLM(messages);
     if (system) {
       patchedMessages.unshift({role: 'system', content: system});
     }

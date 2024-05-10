@@ -93,4 +93,4 @@ export const initiateLocalOllamaProxy = (api: ApiClient) => {
 };
 
 
-export const localOllamaProxyEnabled = ['true', '1'].includes(process.env.VITE_KATUKO_OLLAMA_USE_LOCAL_PROXY!);
+export const localOllamaProxyEnabled = ['true', '1'].includes(process.env.VITE_MAKYO_OLLAMA_USE_LOCAL_PROXY!);

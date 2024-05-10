@@ -17,7 +17,7 @@ const queryClient = new QueryClient({
 
 broadcastQueryClient({
   queryClient,
-  broadcastChannel: 'katuko-react-query',
+  broadcastChannel: 'makyo-react-query',
 });
 
 const queryPersister = createSyncStoragePersister({

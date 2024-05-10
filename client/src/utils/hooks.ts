@@ -8,7 +8,7 @@ export const useMount = (cb: () => VoidFunction | void | Promise<void>) => {
 };
 
 export const usePageTitle = (title: string) => {
-  document.title = `${title} | Katuko chat`;
+  document.title = `${title} | Makyo chat`;
 };
 
 export const useMirrorStateToRef = <T>(val: T) => {

@@ -29,13 +29,11 @@ export const ProgressBar = () => {
       };
       animateProgress();
     } else {
-      const reset = () => {
-        animate(progress, 100, transition).then(() => {
-          return animate(opacity, 0, { duration: 0.2 });
-        }).then(() => {
-          progress.jump(0);
-          opacity.jump(1);
-        });
+      const reset = async () => {
+        await animate(progress, 100, transition);
+        await animate(opacity, 0, { duration: 0.2 });
+        progress.jump(0);
+        opacity.jump(1);
       };
       reset();
       timerRefs.current.push(setTimeout(reset, 40));

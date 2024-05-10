@@ -1,17 +1,15 @@
-# Katuko
+# Makyō
 
 Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 
 
 ## Roadmap
 
-- [ ] Design and branding improvements
-  - [ ] Change font to one that supports cyrillic
-  - [ ] Decide with name and rename mentions of katuko across the codebase
-  - [ ] Make a logo and icon
 - [ ] Browser proxy for Ollama (proxy calls from webserver through browser to Ollama) to allow hosting frontend on remote domain but accessing local Ollama
   Might be useful: https://github.com/lobehub/lobe-chat/pull/2168
   Doc: [LOCAL_PROXY.md](/LOCAL_PROXY.md)
+- [ ] Switching model mid-chat
+  - [ ] Correctly labeling which model sent the message
 - [ ] Support for snippets
   - [ ] Snippets management (add/edit/delete)
   - [ ] Snippets handling (insert snippet when user types `/keyword`)

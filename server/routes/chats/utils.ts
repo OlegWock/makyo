@@ -49,6 +49,7 @@ export const sendMessageAndSave = async ({ parentId, provider, modelId, text, ch
       system,
     },
     {
+      // TODO: we shouldn't call this after we already sent finished message
       onProgress: throttle((response) => {
         broadcastSubscriptionMessage({
           type: 'updateMessage',
@@ -121,6 +122,7 @@ export const regenerateResponseForMessage = async ({ chatId, parentId, modelId, 
       system,
     },
     {
+      // TODO: we shouldn't call this after we already sent finished message
       onProgress: throttle((response) => {
         broadcastSubscriptionMessage({
           type: 'updateMessage',

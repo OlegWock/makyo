@@ -1,5 +1,5 @@
 import { MessageForLLM, Model, Provider, ProviderChatOptions, ProviderChatParameters, ProviderType } from "@server/providers/provider";
-import { convertKatukoMessagesForLLM } from "@server/providers/utils";
+import { convertMakyoMessagesForLLM } from "@server/providers/utils";
 import OpenAI from 'openai';
 
 class OpenaiProvider extends Provider {
@@ -9,10 +9,10 @@ class OpenaiProvider extends Provider {
 
   async chat(modelId: string, { messages, system }: ProviderChatParameters, options?: ProviderChatOptions): Promise<string> {
     const openai = new OpenAI({
-      apiKey: process.env.KATUKO_OPENAI_KEY,
+      apiKey: process.env.MAKYO_OPENAI_KEY,
     });
 
-    const patchedMessages = convertKatukoMessagesForLLM(messages);
+    const patchedMessages = convertMakyoMessagesForLLM(messages);
     if (system) {
       patchedMessages.unshift({role: 'system', content: system});
     }
@@ -35,7 +35,7 @@ class OpenaiProvider extends Provider {
   }
 
   async isEnabled() {
-    return !!process.env.KATUKO_OPENAI_KEY;
+    return !!process.env.MAKYO_OPENAI_KEY;
   }
 
   async getModels(): Promise<Model[]> {

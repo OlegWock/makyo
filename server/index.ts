@@ -40,7 +40,7 @@ app.doc('/swagger.json', {
   openapi: '3.0.0',
   info: {
     version: '1.0.0',
-    title: 'Katuko API',
+    title: 'Makyo API',
   },
 });
 
@@ -54,9 +54,9 @@ app.get(
   }),
 );
 
-console.log('Will be serving content of', resolve(process.cwd(), process.env.KATUKO_FRONTEND_FILES_PATH!), 'as static files');
+console.log('Will be serving content of', resolve(process.cwd(), process.env.MAKYO_FRONTEND_FILES_PATH!), 'as static files');
 app.get('*', serveStatic({
-  root: resolve(process.cwd(), process.env.KATUKO_FRONTEND_FILES_PATH!),
+  root: resolve(process.cwd(), process.env.MAKYO_FRONTEND_FILES_PATH!),
   fallbackPath: 'index.html',
   onNotFound(path, c) {
     console.log('Not found', path);

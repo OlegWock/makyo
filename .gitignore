@@ -177,7 +177,7 @@ dist
 .vscode/*
 !.vscode/extensions.json
 
-katuko.db
+makyo.db
 .env.local
 .env.docker
 .env
