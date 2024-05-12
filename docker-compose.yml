@@ -12,7 +12,7 @@ services:
     volumes:
       - ./makyo.db:/usr/src/data/makyo.db
 
-    # Create your own .env.docker based on .env.docker.example
+    # Create your own .env based on .env.example
     env_file:
-      - .env.docker
+      - .env
     

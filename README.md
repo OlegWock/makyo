@@ -25,14 +25,14 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 
 ## Deploy
 
-Easiest way to deploy is Docker. Copy file `.env.docker.template` and rename it to just `.env.docker`. Edit the file and put password and API keys for services you intend to use there. 
+Easiest way to deploy is Docker. Copy file `.env.example` and rename it to just `.env`. Edit the file and put password and API keys for services you intend to use there. 
 
 And then run container with docker compose (might require using sudo, depending on Docker setup):
 
 ```bash
 # -d to run in background
 # add --build to build container after pulling newer version
-docker-compose --env-file .env.docker up -d
+docker-compose up -d
 ```
 
 ## Local development

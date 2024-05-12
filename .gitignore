@@ -179,5 +179,4 @@ dist
 
 makyo.db
 .env.local
-.env.docker
 .env
