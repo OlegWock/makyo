@@ -25,7 +25,9 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 
 ## Deploy
 
-Easiest way to deploy is Docker. Copy file `.env.example` and rename it to just `.env`. Edit the file and put password and API keys for services you intend to use there. 
+Easiest way to deploy is Docker. Copy file `.env.example` and rename it to just `.env`. Edit the file and put password and API keys for services you intend to use there.
+
+If you decide to use local Ollama proxy, you need to add domain where you deploy Makyo to `OLLAMA_ORIGINS` variable. [How to set variables for Ollama](https://github.com/ollama/ollama/blob/main/docs/faq.md#how-do-i-configure-ollama-server).
 
 And then run container with docker compose (might require using sudo, depending on Docker setup):
 

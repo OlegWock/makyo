@@ -220,6 +220,9 @@ export const serveStatic = <E extends Env = Env>(
       if (mimeType) {
         c.header('Content-Type', mimeType)
       }
+
+      // Will be cached by etag
+      c.header('Cache-Control', 'no-cache');
       return c.body(content)
     }
 

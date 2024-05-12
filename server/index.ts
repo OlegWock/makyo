@@ -9,6 +9,7 @@ import { chatsRouter } from '@server/routes/chats';
 import { subscriptionsRouter } from '@server/routes/subscription';
 import { HTTPException } from 'hono/http-exception';
 import { serveStatic } from './static';
+import { etag } from 'hono/etag'
 import { resolve } from 'path';
 import { bunWebSocket } from '@server/utils/websockets';
 
@@ -54,8 +55,9 @@ app.get(
   }),
 );
 
+
 console.log('Will be serving content of', resolve(process.cwd(), process.env.MAKYO_FRONTEND_FILES_PATH!), 'as static files');
-app.get('*', serveStatic({
+app.get('*', etag(), serveStatic({
   root: resolve(process.cwd(), process.env.MAKYO_FRONTEND_FILES_PATH!),
   fallbackPath: 'index.html',
   onNotFound(path, c) {
