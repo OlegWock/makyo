@@ -31,7 +31,8 @@ And then run container with docker compose (might require using sudo, depending 
 
 ```bash
 # -d to run in background
-docker-compose up -d
+# add --build to build container after pulling newer version
+docker-compose --env-file .env.docker up -d
 ```
 
 ## Local development

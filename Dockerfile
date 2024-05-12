@@ -15,6 +15,8 @@ FROM base AS prerelease
   COPY --from=install-dev /temp/dev/node_modules node_modules
   COPY . .
   ENV NODE_ENV=production
+  ARG VITE_MAKYO_OLLAMA_USE_LOCAL_PROXY
+  ENV VITE_MAKYO_OLLAMA_USE_LOCAL_PROXY ${VITE_MAKYO_OLLAMA_USE_LOCAL_PROXY}
   # Might be good idea to bundle backend into single file, but this doesn't seem to work for some reason
   # RUN bun build --target=bun server/index.ts --outdir ./server/dist
   RUN bun run client:build

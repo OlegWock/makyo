@@ -4,6 +4,8 @@ services:
   makyo:
     build:
       context: .
+      args:
+        - VITE_MAKYO_OLLAMA_USE_LOCAL_PROXY=$VITE_MAKYO_OLLAMA_USE_LOCAL_PROXY
     ports:
       - "8440:8440" 
     restart: unless-stopped 
