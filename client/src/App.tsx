@@ -13,6 +13,7 @@ import { ErrorBoundary } from "@client/components/ErrorBoundary";
 import { Router } from "./components/Router/Router";
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ToastProvider } from "@client/components/LocalToast";
+import { LocalOllamaProxyProvider } from "@client/api/ollama-proxy";
 
 
 export const App = () => {
@@ -21,20 +22,22 @@ export const App = () => {
       <QueryClientProvider>
         <Router>
           <AuthGate>
-            <SubscriptionProvider>
-              <Layout>
-                <ErrorBoundary>
-                  <Switch>
-                    <Route path="/" component={RootPage} />
-                    <Route path="/chats" component={ChatsPage} />
-                    <Route path="/chats/:id" component={ChatPage} />
-                    <Route path="/presets" component={PresetsPage} />
-                    <Route path="/settings" component={SettingsPage} />
-                    <Route component={NotFound} />
-                  </Switch>
-                </ErrorBoundary>
-              </Layout>
-            </SubscriptionProvider>
+            <LocalOllamaProxyProvider>
+              <SubscriptionProvider>
+                <Layout>
+                  <ErrorBoundary>
+                    <Switch>
+                      <Route path="/" component={RootPage} />
+                      <Route path="/chats" component={ChatsPage} />
+                      <Route path="/chats/:id" component={ChatPage} />
+                      <Route path="/presets" component={PresetsPage} />
+                      <Route path="/settings" component={SettingsPage} />
+                      <Route component={NotFound} />
+                    </Switch>
+                  </ErrorBoundary>
+                </Layout>
+              </SubscriptionProvider>
+            </LocalOllamaProxyProvider>
           </AuthGate>
           {/* <ReactQueryDevtools /> */}
         </Router>

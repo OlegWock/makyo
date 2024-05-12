@@ -1,5 +1,6 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { allProviders } from "@server/providers";
+import { createProxiedFetch, ollamaFetch } from "@server/providers/ollama/proxy";
 import { ModelResponseSchema } from "@server/schemas/provider";
 import { upgradeWebSocket } from "@server/utils/websockets";
 
@@ -42,21 +43,16 @@ export const providersRouter = new OpenAPIHono()
   })
   .get(
     '/api/providers/ollama-proxy-ws',
-    upgradeWebSocket((c) => {    
-      return {
-        onOpen(evt, ws) {
-          
-        },
-        onMessage(evt, ws) {
-          
-        },
-        onClose(evt, ws) {
-          
-        },
-        onError(evt, ws) {
-            
-        },
-      };
+    upgradeWebSocket((c) => {
+      const { handlers, proxiedFetch, signal } = createProxiedFetch();
+      if (!ollamaFetch.current) {
+        ollamaFetch.current = proxiedFetch;
+
+        signal.addEventListener('abort', () => {
+          ollamaFetch.current = null;
+        });
+      }
+      return handlers;
     }),
   );
 

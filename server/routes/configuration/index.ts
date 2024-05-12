@@ -1,6 +1,6 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { anthropicProvider } from "@server/providers/anthropic";
-import { ollamaProvider } from "@server/providers/ollama";
+import { ollamaProvider } from "@server/providers/ollama/ollama";
 import { openaiProvider } from "@server/providers/openai";
 import { ConfigurationSchema } from "@server/schemas/configuration";
 

@@ -6,6 +6,7 @@ import { SubscriptionMessage } from "@shared/subscription";
 import { useQueryClient } from "@tanstack/react-query";
 import { produce } from "immer";
 import { ReactNode, useEffect, useMemo } from "react";
+import { initiateLocalOllamaProxy, localOllamaProxyEnabled } from "@client/api/ollama-proxy";
 
 
 type SubscriptionClient = {
@@ -147,6 +148,8 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       }
     });
   }, [client]);
+
+  
 
   return <SubscriptionProviderInner value={client}>
     {children}

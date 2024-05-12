@@ -1,5 +1,5 @@
 import { anthropicProvider } from "./anthropic";
-import { ollamaProvider } from "./ollama";
+import { ollamaProvider } from "./ollama/ollama";
 import { openaiProvider } from "./openai";
 import { Provider } from "./provider";
 import { HTTPException } from "hono/http-exception";

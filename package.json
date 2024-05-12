@@ -18,6 +18,7 @@
     "@hono/zod-openapi": "^0.11.0",
     "@hono/zod-validator": "^0.2.1",
     "@scalar/hono-api-reference": "^0.5.3",
+    "base64-arraybuffer": "^1.0.2",
     "drizzle-orm": "^0.30.8",
     "hono": "^4.2.5",
     "ollama": "^0.5.0",
