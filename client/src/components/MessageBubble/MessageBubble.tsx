@@ -64,7 +64,6 @@ const MessageBubbleActions = () => {
   const { variants, editing, onRegenerate, onDuplicate, onDelete, copy = true } = actions;
   const { showToast, showConfirm } = useLocalToast();
 
-  // TODO: code blocks overflow message area on mobiles and make half of message invisible
   return (
     <div className={styles.actionsWrapper}>
       {!!variants && <div className={styles.variants}>

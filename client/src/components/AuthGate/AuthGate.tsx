@@ -54,12 +54,17 @@ export const AuthGate = ({ children }: AuthGateProps) => {
     console.log('Render authgate, is loading', isLoading);
     return (<div className={styles.AuthGate}>
       <div className={styles.card}>
-        <div className={styles.title}>Please enter the password</div>
-        <div className={styles.inputWrapper}>
-          <Input type='password' className={styles.input} value={apiKeyDraft} onValueChange={setApiKeyDraft} />
-          <Button variant='primary' size='large' onClick={tryLogin} loading={isLoading}>Log in</Button>
-        </div>
-        {!!error && <div className={styles.error}>{error}</div>}
+
+        {window.isSecureContext ? <>
+          <div className={styles.title}>Please enter the password</div>
+          <div className={styles.inputWrapper}>
+            <Input type='password' className={styles.input} value={apiKeyDraft} onValueChange={setApiKeyDraft} />
+            <Button variant='primary' size='large' onClick={tryLogin} loading={isLoading}>Log in</Button>
+          </div>
+          {!!error && <div className={styles.error}>{error}</div>}
+        </> : <>
+          <div className={styles.error}>Makyo should be run either on localhost or over HTTPS, otherwise auth won't work.</div>
+        </>}
       </div>
     </div>);
   }

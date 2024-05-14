@@ -41,6 +41,7 @@ export const sendMessageAndSave = async ({ parentId, provider, modelId, text, ch
     return { messagesHistory, responseMessage };
   });
 
+  let responseGenerated = false;
   provider.chat(
     modelId,
     {
@@ -49,8 +50,8 @@ export const sendMessageAndSave = async ({ parentId, provider, modelId, text, ch
       system,
     },
     {
-      // TODO: we shouldn't call this after we already sent finished message
       onProgress: throttle((response) => {
+        if (responseGenerated) return;
         broadcastSubscriptionMessage({
           type: 'updateMessage',
           data: {
@@ -67,6 +68,7 @@ export const sendMessageAndSave = async ({ parentId, provider, modelId, text, ch
       isGenerating: false,
     }).where(eq(message.id, responseMessage.id)).returning();
   }).then(([responseMessage]) => {
+    responseGenerated = true;
     broadcastSubscriptionMessage({
       type: 'updateMessage',
       data: {
@@ -114,6 +116,7 @@ export const regenerateResponseForMessage = async ({ chatId, parentId, modelId, 
 
   const messagesHistory = await getMessageHistoryUpwards(parentId);
 
+  let responseGenerated = false;
   provider.chat(
     modelId,
     {
@@ -122,8 +125,8 @@ export const regenerateResponseForMessage = async ({ chatId, parentId, modelId, 
       system,
     },
     {
-      // TODO: we shouldn't call this after we already sent finished message
       onProgress: throttle((response) => {
+        if (responseGenerated) return;
         broadcastSubscriptionMessage({
           type: 'updateMessage',
           data: {
@@ -140,6 +143,7 @@ export const regenerateResponseForMessage = async ({ chatId, parentId, modelId, 
       isGenerating: false,
     }).where(eq(message.id, responseMessage.id)).returning();
   }).then(([responseMessage]) => {
+    responseGenerated = true;
     broadcastSubscriptionMessage({
       type: 'updateMessage',
       data: {

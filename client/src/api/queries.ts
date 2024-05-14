@@ -45,7 +45,7 @@ export const useChat = createSuspenseQueryHook(
 
 export const useSearch = createSuspenseQueryHook(
   (searchQuery: string) => ['search', searchQuery],
-  (api, searchQuery) => api.chats.search.$get({ query: { searchQuery } })
+  (api, searchQuery) => api.search.$get({ query: { searchQuery } })
 );
 
 export const useNewChatMutation = () => {

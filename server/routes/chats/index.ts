@@ -32,7 +32,7 @@ const getChats = createRoute({
 
 const search = createRoute({
   method: 'get',
-  path: '/api/chats/search',
+  path: '/api/search',
   summary: 'Search chats and messages',
   tags: ['Chats'],
   security: [{ CookieAuth: [] }],

@@ -1,6 +1,6 @@
 import { ErrorBoundary as ReactErrorBoundary, FallbackProps } from "react-error-boundary";
 import styles from './ErrorBoundary.module.scss';
-import { Component, ComponentType, ReactNode } from "react";
+import { ComponentType, ReactNode } from "react";
 import { HigherOrderComponentFactory } from "@client/utils/react";
 
 const FallbackComponent = ({ error, resetErrorBoundary }: FallbackProps) => {
@@ -28,7 +28,7 @@ export const withErrorBoundary: HigherOrderComponentFactory = <P = {}>(Component
     </ErrorBoundary>
   };
 
-  WithErrorBoundary.displayName = Component.displayName;
+  WithErrorBoundary.displayName = `withErrorBoundary(${Component.displayName})`;
 
   return WithErrorBoundary;
 }

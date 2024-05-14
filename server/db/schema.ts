@@ -24,6 +24,7 @@ export const message = sqliteTable('message', {
   error: text('error'),
   isGenerating: integer('isGenerating', { mode: 'boolean' }).notNull().default(false),
   sender: text('sender', { enum: ['user', 'ai'] }).notNull(),
+  // TODO: in addition to sender we need to save senderName (pretty name for UI) and nullable providerId (for icon in UI)
   chatId: integer('chatId').references((): AnySQLiteColumn => chat.id, { onDelete: 'cascade' }).notNull(),
   parentId: integer('parentId').references((): AnySQLiteColumn => message.id, { onDelete: 'cascade' }),
   createdAt: integer('createdAt', { mode: 'timestamp_ms' }).notNull().default(sql`(unixepoch() * 1000)`),
