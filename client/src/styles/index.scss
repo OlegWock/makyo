@@ -1,3 +1,4 @@
+@use "./utils.scss" as *;
 @import "./fonts.scss";
 
 @import '@radix-ui/colors/gray.css';
@@ -51,6 +52,12 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-font-size-adjust: 100%;
+  font-size-adjust: 100%;
+
+  @include mobile {
+    font-size: 14px;
+  }
 }
 
 html,

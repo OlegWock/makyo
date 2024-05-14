@@ -15,8 +15,9 @@ import { Button } from '@client/components/Button';
 import { useMount, usePageTitle } from '@client/utils/hooks';
 import { Input } from '@client/components/Input';
 import { useSearchParams } from '@client/components/Router/hooks';
-import { useAtom } from 'jotai/react';
 import { produce } from 'immer';
+import { Drawer } from '@client/components/Drawer';
+import { useIsMobile } from '@client/utils/responsive';
 
 
 export const ChatPage = withErrorBoundary(() => {
@@ -48,6 +49,8 @@ export const ChatPage = withErrorBoundary(() => {
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [chatSettings, updateChatSettings] = useChatSettings(chatInfo.chat);
 
+  const isMobile = useIsMobile();
+
   useMount(() => {
     if (defaultScrollTo) {
       // TODO: walk tree upwards from defaultScrollTo and switch all preffered routes in treeChoices so this message will be visible
@@ -75,7 +78,27 @@ export const ChatPage = withErrorBoundary(() => {
         });
       }, 50);
     }
-  })
+  });
+
+
+  const chatSettingsElement = (<ChatSettings
+    settings={chatSettings}
+    settingsUpdater={updateChatSettings}
+    isSubmitting={editChat.isPending}
+    onSubmit={async () => {
+      await editChat.mutateAsync({
+        parameters: {
+          temperature: chatSettings.temperature.enabled ? chatSettings.temperature.value : undefined,
+          system: chatSettings.system.enabled ? chatSettings.system.value : undefined,
+        },
+        model: {
+          providerId: chatSettings.model!.providerId,
+          modelId: chatSettings.model!.modelId,
+        }
+      });
+      setSettingsVisible(false);
+    }}
+  />);
 
 
   return (<ChatPageContextProvider value={{ chatId: id, messagesTree: tree, treeChoices, setTreeChoices, providerId: chatInfo.chat.providerId }}>
@@ -132,7 +155,7 @@ export const ChatPage = withErrorBoundary(() => {
             <Button
               onClick={() => setSettingsVisible(p => !p)}
               variant='borderless'
-              icon={settingsVisible ? <HiChevronRight /> : <HiOutlineCog6Tooth />}
+              icon={(settingsVisible || !isMobile) ? <HiChevronRight /> : <HiOutlineCog6Tooth />}
             />
           </ChatLayout.TitleRightActions>
           <ChatLayout.MessagesArea>
@@ -144,25 +167,12 @@ export const ChatPage = withErrorBoundary(() => {
 
         </ChatLayout>
       </Card>
-      {settingsVisible && <Card className={styles.settingsCard}>
-        <ChatSettings
-          settings={chatSettings}
-          settingsUpdater={updateChatSettings}
-          isSubmitting={editChat.isPending}
-          onSubmit={async () => {
-            await editChat.mutateAsync({
-              parameters: {
-                temperature: chatSettings.temperature.enabled ? chatSettings.temperature.value : undefined,
-                system: chatSettings.system.enabled ? chatSettings.system.value : undefined,
-              },
-              model: {
-                providerId: chatSettings.model!.providerId,
-                modelId: chatSettings.model!.modelId,
-              }
-            });
-            setSettingsVisible(false);
-          }}
-        />
+
+      {isMobile && <Drawer open={settingsVisible} onOpenChange={setSettingsVisible}>
+        {chatSettingsElement}
+      </Drawer>}
+      {(settingsVisible && !isMobile) && <Card className={styles.settingsCard}>
+        {chatSettingsElement}
       </Card>}
     </div>
   </ChatPageContextProvider>);

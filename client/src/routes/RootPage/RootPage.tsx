@@ -15,6 +15,8 @@ import { usePageTitle } from '@client/utils/hooks';
 import { ProviderIcon } from '@client/components/icons';
 import { useLocation } from 'wouter';
 import { ModelSelect } from '@client/components/ModelSelect';
+import { useIsMobile } from '@client/utils/responsive';
+import { Drawer } from '@client/components/Drawer';
 
 export const RootPage = withErrorBoundary(() => {
   const newChat = useNewChatMutation();
@@ -30,6 +32,8 @@ export const RootPage = withErrorBoundary(() => {
     }));
   }, [providers]);
 
+  const isMobile = useIsMobile();
+
   const [lastUsedModel, setLastUsedModel] = useAtom(lastUsedModelAtom);
   const selectedModel = options.find(o => o.providerId === lastUsedModel?.providerId && o.modelId === lastUsedModel?.modelId) || options[0];
 
@@ -39,6 +43,8 @@ export const RootPage = withErrorBoundary(() => {
   const [_, navigate] = useLocation();
 
   usePageTitle('New chat');
+
+  const chatSettingsElement = (<ChatSettings settings={chatSettings} settingsUpdater={updateChatSettings} />);
 
   return (<div className={styles.RootPage}>
     <Card flexGrow withScrollArea={false}>
@@ -76,9 +82,11 @@ export const RootPage = withErrorBoundary(() => {
       </ChatLayout>
     </Card>
 
-    {/* TODO: looks ugly on mobile  */}
-    {settingsVisible && <Card className={styles.settingsCard}>
-      <ChatSettings settings={chatSettings} settingsUpdater={updateChatSettings} />
+    {isMobile && <Drawer open={settingsVisible} onOpenChange={setSettingsVisible}>
+      {chatSettingsElement}
+    </Drawer>}
+    {(settingsVisible && !isMobile) && <Card className={styles.settingsCard}>
+      {chatSettingsElement}
     </Card>}
   </div>);
 });

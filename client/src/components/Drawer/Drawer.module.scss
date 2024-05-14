@@ -1,0 +1,30 @@
+.Drawer {}
+
+.drawer {
+  height: 100%;
+  max-height: 95%;
+  background: white;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 99;
+  padding: 2rem 1rem;
+}
+
+.content {
+  margin-top: 1rem;
+}
+
+.handle {
+  background-color: #ccc;
+}
+
+.overlay {
+  background: rgba(0, 0, 0, 0.5);
+  position: fixed;
+  inset: 0;
+}
