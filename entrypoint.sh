@@ -6,11 +6,10 @@ set -e
 
 
 echo "Nuking database"
-bun run drizzle:nuke
+rm -f ${MAKYO_DB_PATH} 
 
-# Migrate is part of nuke
-# echo "Migrating database"
-# bun run drizzle:migrate
+echo "Migrating database"
+bun run drizzle:migrate
 
 echo "Starting server"
 bun run server/index.ts
