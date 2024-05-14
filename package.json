@@ -8,7 +8,7 @@
     "client:preview": "bunx --bun vite --config client/vite.config.ts preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "scaffold": "bunx --bun hygen",
-    "drizzle:schema": "bunx drizzle-kit generate:sqlite",
+    "drizzle:schema": "bunx drizzle-kit generate",
     "drizzle:migrate": "bun run ./server/db/migrate.ts",
     "drizzle:seed": "bun run ./server/db/seed.ts",
     "drizzle:nuke": "rm -f $MAKYO_DB_PATH && rm -rf ./server/db/drizzle && bun run drizzle:schema && bun run drizzle:migrate",
@@ -82,7 +82,7 @@
     "use-immer": "^0.9.0",
     "vite-tsconfig-paths": "^4.3.2",
     "wouter": "^3.1.2",
-    "drizzle-kit": "^0.20.17"
+    "drizzle-kit": "^0.21.2"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
