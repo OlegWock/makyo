@@ -1,6 +1,6 @@
 import { db } from "@server/db"
 import { message } from "@server/db/schema";
-import { InferSelectModel, sql } from "drizzle-orm";
+import { type InferSelectModel, sql } from "drizzle-orm";
 
 export const getMessageHistoryUpwards = async (messageId: number) => {
   const query = sql`

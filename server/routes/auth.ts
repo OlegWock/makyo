@@ -1,5 +1,5 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
-import { MiddlewareHandler } from "hono";
+import type { MiddlewareHandler } from "hono";
 import { getCookie, setCookie } from 'hono/cookie';
 import { HTTPException } from 'hono/http-exception'
 

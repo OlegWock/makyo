@@ -14,6 +14,7 @@ import { ChatSettings, useChatSettings } from '@client/components/ChatSettings';
 import { usePageTitle } from '@client/utils/hooks';
 import { ProviderIcon } from '@client/components/icons';
 import { useLocation } from 'wouter';
+import { ModelSelect } from '@client/components/ModelSelect';
 
 export const RootPage = withErrorBoundary(() => {
   const newChat = useNewChatMutation();
@@ -67,21 +68,10 @@ export const RootPage = withErrorBoundary(() => {
         <ChatLayout.MessagesArea>
         </ChatLayout.MessagesArea>
         <ChatLayout.TextareaActions>
-          <WithLabel label='Model:'>
-            <Select
-              triggerClassname={styles.modelSelect}
-              options={options}
-              value={selectedModel}
-              onChange={setLastUsedModel}
-              getOptionKey={o => o.providerId + o.modelId}
-              getOptionLabel={o => {
-                return (<div className={styles.modelOption}>
-                  <div className={styles.iconWrapper}><ProviderIcon provider={o.providerId} /></div>
-                  {o.name}
-                </div>)
-              }}
-            />
-          </WithLabel>
+          <ModelSelect
+            value={selectedModel}
+            onChange={setLastUsedModel}
+          />
         </ChatLayout.TextareaActions>
       </ChatLayout>
     </Card>

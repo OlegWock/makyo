@@ -1,4 +1,4 @@
-import { Context, Env, MiddlewareHandler } from "hono";
+import type { Context, Env, MiddlewareHandler } from "hono";
 
 // Copied from https://github.com/honojs/hono/blob/main/src/middleware/serve-static/index.ts#L20
 // And adapted to allow fallback for SPA

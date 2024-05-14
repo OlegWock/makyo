@@ -1,6 +1,5 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { db } from "@server/db";
-import { getMessageHistoryDownwards } from "@server/db/queries/messages";
 import { chat, message } from "@server/db/schema";
 import { getProviderById } from "@server/providers";
 import { augmentChatWithLastMessage, augmentMessagesWithModelAndChatTitle, getChatWithMessagesFromDb, getMessageFromDb, regenerateResponseForMessage, sendMessageAndSave } from "@server/routes/chats/utils";
@@ -9,7 +8,7 @@ import { createTitlePrompt } from "@server/utils/prompts";
 import { omit, serialize } from "@server/utils/serialization";
 import { broadcastSubscriptionMessage } from "@server/utils/subscriptions";
 import { transformStringToNumber } from "@server/utils/zod";
-import { and, eq, inArray, isNull, InferInsertModel, like } from "drizzle-orm";
+import { and, eq, isNull, type InferInsertModel, like } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
 const getChats = createRoute({
@@ -371,7 +370,7 @@ export const chatsRouter = new OpenAPIHono()
     const chats = await Promise.all(rawChats.map(augmentChatWithLastMessage));
     const messages = await augmentMessagesWithModelAndChatTitle(rawMessages);
     const response = [
-      ...chats.map(c => ({...c, type: 'chat' as const})),
+      ...chats.map(c => ({ ...c, type: 'chat' as const })),
       ...messages,
     ];
     return c.json(response);
@@ -429,9 +428,18 @@ export const chatsRouter = new OpenAPIHono()
   })
   .openapi(editChat, async (c) => {
     const { chatId } = c.req.valid('param');
-    const { title, parameters } = c.req.valid('json');
+    const { title, parameters, model: modelPayload } = c.req.valid('json');
     let payload: Partial<InferInsertModel<typeof chat>> = {};
     if (title) payload.title = title;
+    if (modelPayload) {
+      const provider = getProviderById(modelPayload.providerId);
+      const model = await provider.getModelById(modelPayload.modelId);
+      if (!model) {
+        throw new HTTPException(404, { message: 'unknow model' });
+      }
+      payload.providerId = provider.id;
+      payload.modelId = model.id;
+    }
     if (parameters) {
       payload.system = parameters.system ?? null;
       payload.temperature = parameters.temperature ?? null;

@@ -20,6 +20,8 @@ export const ModelSchema = z.object({
   defaultParameters: ModelParametersSchema.partial(),
 }).openapi('Model');
 
+export type ModelSchemaType = z.infer<typeof ModelSchema>;
+
 export const ModelResponseSchema = z.array(z.object({
   provider: ProviderSchema,
   models: z.array(ModelSchema),

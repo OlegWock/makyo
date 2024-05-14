@@ -1,5 +1,6 @@
 import { Ollama } from 'ollama';
-import { MessageForLLM, Model, Provider, ProviderChatOptions, ProviderChatParameters, ProviderType } from "@server/providers/provider";
+import { Provider } from "@server/providers/provider";
+import type { MessageForLLM, Model, ProviderChatOptions, ProviderChatParameters, ProviderType } from "@server/providers/provider";
 import { convertMakyoMessagesForLLM } from '@server/providers/utils';
 import { ollamaFetch } from '@server/providers/ollama/proxy';
 

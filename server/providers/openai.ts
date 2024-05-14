@@ -1,4 +1,5 @@
-import { MessageForLLM, Model, Provider, ProviderChatOptions, ProviderChatParameters, ProviderType } from "@server/providers/provider";
+import type { MessageForLLM, Model, ProviderChatOptions, ProviderChatParameters, ProviderType } from "@server/providers/provider";
+import { Provider } from "@server/providers/provider";
 import { convertMakyoMessagesForLLM } from "@server/providers/utils";
 import OpenAI from 'openai';
 

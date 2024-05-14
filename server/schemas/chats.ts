@@ -27,6 +27,10 @@ export type NewChatSchemaType = z.infer<typeof NewChatSchema>;
 export const UpdateChatSchema = z.object({
   title: z.string().optional(),
   parameters: ModelParametersSchema.partial().optional(),
+  model: z.object({
+    providerId: z.string(),
+    modelId: z.string(),
+  }).optional(),
 });
 
 export type UpdateChatSchemaType = z.infer<typeof UpdateChatSchema>;
@@ -37,6 +41,8 @@ export const MessageSchema = z.object({
   isGenerating: z.boolean(),
   error: z.string().nullable(),
   sender: z.enum(['user', 'ai']),
+  senderName: z.string(),
+  providerId: z.string().nullable(),
   parentId: z.number().nullable(),
   createdAt: z.number(),
 }).openapi('Message');

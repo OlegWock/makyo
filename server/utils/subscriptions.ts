@@ -1,4 +1,4 @@
-import { SubscriptionMessage } from "@shared/subscription";
+import type { SubscriptionMessage } from "@shared/subscription";
 import { iife } from "@shared/utils";
 import { EventEmitter } from 'node:events';
 

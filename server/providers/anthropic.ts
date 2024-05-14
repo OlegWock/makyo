@@ -1,4 +1,5 @@
-import { Model, Provider, ProviderChatOptions, ProviderChatParameters, ProviderType } from "@server/providers/provider";
+import { Provider } from "@server/providers/provider";
+import type { Model, ProviderChatOptions, ProviderChatParameters, ProviderType } from "@server/providers/provider";
 import Anthropic from '@anthropic-ai/sdk';
 import { convertMakyoMessagesForLLM } from "@server/providers/utils";
 

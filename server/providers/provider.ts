@@ -1,5 +1,5 @@
 import { message } from "@server/db/schema";
-import { InferSelectModel } from "drizzle-orm";
+import type { InferSelectModel } from "drizzle-orm";
 
 export type ModelParameters = {
   system: string;
@@ -11,7 +11,7 @@ export type Model = {
   name: string;
   availableParameters: Array<keyof ModelParameters>;
   defaultParameters: Partial<ModelParameters>;
-}
+};
 
 export type MessageForLLM = Pick<InferSelectModel<typeof message>, 'sender' | 'text'>;
 

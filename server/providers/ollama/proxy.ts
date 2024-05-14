@@ -1,6 +1,6 @@
-import { ProxyRequestMessageType, ProxyResponseMessageType } from "@shared/ollama-proxy";
+import type { ProxyRequestMessageType, ProxyResponseMessageType } from "@shared/ollama-proxy";
 import { iife } from "@shared/utils";
-import { WSContext, WSEvents } from "hono/ws";
+import type { WSContext, WSEvents } from "hono/ws";
 import { v4 as uuid4 } from 'uuid';
 import { decode } from "base64-arraybuffer";
 

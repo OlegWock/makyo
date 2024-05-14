@@ -1,4 +1,4 @@
-import { MessageForLLM } from "@server/providers/provider";
+import type { MessageForLLM } from "@server/providers/provider";
 
 type Role = 'assistant' | 'user' | 'system';
 export const convertMakyoMessagesForLLM = (messages: MessageForLLM[]) => {

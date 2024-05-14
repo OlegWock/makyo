@@ -19,4 +19,14 @@ export const useMirrorStateToRef = <T>(val: T) => {
   });
 
   return ref;
-}
+};
+
+export const usePrevious = <T>(val: T) => {
+  const ref = useRef<T | undefined>(undefined);
+
+  useLayoutEffect(() => {
+    ref.current = val;
+  });
+
+  return ref.current;
+};

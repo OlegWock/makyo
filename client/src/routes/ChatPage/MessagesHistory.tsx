@@ -62,8 +62,8 @@ export const MessagesHistory = ({ modelName, defaultScrollTo }: MessagesHistoryP
     const isSingleAiMessage = message.sender === 'ai' && totalVariants === 1;
 
     const sender = <>
-      {message.sender === 'ai' && <ProviderIcon provider={providerId} />}
-      {message.sender === 'user' ? 'User' : modelName ?? 'LLM'}
+      {message.sender === 'ai' && <ProviderIcon provider={message.providerId!} />}
+      {message.senderName}
     </>;
 
     const sharedActions: Partial<MessageBubbleActionsProp> = {

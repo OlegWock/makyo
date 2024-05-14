@@ -1,12 +1,12 @@
 import { db } from "@server/db";
 import { getMessageHistoryUpwards } from "@server/db/queries/messages";
 import { chat, message } from "@server/db/schema";
-import { ModelParameters, Provider } from "@server/providers/provider"
-import { ChatSchemaType, ChatWithMessagesSchemaType, MessageSchemaType, MessageSearchResultSchemaType } from "@server/schemas/chats";
+import { type ModelParameters, Provider } from "@server/providers/provider"
+import type { ChatSchemaType, ChatWithMessagesSchemaType, MessageSearchResultSchemaType } from "@server/schemas/chats";
 import { omit, serialize } from "@server/utils/serialization";
 import { broadcastSubscriptionMessage } from "@server/utils/subscriptions";
 import { throttle } from "@shared/utils";
-import { and, eq, desc, InferSelectModel, inArray } from "drizzle-orm";
+import { and, eq, desc, type InferSelectModel, inArray } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
 
@@ -17,11 +17,16 @@ export const sendMessageAndSave = async ({ parentId, provider, modelId, text, ch
   chatId: number,
   parentId?: number | null
 } & Partial<ModelParameters>) => {
+  const model = await provider.getModelById(modelId);
+  if (!model) {
+    throw new HTTPException(404, { message: 'unknown model' });
+  }
   const { messagesHistory, responseMessage } = await db.transaction(async (tx) => {
     const [userMessage] = await tx.insert(message).values({
       parentId: parentId ?? null,
       text: text,
       sender: 'user',
+      senderName: 'User',
       chatId,
       isGenerating: false,
       createdAt: new Date(),
@@ -33,6 +38,8 @@ export const sendMessageAndSave = async ({ parentId, provider, modelId, text, ch
       parentId: userMessage.id,
       text: '',
       sender: 'ai',
+      senderName: model.name,
+      providerId: provider.id,
       chatId,
       isGenerating: true,
       createdAt: new Date(Date.now() + 1),
@@ -105,10 +112,16 @@ export const regenerateResponseForMessage = async ({ chatId, parentId, modelId, 
   chatId: number,
   parentId: number,
 } & Partial<ModelParameters>) => {
+  const model = await provider.getModelById(modelId);
+  if (!model) {
+    throw new HTTPException(404, { message: 'unknown model' });
+  }
   const [responseMessage] = await db.insert(message).values({
     parentId,
     text: '',
     sender: 'ai',
+    senderName: model.name,
+    providerId: provider.id,
     chatId,
     isGenerating: true,
     createdAt: new Date(),

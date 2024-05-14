@@ -27,7 +27,6 @@
       "@shared/*": ["../shared/*"],
     },
   },
-  "include": ["./src", "../reset.d.ts"],
+  "include": ["./src", "reset.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
-  // "references": [{ "path": "./tsconfig.node.json", {"path": "../tsconfig.base.json"} }]
 }

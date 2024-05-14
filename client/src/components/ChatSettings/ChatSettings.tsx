@@ -5,8 +5,15 @@ import { Switch } from '@client/components/Switch';
 import { Textarea } from '@client/components/Input';
 import { Slider } from '@client/components/Slider';
 import { Button } from '@client/components/Button';
+import { usePrevious } from '@client/utils/hooks';
+import { ModelSelect } from '@client/components/ModelSelect';
+import { useRef } from 'react';
 
 export type ChatSettings = {
+  model?: {
+    modelId: string,
+    providerId: string,
+  },
   system: {
     enabled: boolean,
     value: string
@@ -18,7 +25,13 @@ export type ChatSettings = {
 }
 
 export const useChatSettings = (defaultSettings: Model["defaultParameters"] | ChatSchemaType) => {
+  const prevDefaultSettingsRef = useRef<typeof defaultSettings | null>(null);
+
   const state = useImmer<ChatSettings>({
+    model: ('modelId' in defaultSettings) ? {
+      modelId: defaultSettings.modelId,
+      providerId: defaultSettings.providerId,
+    } : undefined,
     system: {
       enabled: typeof defaultSettings.system === 'string',
       value: defaultSettings.system ?? '',
@@ -28,6 +41,26 @@ export const useChatSettings = (defaultSettings: Model["defaultParameters"] | Ch
       value: defaultSettings.temperature ?? 0.8,
     }
   });
+
+  if (prevDefaultSettingsRef.current !== null && prevDefaultSettingsRef.current !== defaultSettings) {
+    prevDefaultSettingsRef.current = defaultSettings;
+    state[1]({
+      model: ('modelId' in defaultSettings) ? {
+        modelId: defaultSettings.modelId,
+        providerId: defaultSettings.providerId,
+      } : undefined,
+      system: {
+        enabled: typeof defaultSettings.system === 'string',
+        value: defaultSettings.system ?? '',
+      },
+      temperature: {
+        enabled: typeof defaultSettings.temperature === 'number',
+        value: defaultSettings.temperature ?? 0.8,
+      }
+    });
+  } else {
+    prevDefaultSettingsRef.current = defaultSettings;
+  }
 
   return state;
 };
@@ -42,6 +75,14 @@ export type ChatSettingsProps = {
 export const ChatSettings = ({ settings, settingsUpdater, isSubmitting, onSubmit }: ChatSettingsProps) => {
   return (<div className={styles.ChatSettings}>
     <div className={styles.title}>Chat settings</div>
+    {!!settings.model && <div className={styles.row}>
+      <ModelSelect
+        value={settings.model}
+        onChange={(newVal) => settingsUpdater((draft) => {
+          draft.model = newVal;
+        })}
+      />
+    </div>}
     <div className={styles.row}>
       <Switch
         checked={settings.system.enabled}

@@ -14,6 +14,8 @@ CREATE TABLE `message` (
 	`error` text,
 	`isGenerating` integer DEFAULT false NOT NULL,
 	`sender` text NOT NULL,
+	`senderName` text NOT NULL,
+	`providerId` text,
 	`chatId` integer NOT NULL,
 	`parentId` integer,
 	`createdAt` integer DEFAULT (unixepoch() * 1000) NOT NULL,

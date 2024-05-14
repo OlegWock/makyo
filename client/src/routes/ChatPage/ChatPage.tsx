@@ -154,6 +154,10 @@ export const ChatPage = withErrorBoundary(() => {
               parameters: {
                 temperature: chatSettings.temperature.enabled ? chatSettings.temperature.value : undefined,
                 system: chatSettings.system.enabled ? chatSettings.system.value : undefined,
+              },
+              model: {
+                providerId: chatSettings.model!.providerId,
+                modelId: chatSettings.model!.modelId,
               }
             });
             setSettingsVisible(false);

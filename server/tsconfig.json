@@ -18,6 +18,7 @@
     },
 
     // Bundler mode
+    "moduleResolution": "bundler",
     "verbatimModuleSyntax": true,
     "noEmit": true,
     "allowImportingTsExtensions": true,
@@ -31,6 +32,5 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false
-  },
-  "references": [{"path": "../tsconfig.base.json"}],
+  }
 }

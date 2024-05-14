@@ -5,8 +5,6 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 
 ## Roadmap
 
-- [ ] Switching model mid-chat
-  - [ ] Correctly labeling which model sent the message
 - [ ] Mark conversation as favorite/starred
 - [ ] Support for snippets
   - [ ] Snippets management (add/edit/delete)
