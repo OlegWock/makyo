@@ -1,12 +1,12 @@
 {
-  "version": "5",
+  "version": "6",
   "dialect": "sqlite",
   "entries": [
     {
       "idx": 0,
-      "version": "5",
-      "when": 1715702147223,
-      "tag": "0000_strong_vampiro",
+      "version": "6",
+      "when": 1715712767724,
+      "tag": "0000_left_pride",
       "breakpoints": true
     }
   ]
