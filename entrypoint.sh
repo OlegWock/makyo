@@ -4,6 +4,10 @@
 
 set -e
 
+
+echo "Nuking database"
+bun run drizzle:nuke
+
 echo "Migrating database"
 bun run drizzle:migrate
 
