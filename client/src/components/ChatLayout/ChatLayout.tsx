@@ -6,6 +6,7 @@ import { ChangeEventHandler, KeyboardEvent, ReactNode, useState } from 'react';
 import { createComponentWithSlotsFactory, SlotsPropsFromFactory } from '@client/components/slots';
 import { useIsMobile } from '@client/utils/responsive';
 import { useSnippets } from '@client/api';
+import { WithSnippets } from '@client/components/WithSnippets';
 
 const componentFactory = createComponentWithSlotsFactory({
   'MessagesArea': { required: false },
@@ -38,8 +39,8 @@ export const ChatLayout = componentFactory('ChatLayout', ({ onSend, slots }: Cha
     for (const snippet of snippets) {
       if (textBeforeCursor.endsWith(snippet.shortcut)) {
         console.log('Matched snippet shortcut!', snippet);
-        const unfoldedText = 
-          textBeforeCursor.slice(0, textBeforeCursor.length - snippet.shortcut.length) 
+        const unfoldedText =
+          textBeforeCursor.slice(0, textBeforeCursor.length - snippet.shortcut.length)
           + snippet.text
           + target.value.slice(target.selectionStart);
         console.log('Unfolded text', unfoldedText);
@@ -81,18 +82,18 @@ export const ChatLayout = componentFactory('ChatLayout', ({ onSend, slots }: Cha
         </div>}
 
         <div className={styles.textareaWrapper}>
-          {/* TODO: show autocomplete for snippets that start with / or @ */}
-          <Textarea
-            className={styles.textarea}
-            autoFocus={!isMobile}
-            minRows={1}
-            maxRows={20}
-            value={text}
-            placeholder='Enter your message...'
-            onValueChange={setText}
-            onKeyDown={onKeyDown}
-            onChange={onChange}
-          />
+          <WithSnippets>
+            <Textarea
+              className={styles.textarea}
+              autoFocus={!isMobile}
+              minRows={1}
+              maxRows={20}
+              value={text}
+              placeholder='Enter your message...'
+              onKeyDown={onKeyDown}
+              onValueChange={setText}
+            />
+          </WithSnippets>
           <Button
             className={styles.sendButton}
             icon={<HiOutlinePaperAirplane />}

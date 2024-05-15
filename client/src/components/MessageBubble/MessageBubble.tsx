@@ -12,6 +12,7 @@ import { Textarea } from '@client/components/Input';
 import { Tooltip } from '@client/components/Tooltip';
 import { Markdown } from '@client/components/Markdown';
 import { ToastTarget, useLocalToast } from "@client/components/LocalToast";
+import { WithSnippets } from "@client/components/WithSnippets";
 
 
 export type MessageBubbleActionsProp = {
@@ -151,12 +152,14 @@ export const MessageBubble = (props: MessageBubbleProps) => {
           if (isEditing && !!actions?.editing) {
             const { onEdit } = actions.editing;
             return (<>
-              <Textarea
-                className={styles.textarea}
-                value={messageDraft}
-                onValueChange={setMessageDraft}
-                minRows={3}
-              />
+              <WithSnippets>
+                <Textarea
+                  className={styles.textarea}
+                  value={messageDraft}
+                  onValueChange={setMessageDraft}
+                  minRows={3}
+                />
+              </WithSnippets>
               <div className={styles.editingActions}>
                 <Button
                   onClick={() => setIsEditing(false)}

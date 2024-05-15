@@ -8,6 +8,7 @@ import { Button } from '@client/components/Button';
 import { usePrevious } from '@client/utils/hooks';
 import { ModelSelect } from '@client/components/ModelSelect';
 import { useRef } from 'react';
+import { WithSnippets } from '@client/components/WithSnippets';
 
 export type ChatSettings = {
   model?: {
@@ -93,17 +94,18 @@ export const ChatSettings = ({ settings, settingsUpdater, isSubmitting, onSubmit
         System message
       </Switch>
 
-      {/* TODO: we probably should expand snippets here too */}
-      {settings.system.enabled && <Textarea
-        className={styles.textarea}
-        minRows={6}
-        maxRows={20}
-        placeholder='System prompt'
-        value={settings.system.value}
-        onValueChange={newVal => settingsUpdater(draft => {
-          draft.system.value = newVal;
-        })}
-      />}
+      {settings.system.enabled && <WithSnippets>
+        <Textarea
+          className={styles.textarea}
+          minRows={6}
+          maxRows={20}
+          placeholder='System prompt'
+          value={settings.system.value}
+          onValueChange={newVal => settingsUpdater(draft => {
+            draft.system.value = newVal;
+          })}
+        />
+      </WithSnippets>}
     </div>
     <div className={styles.row}>
       <Switch

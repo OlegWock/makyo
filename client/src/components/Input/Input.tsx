@@ -11,8 +11,8 @@ export const Input = ({ onValueChange, onChange, className, ...props }: InputPro
   return (<input
     className={clsx(styles.Input, className)}
     onChange={(e) => {
+      onChange?.(e);
       onValueChange?.(e.target.value);
-      return onChange?.(e);
     }}
     {...props}
   />);
@@ -26,8 +26,8 @@ export const Textarea = ({ onValueChange, onChange, className, ...props }: Texta
   return (<TextareaAutosize
     className={clsx(styles.Input, styles.Textarea, className)}
     onChange={(e) => {
+      onChange?.(e);
       onValueChange?.(e.target.value);
-      return onChange?.(e);
     }}
     {...props}
   />);

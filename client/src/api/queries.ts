@@ -50,6 +50,7 @@ export const useSearch = createSuspenseQueryHook(
 );
 
 export const useSnippets = createSuspenseQueryHook(['snippets'], (api) => api.snippets.$get());
+export const useSnippetsNonBlocking = createQueryHook(['snippets'], (api) => api.snippets.$get());
 
 export const useNewChatMutation = () => {
   const api = useApiClient();
