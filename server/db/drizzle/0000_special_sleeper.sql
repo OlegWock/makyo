@@ -27,3 +27,11 @@ CREATE TABLE `setting` (
 	`key` text PRIMARY KEY NOT NULL,
 	`value` text
 );
+--> statement-breakpoint
+CREATE TABLE `snippet` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`name` text NOT NULL,
+	`shortcut` text NOT NULL,
+	`text` text NOT NULL,
+	`createdAt` integer DEFAULT (unixepoch() * 1000) NOT NULL
+);

@@ -2,9 +2,10 @@ import { Textarea } from '@client/components/Input';
 import { Button } from '@client/components/Button';
 import { HiOutlinePaperAirplane } from 'react-icons/hi2';
 import styles from './ChatLayout.module.scss';
-import { ReactNode, useState } from 'react';
+import { ChangeEventHandler, KeyboardEvent, ReactNode, useState } from 'react';
 import { createComponentWithSlotsFactory, SlotsPropsFromFactory } from '@client/components/slots';
 import { useIsMobile } from '@client/utils/responsive';
+import { useSnippets } from '@client/api';
 
 const componentFactory = createComponentWithSlotsFactory({
   'MessagesArea': { required: false },
@@ -22,6 +23,36 @@ export type ChatLayoutProps = {
 type ChatLayoutPropsWithSlots = ChatLayoutProps & SlotsPropsFromFactory<typeof componentFactory>;
 
 export const ChatLayout = componentFactory('ChatLayout', ({ onSend, slots }: ChatLayoutPropsWithSlots) => {
+  const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      onSend?.(text);
+      setText('');
+      return;
+    }
+  };
+
+  const onChange: ChangeEventHandler<HTMLTextAreaElement> = (e) => {
+    const target = e.target as HTMLTextAreaElement;
+    const textBeforeCursor = target.value.slice(0, target.selectionStart);
+    for (const snippet of snippets) {
+      if (textBeforeCursor.endsWith(snippet.shortcut)) {
+        console.log('Matched snippet shortcut!', snippet);
+        const unfoldedText = 
+          textBeforeCursor.slice(0, textBeforeCursor.length - snippet.shortcut.length) 
+          + snippet.text
+          + target.value.slice(target.selectionStart);
+        console.log('Unfolded text', unfoldedText);
+        setText(unfoldedText);
+        e.preventDefault();
+        return;
+      }
+    }
+
+    setText(target.value);
+  };
+
+  const { data: snippets } = useSnippets();
   const [text, setText] = useState('');
   const isMobile = useIsMobile();
 
@@ -50,6 +81,7 @@ export const ChatLayout = componentFactory('ChatLayout', ({ onSend, slots }: Cha
         </div>}
 
         <div className={styles.textareaWrapper}>
+          {/* TODO: show autocomplete for snippets that start with / or @ */}
           <Textarea
             className={styles.textarea}
             autoFocus={!isMobile}
@@ -58,13 +90,8 @@ export const ChatLayout = componentFactory('ChatLayout', ({ onSend, slots }: Cha
             value={text}
             placeholder='Enter your message...'
             onValueChange={setText}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                onSend?.(text);
-                setText('');
-              }
-            }}
+            onKeyDown={onKeyDown}
+            onChange={onChange}
           />
           <Button
             className={styles.sendButton}

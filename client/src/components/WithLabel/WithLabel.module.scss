@@ -2,12 +2,17 @@
   .label {
     font-size: 0.875rem;
     font-weight: 500;
-    color: var(--gray-9);
+    color: var(--gray-10);
     margin-bottom: 0.125rem;
     margin-left: 0.125rem;
   }
 
-  .content {
+  .content {}
 
+  .hint {
+    font-size: 0.875rem;
+    color: var(--gray-9);
+    margin-top: 0.125rem;
+    margin-left: 0.125rem;
   }
 }

@@ -1,10 +1,6 @@
 .ChatCard {
-  border: 1px solid var(--gray-4);
-  border-radius: 0.25rem;
-  display: flex;
-  flex-direction: column;
   gap: 0.25rem;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 1rem !important;
 
   &.ghost {
     pointer-events: none;
@@ -14,7 +10,7 @@
   .titleWrapper {
     display: flex;
     gap: 1rem;
-    align-items: center;
+    align-items: baseline;
 
     .title {
       font-size: 1.25rem;

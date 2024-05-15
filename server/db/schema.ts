@@ -30,3 +30,11 @@ export const message = sqliteTable('message', {
   parentId: integer('parentId').references((): AnySQLiteColumn => message.id, { onDelete: 'cascade' }),
   createdAt: integer('createdAt', { mode: 'timestamp_ms' }).notNull().default(sql`(unixepoch() * 1000)`),
 });
+
+export const snippet = sqliteTable('snippet', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull(),
+  shortcut: text('shortcut').notNull(),
+  text: text('text').notNull(),
+  createdAt: integer('createdAt', { mode: 'timestamp_ms' }).notNull().default(sql`(unixepoch() * 1000)`),
+});

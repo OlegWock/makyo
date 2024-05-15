@@ -12,6 +12,7 @@ import { serveStatic } from './static';
 import { etag } from 'hono/etag'
 import { resolve } from 'path';
 import { bunWebSocket } from '@server/utils/websockets';
+import { presetsRouter } from '@server/routes/presets';
 
 const app = new OpenAPIHono();
 
@@ -29,6 +30,7 @@ const router = app
   .route('/', providersRouter)
   .route('/', chatsRouter)
   .route('/', subscriptionsRouter)
+  .route('/', presetsRouter)
   .route('/', configurationRouter);
 
 app.openAPIRegistry.registerComponent('securitySchemes', 'CookieAuth', {

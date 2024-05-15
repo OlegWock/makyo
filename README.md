@@ -6,12 +6,6 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 ## Roadmap
 
 - [ ] Mark conversation as favorite/starred
-- [ ] Support for snippets
-  - [ ] Snippets management (add/edit/delete)
-  - [ ] Snippets handling (insert snippet when user types `/keyword`)
-  - [ ] Autocomplete for snippets when user types `/`
-  - [ ] Experiment maybe to allow entering just `keyword` and then pressing Tab
-  - [ ] Allow placing placeholders in the snippet (when pasted, user will be prompted to fill placeholders)
 - [ ] Support for personas
   - [ ] Essentially just a preset with name, icon and chat settings (model, temperature, system prompt)
   - [ ] When creating new chat, parameters are copied + chat is associated with persona, but user can change any parameter
@@ -21,6 +15,7 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 - [ ] Multimodal (start with vision, maybe expand to image generation) LLMs support
 - [ ] Support for perplexity.ai provider
 - [ ] Semantic/vector search across messages
+- [ ] Autocomplete for snippets when user types `/` or `@`
 
 
 ## Deploy

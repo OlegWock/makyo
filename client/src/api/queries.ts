@@ -1,6 +1,7 @@
 import { ApiClient } from "@client/api/client";
 import { useApiClient } from "@client/api/context";
 import { throwExceptionOnFailedResponse } from "@client/api/exceptions";
+import { SnippetInSchemaType, SnippetSchemaType } from "@server/schemas/snippets";
 import { ChatSchemaType, ChatWithMessagesSchemaType, MessageSchemaType, NewChatSchemaType, NewMessageSchemaType, UpdateChatSchemaType } from "@shared/api";
 import { useMutation, useQuery, useQueryClient, UseQueryOptions, UseQueryResult, useSuspenseQuery, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
 import { ClientResponse } from "hono/client";
@@ -12,7 +13,7 @@ type Result<S, Out> = S extends true ? UseSuspenseQueryResult<Out> : UseQueryRes
 type Options<S, Out> = Omit<S extends true ? UseSuspenseQueryOptions<Out> : UseQueryOptions<Out>, 'queryKey' | 'queryFn'>
 
 const createHookFactory = <S extends boolean>(suspense: S) => <Out, In = void>(
-  key: Key<In>, 
+  key: Key<In>,
   func: (api: ApiClient, arg: In) => Promise<ClientResponse<Out>>
 ) => (arg: In, opts: Partial<Options<S, Out>> = {}): Result<S, Out> => {
   const api = useApiClient();
@@ -47,6 +48,8 @@ export const useSearch = createSuspenseQueryHook(
   (searchQuery: string) => ['search', searchQuery],
   (api, searchQuery) => api.search.$get({ query: { searchQuery } })
 );
+
+export const useSnippets = createSuspenseQueryHook(['snippets'], (api) => api.snippets.$get());
 
 export const useNewChatMutation = () => {
   const api = useApiClient();
@@ -193,6 +196,65 @@ export const useDeleteMessageMutation = (chatId: number) => {
     },
     onSuccess(data) {
       client.setQueryData(['chats', chatId], () => data);
+    },
+  });
+};
+
+export const useNewSnippetMutation = () => {
+  const api = useApiClient();
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: SnippetInSchemaType) => {
+      const resp = await api.snippets.$put({
+        json: payload,
+      });
+      return resp.json();
+    },
+    onSuccess(data) {
+      client.setQueryData(['snippets'], (old: SnippetSchemaType[]) => [data, ...(old || [])]);
+      client.invalidateQueries({ queryKey: ['snippets'] });
+    },
+  });
+};
+
+export const useEditSnippetMutation = (snippetId: number) => {
+  const api = useApiClient();
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: Partial<SnippetInSchemaType>) => {
+      const resp = await api.snippets[":snippetId"].$patch({
+        param: { snippetId: snippetId.toString() },
+        json: payload,
+      });
+      return resp.json();
+    },
+    onSuccess(data) {
+      client.setQueryData(['snippets'], (old: SnippetSchemaType[]) => {
+        if (!old) return [data];
+        return produce(old, (draft) => {
+          const snippet = draft.find(s => s.id === data.id);
+          if (snippet) {
+            Object.assign(snippet, data);
+          }
+        });
+      });
+      client.invalidateQueries({ queryKey: ['snippets'] });
+    },
+  });
+};
+
+export const useDeleteSnippetMutation = (snippetId: number) => {
+  const api = useApiClient();
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const resp = await api.snippets[":snippetId"].$delete({
+        param: { snippetId: snippetId.toString() },
+      });
+      return resp.json();
+    },
+    onSuccess(data) {
+      client.setQueryData(['snippets'], () => data);
     },
   });
 };

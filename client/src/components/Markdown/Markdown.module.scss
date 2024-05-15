@@ -6,12 +6,19 @@
     }
   }
 
-  pre>code {
-    border-radius: 0.35rem;
-    display: block;
-    overflow-x: auto;
-    padding: 1em;
-    background: #1a1b26;
-    color: #9aa5ce;
+  code {
+    padding: 0.125rem 0.25rem;
+    background: var(--jade-2);
+    color: var(--jade-11);
+    font-weight: 500;
+  }
+
+  pre {
+    code {
+      padding: unset;
+      background: unset;
+      color: unset;
+      font-weight: inherit;
+    }
   }
 }

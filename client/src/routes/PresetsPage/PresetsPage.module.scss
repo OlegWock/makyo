@@ -1,3 +1,94 @@
+@use "../../styles/utils.scss" as *;
+
+
 .PresetsPage {
-  
+  .content {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .title {
+    font-size: 2rem;
+    margin-top: 6rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    line-height: 1;
+
+    @include mobile {
+      margin-top: 0;
+    }
+  }
+}
+
+.newSnippetWizard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  .formTitle {
+    font-size: 1.5rem;
+  }
+
+  .input {
+    width: 100%;
+  }
+
+  .actions {
+    display: flex;
+    gap: 1rem;
+  }
+}
+
+.snippets {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  .snippet {
+    gap: 0.25rem;
+    padding: 0.5rem 1rem !important;
+
+    &.ghost {
+      pointer-events: none;
+      opacity: 0.65;
+    }
+
+    .nameWrapper {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+
+      .name {
+        font-size: 1.25rem;
+      }
+
+      .shortcut {
+        font-size: 1.25rem;
+        flex-grow: 1;
+        color: var(--gray-8);
+      }
+
+      .menuButton {
+        color: var(--gray-8);
+      }
+    }
+
+    .text {
+      font-size: 0.9rem;
+      white-space: pre-wrap;
+      border-left: 2px solid var(--gray-10);
+      padding-left: 0.75rem;
+    }
+
+    .datetime {
+      align-self: flex-end;
+      color: var(--gray-8);
+      font-size: 0.875rem;
+    }
+  }
 }

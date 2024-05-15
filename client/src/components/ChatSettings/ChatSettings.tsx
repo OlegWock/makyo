@@ -92,6 +92,8 @@ export const ChatSettings = ({ settings, settingsUpdater, isSubmitting, onSubmit
       >
         System message
       </Switch>
+
+      {/* TODO: we probably should expand snippets here too */}
       {settings.system.enabled && <Textarea
         className={styles.textarea}
         minRows={6}
