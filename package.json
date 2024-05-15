@@ -59,7 +59,7 @@
     "typescript": "^5.2.2",
     "vite": "^5.2.0",
     "dayjs": "^1.11.11",
-    "framer-motion": "^11.1.7",
+    "framer-motion": "11.0.8",
     "immer": "^10.0.4",
     "jotai": "^2.8.0",
     "jotai-location": "^0.5.5",

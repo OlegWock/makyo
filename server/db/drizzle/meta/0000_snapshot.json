@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "464307bf-1a84-491a-b03e-15856e619f49",
+  "id": "95b448c1-5db7-40dd-a6f5-96790213c593",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "chat": {
@@ -34,6 +34,14 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "isStarred": {
+          "name": "isStarred",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
         },
         "system": {
           "name": "system",

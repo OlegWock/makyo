@@ -5,9 +5,9 @@ import { useMemo } from 'react';
 import dayjs from 'dayjs';
 import { DropdownMenu } from '@client/components/DropdownMenu';
 import { Button } from '@client/components/Button';
-import { HiOutlineTrash } from 'react-icons/hi2';
+import { HiOutlineStar, HiOutlineTrash, HiStar } from 'react-icons/hi2';
 import { HiOutlineDotsVertical } from 'react-icons/hi';
-import { useDeleteChatMutation } from '@client/api';
+import { useDeleteChatMutation, useEditChatMutation } from '@client/api';
 import clsx from 'clsx';
 import { Card } from '@client/components/Card';
 
@@ -18,12 +18,23 @@ export type ChatCardProps = {
 export const ChatCard = ({ chat }: ChatCardProps) => {
   const date = useMemo(() => dayjs(chat.lastMessageAt).fromNow(), [chat.lastMessageAt]);
   const deleteChat = useDeleteChatMutation(chat.id);
+  const editChat = useEditChatMutation(chat.id);
 
   return (<Card className={clsx(styles.ChatCard, deleteChat.isPending && styles.ghost)} withScrollArea={false}>
     <div className={styles.titleWrapper}>
-      <Link variant='unstyled' href={`/chats/${chat.id}`} className={styles.title}>{chat.title}</Link>
+      <Link variant='unstyled' href={`/chats/${chat.id}`} className={styles.title}>
+        {chat.isStarred && '⭐️ '}
+        {chat.title}
+      </Link>
       <DropdownMenu
         menu={<>
+          <DropdownMenu.Item
+            type='normal'
+            icon={chat.isStarred ? <HiOutlineStar /> : <HiStar />}
+            onSelect={() => editChat.mutate({ isStarred: !chat.isStarred })}
+          >
+            {chat.isStarred ? 'Unstar' : 'Star'}
+          </DropdownMenu.Item>
           <DropdownMenu.Item
             type='danger-with-confirmation'
             icon={<HiOutlineTrash />}

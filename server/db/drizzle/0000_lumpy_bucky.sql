@@ -3,6 +3,7 @@ CREATE TABLE `chat` (
 	`title` text NOT NULL,
 	`providerId` text NOT NULL,
 	`modelId` text NOT NULL,
+	`isStarred` integer DEFAULT false NOT NULL,
 	`system` text,
 	`temperature` real,
 	`createdAt` integer DEFAULT (unixepoch() * 1000) NOT NULL

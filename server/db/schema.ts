@@ -13,6 +13,7 @@ export const chat = sqliteTable('chat', {
   title: text('title').notNull(),
   providerId: text('providerId').notNull(),
   modelId: text('modelId').notNull(),
+  isStarred: integer('isStarred', { mode: 'boolean' }).notNull().default(false),
   system: text('system'),
   temperature: real('temperature'),
   createdAt: integer('createdAt', { mode: 'timestamp_ms' }).notNull().default(sql`(unixepoch() * 1000)`),

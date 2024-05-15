@@ -12,6 +12,8 @@ export type DropdownMenuProps = {
 
 export const DropdownMenu = ({ children, menu }: DropdownMenuProps) => {
   const [open, setOpen] = useState(false);
+  console.log('Render dropdown is open', open);
+
   return (<RadixDropdownMenu.Root onOpenChange={setOpen} open={open}>
     <RadixDropdownMenu.Trigger asChild>
       {children}

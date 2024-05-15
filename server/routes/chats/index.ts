@@ -358,7 +358,11 @@ export const chatsRouter = new OpenAPIHono()
   .openapi(getChats, async (c) => {
     const chats = await db.select().from(chat);
     const augmented = await Promise.all(chats.map(c => augmentChatWithLastMessage(c)));
-    augmented.sort((a, b) => b.lastMessageAt - a.lastMessageAt);
+    augmented.sort((a, b) => {
+      if (a.isStarred === b.isStarred) return b.lastMessageAt - a.lastMessageAt;
+      if (a.isStarred) return -1;
+      return 1;
+    });
     return c.json(augmented);
   })
   .openapi(search, async (c) => {
@@ -428,8 +432,8 @@ export const chatsRouter = new OpenAPIHono()
   })
   .openapi(editChat, async (c) => {
     const { chatId } = c.req.valid('param');
-    const { title, parameters, model: modelPayload } = c.req.valid('json');
-    let payload: Partial<InferInsertModel<typeof chat>> = {};
+    const { title, parameters, model: modelPayload, isStarred } = c.req.valid('json');
+    let payload: Partial<InferInsertModel<typeof chat>> = { isStarred };
     if (title) payload.title = title;
     if (modelPayload) {
       const provider = getProviderById(modelPayload.providerId);

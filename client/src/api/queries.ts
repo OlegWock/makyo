@@ -100,6 +100,15 @@ export const useEditChatMutation = (chatId: number) => {
     },
     onSuccess(data) {
       client.setQueryData(['chats', chatId], () => data);
+      client.setQueryData(['chats'], (old: ChatSchemaType[]) => {
+        if (!old) return old;
+        return produce(old, (draft) => {
+          const chat = draft.find(c => c.id === chatId);
+          if (chat) {
+            Object.assign(chat, data.chat);
+          }
+        })
+      });
     },
   });
 };

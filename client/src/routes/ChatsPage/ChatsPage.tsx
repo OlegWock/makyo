@@ -4,7 +4,7 @@ import { withErrorBoundary } from '@client/components/ErrorBoundary';
 import { Card } from '@client/components/Card';
 import { usePageTitle } from '@client/utils/hooks';
 import { ChatCard } from '@client/components/ChatCard';
-import { Suspense, useDeferredValue } from 'react';
+import { Suspense, useDeferredValue, useMemo } from 'react';
 import { Input } from '@client/components/Input';
 import { MessageCard } from '@client/components/MessageCard';
 import { useSearchParams } from '@client/components/Router/hooks';
@@ -31,6 +31,11 @@ export const ChatsPage = withErrorBoundary(() => {
   const deferredSearchQuery = useDeferredValue(params.query ?? '');
 
   const { data: chats } = useChats();
+  const sortedChats = useMemo(() => chats.sort((a, b) => {
+    if (a.isStarred === b.isStarred) return b.lastMessageAt - a.lastMessageAt;
+    if (a.isStarred) return -1;
+    return 1;
+  }), [chats]);
 
   usePageTitle('All chats');
 
@@ -46,10 +51,10 @@ export const ChatsPage = withErrorBoundary(() => {
         />
         <Suspense>
           {!!params.query ? <SearchResults query={deferredSearchQuery} /> : <>
-            {chats.length === 0 && <div>
+            {sortedChats.length === 0 && <div>
               <Empty text='No chats yet' />
             </div>}
-            {chats.map((chat) => {
+            {sortedChats.map((chat) => {
               return (<ChatCard
                 key={chat.id}
                 chat={chat}

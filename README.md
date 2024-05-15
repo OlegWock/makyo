@@ -5,7 +5,6 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 
 ## Roadmap
 
-- [ ] Mark conversation as favorite/starred
 - [ ] Support for personas
   - [ ] Essentially just a preset with name, icon and chat settings (model, temperature, system prompt)
   - [ ] When creating new chat, parameters are copied + chat is associated with persona, but user can change any parameter

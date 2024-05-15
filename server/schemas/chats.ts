@@ -7,6 +7,7 @@ export const ChatSchema = z.object({
   providerId: z.string(),
   modelId: z.string(),
   createdAt: z.number(),
+  isStarred: z.boolean(),
   lastMessageText: z.string(),
   lastMessageAt: z.number(),
   system: z.string().nullable(),
@@ -27,6 +28,7 @@ export type NewChatSchemaType = z.infer<typeof NewChatSchema>;
 export const UpdateChatSchema = z.object({
   title: z.string().optional(),
   parameters: ModelParametersSchema.partial().optional(),
+  isStarred: z.boolean().optional(),
   model: z.object({
     providerId: z.string(),
     modelId: z.string(),
