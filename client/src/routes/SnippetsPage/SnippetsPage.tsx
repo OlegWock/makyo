@@ -1,5 +1,7 @@
+import { withErrorBoundary } from '@client/components/ErrorBoundary';
+import styles from './SnippetsPage.module.scss';
 import { Card } from '@client/components/Card';
-import styles from './PresetsPage.module.scss';
+import { usePageTitle } from '@client/utils/hooks';
 import { useMemo, useState } from 'react';
 import { Button } from '@client/components/Button';
 import { HiOutlinePencil, HiOutlineTrash, HiPlus } from 'react-icons/hi2';
@@ -115,37 +117,44 @@ const Snippet = ({ id, name, shortcut, text, createdAt }: SnippetSchemaType) => 
   </Card>)
 }
 
-export const Snippets = () => {
+export const SnippetsPage = withErrorBoundary(() => {
   const createSnippet = useNewSnippetMutation();
   const [showNewSnippetWizard, setShowNewSnippetWizard] = useState(false);
 
   const { data: snippets } = useSnippets();
+  usePageTitle('Presets');
 
-  return (<>
-    <div className={styles.title}>
-      <div>Snippets</div>
-      <div className={styles.titleActions}>
-        <Button onClick={() => setShowNewSnippetWizard(true)} icon={<HiPlus />} variant='borderless' size='large' />
+  return (<Card flexGrow>
+    <div className={styles.PresetsPage}>
+      <div className={styles.content}>
+        <div className={styles.title}>
+          <div>Snippets</div>
+          <div className={styles.titleActions}>
+            <Button onClick={() => setShowNewSnippetWizard(true)} icon={<HiPlus />} variant='borderless' size='large' />
+          </div>
+        </div>
+
+        {showNewSnippetWizard && <Card>
+          <SnippetForm
+            title='New snippet'
+            onCancel={() => setShowNewSnippetWizard(false)}
+            onSave={async (val) => {
+              await createSnippet.mutateAsync(val);
+              setShowNewSnippetWizard(false);
+            }}
+            loading={createSnippet.isPending}
+          />
+        </Card>}
+
+        <div className={styles.snippets}>
+          {snippets.length === 0 && <Empty text='No snippets' />}
+          {snippets.map(s => {
+            return (<Snippet key={s.id} {...s} />)
+          })}
+        </div>
       </div>
     </div>
+  </Card>);
+});
 
-    {showNewSnippetWizard && <Card>
-      <SnippetForm
-        title='New snippet'
-        onCancel={() => setShowNewSnippetWizard(false)}
-        onSave={async (val) => {
-          await createSnippet.mutateAsync(val);
-          setShowNewSnippetWizard(false);
-        }}
-        loading={createSnippet.isPending}
-      />
-    </Card>}
-
-    <div className={styles.snippets}>
-      {snippets.length === 0 && <Empty text='No snippets' />}
-      {snippets.map(s => {
-        return (<Snippet key={s.id} {...s} />)
-      })}
-    </div>
-  </>);
-}
+SnippetsPage.displayName = 'PresetsPage';

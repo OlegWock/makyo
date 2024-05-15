@@ -5,7 +5,7 @@ import { RootPage } from "@client/routes/RootPage";
 import { NotFound } from "@client/routes/NotFound";
 import { SettingsPage } from "@client/routes/SettingsPage";
 import { ChatsPage } from "@client/routes/ChatsPage";
-import { PresetsPage } from "@client/routes/PresetsPage";
+import { SnippetsPage } from "@client/routes/SnippetsPage";
 import { QueryClientProvider } from "@client/api";
 import { ChatPage } from "@client/routes/ChatPage";
 import { SubscriptionProvider } from "./api/subscription";
@@ -30,7 +30,7 @@ export const App = () => {
                       <Route path="/" component={RootPage} />
                       <Route path="/chats" component={ChatsPage} />
                       <Route path="/chats/:id" component={ChatPage} />
-                      <Route path="/presets" component={PresetsPage} />
+                      <Route path="/snippets" component={SnippetsPage} />
                       <Route path="/settings" component={SettingsPage} />
                       <Route component={NotFound} />
                     </Switch>
