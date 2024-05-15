@@ -1,3 +1,98 @@
+@use "../../styles/utils.scss" as *;
+
 .PersonasPage {
-  
+  .content {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .title {
+    font-size: 2rem;
+    margin-top: 6rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    line-height: 1;
+
+    @include mobile {
+      margin-top: 0;
+    }
+  }
+}
+
+.newPersonaWizard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  .formTitle {
+    font-size: 1.5rem;
+  }
+
+  .topRow {
+    display: flex;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .avatarButton {
+    font-size: 2.5rem;
+    padding: 0.75rem 1rem !important;
+  }
+
+  .nameWrapper {
+    flex-grow: 1;
+  }
+
+  .input {
+    width: 100%;
+  }
+
+  .actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+}
+
+.personas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.persona {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+
+  &.ghost {
+    pointer-events: none;
+    opacity: 0.65;
+  }
+
+  .newPersonaWizard {
+    flex-grow: 1;
+  }
+
+  .avatar {
+    font-size: 2rem;
+    padding: 0.5rem;
+    line-height: 1;
+  }
+
+  .name {
+    font-size: 1.5rem;
+    flex-grow: 1;
+  }
+
+  .menuButton {
+    color: var(--gray-8);
+  }
 }

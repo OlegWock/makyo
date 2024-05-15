@@ -24,6 +24,15 @@ CREATE TABLE `message` (
 	FOREIGN KEY (`parentId`) REFERENCES `message`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
+CREATE TABLE `persona` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`name` text NOT NULL,
+	`avatar` text NOT NULL,
+	`system` text,
+	`temperature` real,
+	`createdAt` integer DEFAULT (unixepoch() * 1000) NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE `setting` (
 	`key` text PRIMARY KEY NOT NULL,
 	`value` text

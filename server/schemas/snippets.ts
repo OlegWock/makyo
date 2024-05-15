@@ -10,10 +10,6 @@ export const SnippetSchema = z.object({
 
 export type SnippetSchemaType = z.infer<typeof SnippetSchema>;
 
-export const SnippetInSchema = z.object({
-  name: z.string(),
-  shortcut: z.string(),
-  text: z.string(),
-});
+export const SnippetInSchema = SnippetSchema.omit({id: true, createdAt: true});
 
 export type SnippetInSchemaType = z.infer<typeof SnippetInSchema>;

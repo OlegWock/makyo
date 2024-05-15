@@ -14,6 +14,7 @@ import { Router } from "./components/Router/Router";
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ToastProvider } from "@client/components/LocalToast";
 import { LocalOllamaProxyProvider } from "@client/api/ollama-proxy";
+import { PersonasPage } from "@client/routes/PersonasPage";
 
 
 export const App = () => {
@@ -31,6 +32,7 @@ export const App = () => {
                       <Route path="/chats" component={ChatsPage} />
                       <Route path="/chats/:id" component={ChatPage} />
                       <Route path="/snippets" component={SnippetsPage} />
+                      <Route path="/personas" component={PersonasPage} />
                       <Route path="/settings" component={SettingsPage} />
                       <Route component={NotFound} />
                     </Switch>

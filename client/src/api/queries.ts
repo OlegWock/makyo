@@ -1,6 +1,7 @@
 import { ApiClient } from "@client/api/client";
 import { useApiClient } from "@client/api/context";
 import { throwExceptionOnFailedResponse } from "@client/api/exceptions";
+import { PersonaInSchemaType, PersonaSchemaType } from "@server/schemas/personas";
 import { SnippetInSchemaType, SnippetSchemaType } from "@server/schemas/snippets";
 import { ChatSchemaType, ChatWithMessagesSchemaType, MessageSchemaType, NewChatSchemaType, NewMessageSchemaType, UpdateChatSchemaType } from "@shared/api";
 import { useMutation, useQuery, useQueryClient, UseQueryOptions, UseQueryResult, useSuspenseQuery, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
@@ -51,6 +52,12 @@ export const useSearch = createSuspenseQueryHook(
 
 export const useSnippets = createSuspenseQueryHook(['snippets'], (api) => api.snippets.$get());
 export const useSnippetsNonBlocking = createQueryHook(['snippets'], (api) => api.snippets.$get());
+
+export const usePersonas = createSuspenseQueryHook(['personas'], (api) => api.personas.$get())
+
+// ------------------------------------------------------------------
+
+// TODO: maybe create a hook factory for mutations too (like we have for queries)
 
 export const useNewChatMutation = () => {
   const api = useApiClient();
@@ -265,6 +272,65 @@ export const useDeleteSnippetMutation = (snippetId: number) => {
     },
     onSuccess(data) {
       client.setQueryData(['snippets'], () => data);
+    },
+  });
+};
+
+export const useNewPersonaMutation = () => {
+  const api = useApiClient();
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: PersonaInSchemaType) => {
+      const resp = await api.personas.$put({
+        json: payload,
+      });
+      return resp.json();
+    },
+    onSuccess(data) {
+      client.setQueryData(['personas'], (old: PersonaSchemaType[]) => [data, ...(old || [])]);
+      client.invalidateQueries({ queryKey: ['personas'] });
+    },
+  });
+};
+
+export const useEditPersonaMutation = (personaId: number) => {
+  const api = useApiClient();
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: Partial<PersonaInSchemaType>) => {
+      const resp = await api.personas[":personaId"].$patch({
+        param: { personaId: personaId.toString() },
+        json: payload,
+      });
+      return resp.json();
+    },
+    onSuccess(data) {
+      client.setQueryData(['personas'], (old: PersonaSchemaType[]) => {
+        if (!old) return [data];
+        return produce(old, (draft) => {
+          const persona = draft.find(p => p.id === data.id);
+          if (persona) {
+            Object.assign(persona, data);
+          }
+        });
+      });
+      client.invalidateQueries({ queryKey: ['personas'] });
+    },
+  });
+};
+
+export const useDeletePersonaMutation = (personaId: number) => {
+  const api = useApiClient();
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const resp = await api.personas[":personaId"].$delete({
+        param: { personaId: personaId.toString() },
+      });
+      return resp.json();
+    },
+    onSuccess(data) {
+      client.setQueryData(['personas'], () => data);
     },
   });
 };

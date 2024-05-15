@@ -39,3 +39,12 @@ export const snippet = sqliteTable('snippet', {
   text: text('text').notNull(),
   createdAt: integer('createdAt', { mode: 'timestamp_ms' }).notNull().default(sql`(unixepoch() * 1000)`),
 });
+
+export const persona = sqliteTable('persona', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull(),
+  avatar: text('avatar').notNull(),
+  system: text('system'),
+  temperature: real('temperature'),
+  createdAt: integer('createdAt', { mode: 'timestamp_ms' }).notNull().default(sql`(unixepoch() * 1000)`),
+});

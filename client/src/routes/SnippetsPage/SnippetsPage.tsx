@@ -20,7 +20,7 @@ type SnippetFormProps = {
   defaultValue?: SnippetInSchemaType,
   loading?: boolean;
   onCancel?: VoidFunction,
-  onSave?: (val: { name: string, shortcut: string, text: string }) => void,
+  onSave?: (val: SnippetInSchemaType) => void,
 }
 
 const SnippetForm = ({ onCancel, onSave, loading, defaultValue, title }: SnippetFormProps) => {
@@ -122,10 +122,10 @@ export const SnippetsPage = withErrorBoundary(() => {
   const [showNewSnippetWizard, setShowNewSnippetWizard] = useState(false);
 
   const { data: snippets } = useSnippets();
-  usePageTitle('Presets');
+  usePageTitle('Snippets');
 
   return (<Card flexGrow>
-    <div className={styles.PresetsPage}>
+    <div className={styles.SnippetsPage}>
       <div className={styles.content}>
         <div className={styles.title}>
           <div>Snippets</div>
