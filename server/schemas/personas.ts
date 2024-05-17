@@ -6,6 +6,8 @@ export const PersonaSchema = z.object({
   avatar: z.string(),
   system: z.string().nullable(),
   temperature: z.number().nullable(),
+  providerId: z.string().nullable(),
+  modelId: z.string().nullable(),
   createdAt: z.number(),
 }).openapi('Persona');
 

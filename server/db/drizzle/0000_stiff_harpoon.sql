@@ -28,6 +28,8 @@ CREATE TABLE `persona` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
 	`avatar` text NOT NULL,
+	`providerId` text,
+	`modelId` text,
 	`system` text,
 	`temperature` real,
 	`createdAt` integer DEFAULT (unixepoch() * 1000) NOT NULL

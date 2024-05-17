@@ -7,7 +7,7 @@ import { usePageTitle } from '@client/utils/hooks';
 import { PersonaInSchemaType, PersonaSchemaType } from '@server/schemas/personas';
 import { WithLabel } from '@client/components/WithLabel';
 import { Input, Textarea } from '@client/components/Input';
-import { useDeletePersonaMutation, useEditPersonaMutation, useNewPersonaMutation, usePersonas } from '@client/api';
+import { useDeletePersonaMutation, useEditPersonaMutation, useModels, useNewPersonaMutation, usePersonas } from '@client/api';
 import { Switch } from '@client/components/Switch';
 import { WithSnippets } from '@client/components/WithSnippets';
 import { Slider } from '@client/components/Slider';
@@ -17,6 +17,7 @@ import dayjs from 'dayjs';
 import { DropdownMenu } from '@client/components/DropdownMenu';
 import { HiOutlineDotsVertical } from 'react-icons/hi';
 import clsx from 'clsx';
+import { ModelSelect } from '@client/components/ModelSelect';
 
 type PersonaFormProps = {
   title: string,
@@ -27,7 +28,11 @@ type PersonaFormProps = {
 }
 
 const PersonaForm = ({ onCancel, onSave, loading, defaultValue, title }: PersonaFormProps) => {
+  const { data: models } = useModels();
+
   const [personaName, setPersonaName] = useState(defaultValue?.name ?? '');
+  const [personaProviderId, setPersonaProviderId] = useState(defaultValue?.providerId ?? null);
+  const [personaModelId, setPersonaModelId] = useState(defaultValue?.modelId ?? null);
   const [personaAvatar, setPersonaAvatar] = useState(defaultValue?.avatar ?? '👩🏻‍🦰');
   const [personaSystem, setPersonaSystem] = useState(defaultValue?.system ?? null);
   const [personaTemperature, setPersonaTemperature] = useState(defaultValue?.temperature ?? null);
@@ -46,6 +51,33 @@ const PersonaForm = ({ onCancel, onSave, loading, defaultValue, title }: Persona
         <Input className={styles.input} placeholder='Assistant' value={personaName} onValueChange={setPersonaName} />
       </WithLabel>
     </div>
+
+    <Switch 
+    checked={personaModelId !== null && personaProviderId !== null} 
+    onChange={(checked) => {
+      if (checked) {
+        const provider = models[0].provider;
+        const model = models[0].models[0];
+        setPersonaProviderId(provider.id);
+        setPersonaModelId(model.id);
+      } else {
+        setPersonaProviderId(null);
+        setPersonaModelId(null);
+      }
+    }}
+    >
+      Change default model
+    </Switch>
+
+    {(personaModelId !== null && personaProviderId !== null) && <ModelSelect
+      withLabel={false}
+      value={{ providerId: personaProviderId, modelId: personaModelId }}
+      onChange={(newVal) => {
+        setPersonaProviderId(newVal.providerId);
+        setPersonaModelId(newVal.modelId);
+      }}
+    />}
+
     <Switch checked={personaSystem !== null} onChange={(checked) => setPersonaSystem(checked ? '' : null)}>
       Custom system message
     </Switch>
@@ -77,7 +109,14 @@ const PersonaForm = ({ onCancel, onSave, loading, defaultValue, title }: Persona
         variant='primary'
         size='large'
         loading={loading}
-        onClick={() => onSave?.({ name: personaName, avatar: personaAvatar, system: personaSystem, temperature: personaTemperature })}
+        onClick={() => onSave?.({
+          name: personaName,
+          avatar: personaAvatar,
+          providerId: personaProviderId,
+          modelId: personaModelId,
+          system: personaSystem,
+          temperature: personaTemperature,
+        })}
       >
         Save
       </Button>
@@ -110,28 +149,28 @@ const Persona = (props: PersonaSchemaType) => {
       loading={editPersona.isPending}
     />}
     {!isEditing && <>
-      <div className={styles.avatar}>{avatar}</div> 
+      <div className={styles.avatar}>{avatar}</div>
       <div className={styles.name}>{name}</div>
       <DropdownMenu
-          menu={<>
-            <DropdownMenu.Item
-              type='normal'
-              icon={<HiOutlinePencil />}
-              onSelect={() => setIsEditing(true)}
-            >
-              Edit
-            </DropdownMenu.Item>
-            <DropdownMenu.Item
-              type='danger-with-confirmation'
-              icon={<HiOutlineTrash />}
-              onSelect={() => deletePersona.mutate()}
-            >
-              Delete
-            </DropdownMenu.Item>
-          </>}
-        >
-          <Button className={styles.menuButton} size='small' variant='borderless' icon={<HiOutlineDotsVertical />} />
-        </DropdownMenu>
+        menu={<>
+          <DropdownMenu.Item
+            type='normal'
+            icon={<HiOutlinePencil />}
+            onSelect={() => setIsEditing(true)}
+          >
+            Edit
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            type='danger-with-confirmation'
+            icon={<HiOutlineTrash />}
+            onSelect={() => deletePersona.mutate()}
+          >
+            Delete
+          </DropdownMenu.Item>
+        </>}
+      >
+        <Button className={styles.menuButton} size='small' variant='borderless' icon={<HiOutlineDotsVertical />} />
+      </DropdownMenu>
     </>}
   </Card>)
 };

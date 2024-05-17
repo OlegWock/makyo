@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "e85e16d6-0d7d-4363-b825-c801557d9000",
+  "id": "d56f6558-d371-4f7d-a00a-f1ff5b6577d7",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "chat": {
@@ -201,6 +201,20 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false
+        },
+        "providerId": {
+          "name": "providerId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "modelId": {
+          "name": "modelId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         },
         "system": {
