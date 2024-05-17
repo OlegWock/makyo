@@ -24,7 +24,6 @@ app.use('/*', cors({
 }));
 app.use('/*', prettyJSON());
 app.use('/api/*', cookieAuthMiddleware());
-app.use('*', compress());
 
 // Attach other routes by chaining calls on top of previous .route instead of calling app.route multiple times
 const router = app
@@ -61,7 +60,7 @@ app.get(
 
 
 console.log('Will be serving content of', resolve(process.cwd(), process.env.MAKYO_FRONTEND_FILES_PATH!), 'as static files');
-app.get('*', etag(), serveStatic({
+app.get('*', etag(), compress(), serveStatic({
   root: resolve(process.cwd(), process.env.MAKYO_FRONTEND_FILES_PATH!),
   fallbackPath: 'index.html',
   onNotFound(path, c) {
