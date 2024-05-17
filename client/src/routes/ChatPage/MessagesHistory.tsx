@@ -73,10 +73,20 @@ export const MessagesHistory = ({ }: MessagesHistoryProps) => {
       }
 
       return (<ProviderIcon provider={message.providerId!} />);
+    });
+    const name = iife(() => {
+      if (message.sender === 'ai' && chatInfo.chat.personaId) {
+        const persona = personas.find(p => p.id === chatInfo.chat.personaId);
+        if (persona) {
+          return `${persona.name} (${message.senderName})`;
+        }
+      }
+        
+      return message.senderName;
     })
     const sender = <>
       {icon}
-      {message.senderName}
+      {name}
     </>;
 
     const sharedActions: Partial<MessageBubbleActionsProp> = {

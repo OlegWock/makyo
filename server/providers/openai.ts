@@ -42,7 +42,7 @@ class OpenaiProvider extends Provider {
   async getModels(): Promise<Model[]> {
     return [
       {
-        id: 'gpt-4o-turbo',
+        id: 'gpt-4o',
         name: 'GPT-4o',
         availableParameters: ['system', 'temperature'],
         defaultParameters: {
