@@ -1,13 +1,12 @@
 import { createCustomLocalToast, ToastComponentProps, ToastPlacement } from 'react-local-toast';
 import styles from './LocalToast.module.scss';
-import { Ref, useMemo, useState } from 'react';
-import { animate, motion, useMotionValue, useMotionValueEvent, useTransform, Variants } from 'framer-motion';
+import { Ref, useMemo } from 'react';
+import { type Variants, m } from 'framer-motion';
 import clsx from 'clsx';
 import { iife } from '@shared/utils';
 import { HiOutlineCheckCircle, HiOutlineExclamationCircle, HiOutlineExclamationTriangle, HiOutlineInformationCircle, HiOutlineQuestionMarkCircle } from 'react-icons/hi2';
 import PuffLoader from 'react-spinners/PuffLoader';
 import { Button } from '@client/components/Button';
-import { inverseLerp, lerp, minmax } from '@client/utils/animations';
 
 type ToastDataText = {
   type: 'info' | 'success' | 'error' | 'loading';
@@ -73,7 +72,7 @@ const LocalToast = ({ id, style, data, ref, removeMe, animation, placement }: To
       '--transition-duration': `${animation.duration}ms`,
     }}
   >
-    <motion.div
+    <m.div
       className={clsx(
         styles.LocalToast,
         styles[data.type],
@@ -109,7 +108,7 @@ const LocalToast = ({ id, style, data, ref, removeMe, animation, placement }: To
           {data.cancelText ?? 'Cancel'}
         </Button>
       </div>}
-    </motion.div>
+    </m.div>
   </div>);
 };
 

@@ -23,6 +23,7 @@
     "@radix-ui/react-popover": "^1.0.7",
     "@scalar/hono-api-reference": "^0.5.3",
     "base64-arraybuffer": "^1.0.2",
+    "bun-compression": "^0.0.4",
     "drizzle-orm": "^0.30.10",
     "emoji-mart": "^5.6.0",
     "hono": "^4.2.5",

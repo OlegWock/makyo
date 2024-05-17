@@ -1,7 +1,7 @@
 import * as RadixDropdownMenu from '@radix-ui/react-dropdown-menu';
 import styles from './DropdownMenu.module.scss';
 import { ReactNode, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import clsx from 'clsx';
 
 
@@ -27,7 +27,7 @@ export const DropdownMenu = ({ children, menu }: DropdownMenuProps) => {
             forceMount
             asChild
           >
-            <motion.div
+            <m.div
               style={{ transformOrigin: 'top right' }}
               initial={{ opacity: 0, scale: 0.85 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -36,7 +36,7 @@ export const DropdownMenu = ({ children, menu }: DropdownMenuProps) => {
               className={styles.DropdownMenu}
             >
               {menu}
-            </motion.div>
+            </m.div>
           </RadixDropdownMenu.Content>}
       </AnimatePresence>
     </RadixDropdownMenu.Portal>

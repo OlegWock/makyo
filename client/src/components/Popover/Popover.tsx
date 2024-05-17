@@ -1,7 +1,7 @@
 import * as RadixPopover from '@radix-ui/react-popover';
 import styles from './Popover.module.scss';
 import { ReactNode, useState } from 'react';
-import { AnimatePresence, motion, Variants } from 'framer-motion';
+import { AnimatePresence, m, type Variants } from 'framer-motion';
 import clsx from 'clsx';
 
 type Side = 'top' | 'right' | 'left' | 'bottom';
@@ -35,7 +35,7 @@ export const Popover = ({ children, renderContent, className, side = 'top' }: Po
     <RadixPopover.Portal forceMount>
       <AnimatePresence>
         {open && <RadixPopover.Content asChild side={side}>
-          <motion.div 
+          <m.div 
             className={clsx(styles.Popover, className)}
             transition={{ duration: 0.15 }}
             variants={variants}
@@ -45,7 +45,7 @@ export const Popover = ({ children, renderContent, className, side = 'top' }: Po
             exit="hidden"
             >
             {renderContent(() => setOpen(false))}
-          </motion.div>
+          </m.div>
         </RadixPopover.Content>}
       </AnimatePresence>
     </RadixPopover.Portal>

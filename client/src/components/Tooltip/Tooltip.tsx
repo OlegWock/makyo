@@ -1,7 +1,7 @@
 import * as RadixTooltip from '@radix-ui/react-tooltip';
 import styles from './Tooltip.module.scss';
 import { ReactNode, Ref, useState } from 'react';
-import { AnimatePresence, motion, Variants } from 'framer-motion';
+import { AnimatePresence, m, type Variants } from 'framer-motion';
 
 type Side = 'top' | 'right' | 'left' | 'bottom';
 
@@ -45,7 +45,7 @@ export const Tooltip = ({ children, text, side = 'top', delayDuration = 300, sid
                 side={side}
                 asChild
               >
-                <motion.div
+                <m.div
                   transition={{ duration: 0.15 }}
                   variants={variants}
                   custom={side}
@@ -54,7 +54,7 @@ export const Tooltip = ({ children, text, side = 'top', delayDuration = 300, sid
                   exit="hidden"
                 >
                   {text}
-                </motion.div>
+                </m.div>
               </RadixTooltip.Content>
             }
           </AnimatePresence>

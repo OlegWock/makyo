@@ -2,7 +2,7 @@ import { Card } from '@client/components/Card';
 import styles from './PersonasPage.module.scss';
 import { Button } from '@client/components/Button';
 import { HiOutlinePencil, HiOutlineTrash, HiPlus } from 'react-icons/hi2';
-import { useMemo, useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { usePageTitle } from '@client/utils/hooks';
 import { PersonaInSchemaType, PersonaSchemaType } from '@server/schemas/personas';
 import { WithLabel } from '@client/components/WithLabel';
@@ -11,13 +11,13 @@ import { useDeletePersonaMutation, useEditPersonaMutation, useModels, useNewPers
 import { Switch } from '@client/components/Switch';
 import { WithSnippets } from '@client/components/WithSnippets';
 import { Slider } from '@client/components/Slider';
-import { EmojiPopover } from '@client/components/EmojiPopover';
 import { Empty } from '@client/components/Empty';
-import dayjs from 'dayjs';
 import { DropdownMenu } from '@client/components/DropdownMenu';
 import { HiOutlineDotsVertical } from 'react-icons/hi';
 import clsx from 'clsx';
 import { ModelSelect } from '@client/components/ModelSelect';
+
+const LazyEmojiPopover = lazy(() => import('@client/components/EmojiPopover').then(m => ({ default: m.EmojiPopover })));
 
 type PersonaFormProps = {
   title: string,
@@ -41,30 +41,32 @@ const PersonaForm = ({ onCancel, onSave, loading, defaultValue, title }: Persona
     <div className={styles.formTitle}>{title}</div>
 
     <div className={styles.topRow}>
-      <EmojiPopover
-        side='bottom'
-        onSelect={(emoji) => setPersonaAvatar(emoji)}
-      >
-        <Button className={styles.avatarButton} variant='borderless' size='large'>{personaAvatar}</Button>
-      </EmojiPopover>
+      <Suspense fallback={<Button className={styles.avatarButton} variant='borderless' size='large'>{personaAvatar}</Button>}>
+        <LazyEmojiPopover
+          side='bottom'
+          onSelect={(emoji) => setPersonaAvatar(emoji)}
+        >
+          <Button className={styles.avatarButton} variant='borderless' size='large'>{personaAvatar}</Button>
+        </LazyEmojiPopover>
+      </Suspense>
       <WithLabel label='Name:' className={styles.nameWrapper}>
         <Input className={styles.input} placeholder='Assistant' value={personaName} onValueChange={setPersonaName} />
       </WithLabel>
     </div>
 
-    <Switch 
-    checked={personaModelId !== null && personaProviderId !== null} 
-    onChange={(checked) => {
-      if (checked) {
-        const provider = models[0].provider;
-        const model = models[0].models[0];
-        setPersonaProviderId(provider.id);
-        setPersonaModelId(model.id);
-      } else {
-        setPersonaProviderId(null);
-        setPersonaModelId(null);
-      }
-    }}
+    <Switch
+      checked={personaModelId !== null && personaProviderId !== null}
+      onChange={(checked) => {
+        if (checked) {
+          const provider = models[0].provider;
+          const model = models[0].models[0];
+          setPersonaProviderId(provider.id);
+          setPersonaModelId(model.id);
+        } else {
+          setPersonaProviderId(null);
+          setPersonaModelId(null);
+        }
+      }}
     >
       Change default model
     </Switch>

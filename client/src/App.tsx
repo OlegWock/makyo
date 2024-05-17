@@ -15,7 +15,10 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ToastProvider } from "@client/components/LocalToast";
 import { LocalOllamaProxyProvider } from "@client/api/ollama-proxy";
 import { PersonasPage } from "@client/routes/PersonasPage";
+import { LazyMotion } from "framer-motion";
 
+
+const fmFeatures = () => import('./utils/lazy-fm').then(m => m.default);
 
 export const App = () => {
   return (
@@ -23,23 +26,25 @@ export const App = () => {
       <QueryClientProvider>
         <Router>
           <AuthGate>
-            <LocalOllamaProxyProvider>
-              <SubscriptionProvider>
-                <Layout>
-                  <ErrorBoundary>
-                    <Switch>
-                      <Route path="/" component={RootPage} />
-                      <Route path="/chats" component={ChatsPage} />
-                      <Route path="/chats/:id" component={ChatPage} />
-                      <Route path="/snippets" component={SnippetsPage} />
-                      <Route path="/personas" component={PersonasPage} />
-                      <Route path="/settings" component={SettingsPage} />
-                      <Route component={NotFound} />
-                    </Switch>
-                  </ErrorBoundary>
-                </Layout>
-              </SubscriptionProvider>
-            </LocalOllamaProxyProvider>
+            <LazyMotion features={fmFeatures} strict>
+              <LocalOllamaProxyProvider>
+                <SubscriptionProvider>
+                  <Layout>
+                    <ErrorBoundary>
+                      <Switch>
+                        <Route path="/" component={RootPage} />
+                        <Route path="/chats" component={ChatsPage} />
+                        <Route path="/chats/:id" component={ChatPage} />
+                        <Route path="/snippets" component={SnippetsPage} />
+                        <Route path="/personas" component={PersonasPage} />
+                        <Route path="/settings" component={SettingsPage} />
+                        <Route component={NotFound} />
+                      </Switch>
+                    </ErrorBoundary>
+                  </Layout>
+                </SubscriptionProvider>
+              </LocalOllamaProxyProvider>
+            </LazyMotion>
           </AuthGate>
           {/* <ReactQueryDevtools /> */}
         </Router>

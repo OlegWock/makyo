@@ -5,11 +5,10 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 
 ## Roadmap
 
-- [ ] Better 'New chat' screen: suggest user some pre-defined questions or continue one of recent chats
 - [ ] Selection text menu: when user selects some text in chat, show menu proposing to ask LLM 'more about X', 'what is X', 'don't tell me about X', etc
-- [ ] Optimize frontend build size
+  Ref: https://codesandbox.io/p/sandbox/floating-ui-react-range-selection-tkpj9v?file=%2Fsrc%2FApp.tsx%3A21%2C22
 - [ ] Multimodal (start with vision, maybe expand to image generation) LLMs support
-- [ ] Support for perplexity.ai provider
+- [ ] Support for perplexity.ai provider (with citations)
 - [ ] Semantic/vector search across messages
 - [ ] Autocomplete for snippets when user types `/` or `@`
 

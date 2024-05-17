@@ -1,7 +1,7 @@
 import { cloneElement, ComponentPropsWithRef, MouseEventHandler, ReactElement, ReactNode } from 'react';
 import styles from './Button.module.scss';
 import clsx from 'clsx';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 export type ButtonProps = {
   loading?: boolean,
@@ -10,7 +10,7 @@ export type ButtonProps = {
   icon?: ReactElement,
   iconPosition?: 'before' | 'after',
   children?: ReactNode;
-} & Omit<ComponentPropsWithRef<typeof motion.button>, 'children'>;
+} & Omit<ComponentPropsWithRef<typeof m.button>, 'children'>;
 
 export const Button = ({ loading = false, variant = 'normal', iconPosition = 'before', onClick, className, style = {}, icon, children, size = 'medium', ...props }: ButtonProps) => {
   const localOnClick: MouseEventHandler<HTMLButtonElement> = (e) => {
@@ -18,7 +18,7 @@ export const Button = ({ loading = false, variant = 'normal', iconPosition = 'be
     if (onClick) return onClick(e);
   };
 
-  return (<motion.button
+  return (<m.button
     className={clsx(
       styles.Button,
       loading && styles.loading,
@@ -41,5 +41,5 @@ export const Button = ({ loading = false, variant = 'normal', iconPosition = 'be
     {!!icon && iconPosition === 'before' && cloneElement(icon, { className: clsx(styles.icon, icon.props.className) })}
     {children}
     {!!icon && iconPosition === 'after' && cloneElement(icon, { className: clsx(styles.icon, icon.props.className) })}
-  </motion.button>);
+  </m.button>);
 };

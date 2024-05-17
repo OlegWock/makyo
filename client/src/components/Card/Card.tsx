@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import styles from './Card.module.scss';
 import clsx from 'clsx';
 import { ScrollArea } from '@client/components/ScrollArea';
-import { motion, MotionProps } from 'framer-motion';
+import { m, type MotionProps } from 'framer-motion';
 
 export type CardProps = {
   withScrollArea?: boolean;
@@ -29,10 +29,10 @@ export const Card = ({ children, className, padding = 'medium', flexGrow, withSc
     </ScrollArea>);
   }
 
-  return (<motion.div className={clsx(
+  return (<m.div className={clsx(
     styles.Card,
     styles[padding],
     flexGrow && styles.flexGrow,
     className
-  )} {...props}>{children}</motion.div>)
+  )} {...props}>{children}</m.div>)
 };

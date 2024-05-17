@@ -1,7 +1,7 @@
 import * as RadixSwitch from '@radix-ui/react-switch';
 import styles from './Switch.module.scss';
 import { Children, ReactNode, useId } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 export type SwitchProps = {
   children?: ReactNode;
@@ -9,8 +9,8 @@ export type SwitchProps = {
   onChange?: (checked: boolean) => void;
 };
 
-const MotionThumb = motion(RadixSwitch.Thumb);
-const MotionRoot = motion(RadixSwitch.Root);
+const MotionThumb = m(RadixSwitch.Thumb);
+const MotionRoot = m(RadixSwitch.Root);
 
 export const Switch = ({ children, checked, onChange }: SwitchProps) => {
   const id = useId();

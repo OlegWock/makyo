@@ -1,7 +1,7 @@
 import { useRouterTransition } from './context';
 import styles from './ProgressBar.module.scss';
 import { useLayoutEffect, useRef } from 'react';
-import { animate, motion, useMotionValue, useTransform } from 'framer-motion';
+import { animate, m, useMotionValue, useTransform } from 'framer-motion';
 import { getRandomInt } from '@shared/utils';
 
 const transition = { type: 'spring', stiffness: 500, damping: 33, mass: 1 } as const;
@@ -39,19 +39,19 @@ export const ProgressBar = () => {
       timerRefs.current.push(setTimeout(reset, 40));
     }
   }, [isTransitionPending]);
-  return (<motion.div
+  return (<m.div
     style={{
       opacity
     }}
     className={styles.root}
   >
-    <motion.div
+    <m.div
       className={styles.bar}
       style={{
         width: progressPercent
       }}
     >
-      <motion.div className={styles.highlight} />
-    </motion.div>
-  </motion.div>)
+      <m.div className={styles.highlight} />
+    </m.div>
+  </m.div>)
 };

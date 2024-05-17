@@ -13,6 +13,7 @@ import { etag } from 'hono/etag'
 import { resolve } from 'path';
 import { bunWebSocket } from '@server/utils/websockets';
 import { presetsRouter } from '@server/routes/presets';
+import { compress } from 'bun-compression';
 
 const app = new OpenAPIHono();
 
@@ -23,6 +24,7 @@ app.use('/*', cors({
 }));
 app.use('/*', prettyJSON());
 app.use('/api/*', cookieAuthMiddleware());
+app.use('*', compress());
 
 // Attach other routes by chaining calls on top of previous .route instead of calling app.route multiple times
 const router = app
