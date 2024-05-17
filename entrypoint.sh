@@ -12,7 +12,7 @@ echo "Migrating database"
 bun run drizzle:migrate
 
 echo "Seeding database"
-bun run drizzle:migrate
+bun run drizzle:seed
 
 echo "Starting server"
 bun run server/index.ts
