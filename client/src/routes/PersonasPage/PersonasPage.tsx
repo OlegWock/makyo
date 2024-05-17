@@ -2,7 +2,7 @@ import { Card } from '@client/components/Card';
 import styles from './PersonasPage.module.scss';
 import { Button } from '@client/components/Button';
 import { HiOutlinePencil, HiOutlineTrash, HiPlus } from 'react-icons/hi2';
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense, useMemo, useState } from 'react';
 import { usePageTitle } from '@client/utils/hooks';
 import { PersonaInSchemaType, PersonaSchemaType } from '@server/schemas/personas';
 import { WithLabel } from '@client/components/WithLabel';
@@ -184,6 +184,8 @@ export const PersonasPage = () => {
 
   const { data: personas } = usePersonas();
 
+  const sortedPersonas = useMemo(() => personas.toSorted((a, b) => b.createdAt - a.createdAt), [personas]);
+
   usePageTitle('Personas');
 
   return (<Card flexGrow>
@@ -209,8 +211,8 @@ export const PersonasPage = () => {
         </Card>}
 
         <div className={styles.personas}>
-          {personas.length === 0 && <Empty text='No personas' />}
-          {personas.map(p => {
+          {sortedPersonas.length === 0 && <Empty text='No personas' />}
+          {sortedPersonas.map(p => {
             return (<Persona key={p.id} {...p} />)
           })}
         </div>

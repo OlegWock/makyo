@@ -9,13 +9,14 @@
   height: 100%;
   width: 100%;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  overflow: auto;
 }
 
 .startMenu {
-  min-width: min(25rem, 100%);
-  max-width: min(50.5rem, 100%);
+  margin: auto;
+  min-width: min(27rem, 100%);
+  max-width: min(52.5rem, 100%);
+  padding: 1rem;
   display: flex;
   flex-direction: column;
   justify-content: center;

@@ -76,6 +76,7 @@ export const sendMessageAndSave = async ({ parentId, provider, modelId, text, ch
     }).where(eq(message.id, responseMessage.id)).returning();
   }).then(([responseMessage]) => {
     responseGenerated = true;
+    // TODO: Sometimes this isn't being sent??
     broadcastSubscriptionMessage({
       type: 'updateMessage',
       data: {

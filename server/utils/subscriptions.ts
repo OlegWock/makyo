@@ -13,5 +13,6 @@ export const sseEmitter = iife(() => {
 
 export const broadcastSubscriptionMessage = (message: SubscriptionMessage) => {
   const serialized = JSON.stringify(message);
+  console.log('Emitting subscription message', message);
   sseEmitter.emit('message', serialized);
 };
