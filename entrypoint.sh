@@ -11,5 +11,8 @@ rm -f ${MAKYO_DB_PATH}
 echo "Migrating database"
 bun run drizzle:migrate
 
+echo "Seeding database"
+bun run drizzle:migrate
+
 echo "Starting server"
 bun run server/index.ts
