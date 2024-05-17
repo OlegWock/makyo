@@ -1,24 +1,53 @@
 import { ChatLayout } from '@client/components/ChatLayout';
 import styles from './RootPage.module.scss';
-import { useModels, useNewChatMutation } from '@client/api';
-import { startTransition, useMemo, useState } from 'react';
-import { Select } from '@client/components/Select';
-import { WithLabel } from '@client/components/WithLabel';
+import { useModels, useNewChatMutation, usePersonas } from '@client/api';
+import { useMemo, useRef, useState } from 'react';
 import { useAtom } from 'jotai/react';
 import { lastUsedModelAtom } from '@client/atoms/chat';
 import { withErrorBoundary } from '@client/components/ErrorBoundary';
 import { Button } from '@client/components/Button';
-import { HiChevronRight, HiOutlineCog6Tooth } from 'react-icons/hi2';
 import { Card } from '@client/components/Card';
 import { ChatSettings, useChatSettings } from '@client/components/ChatSettings';
 import { usePageTitle } from '@client/utils/hooks';
-import { ProviderIcon } from '@client/components/icons';
 import { useLocation } from 'wouter';
 import { ModelSelect } from '@client/components/ModelSelect';
-import { useIsMobile } from '@client/utils/responsive';
-import { Drawer } from '@client/components/Drawer';
+import { PersonaSchemaType } from '@server/schemas/personas';
 
 export const RootPage = withErrorBoundary(() => {
+  const applyPersona = (persona: PersonaSchemaType | null) => {
+    setActivePersona(persona);
+    if (persona) {
+      if (persona.providerId !== null && persona.modelId !== null) {
+        const model = options.find(m => m.modelId === persona.modelId && m.providerId === persona.providerId);
+        if (model) {
+          setLastUsedModel(model);
+        }
+      }
+      updateChatSettings({
+        system: {
+          enabled: persona.system !== null,
+          value: persona.system ?? '',
+        },
+        temperature: {
+          enabled: persona.temperature !== null,
+          value: persona.temperature ?? 0.8,
+        }
+      });
+      inputRef.current?.focus();
+    } else {
+      updateChatSettings({
+        system: {
+          enabled: false,
+          value: '',
+        },
+        temperature: {
+          enabled: false,
+          value: 0.8
+        }
+      });
+    }
+  };
+
   const newChat = useNewChatMutation();
   const { data: providers } = useModels();
 
@@ -32,28 +61,30 @@ export const RootPage = withErrorBoundary(() => {
     }));
   }, [providers]);
 
-  const isMobile = useIsMobile();
 
   const [lastUsedModel, setLastUsedModel] = useAtom(lastUsedModelAtom);
   const selectedModel = options.find(o => o.providerId === lastUsedModel?.providerId && o.modelId === lastUsedModel?.modelId) || options[0];
 
-  const [settingsVisible, setSettingsVisible] = useState(false);
   const [chatSettings, updateChatSettings] = useChatSettings(selectedModel.defaultParameters);
+  const [activePersona, setActivePersona] = useState<PersonaSchemaType | null>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const [_, navigate] = useLocation();
 
-  usePageTitle('New chat');
+  const { data: personas } = usePersonas();
 
-  const chatSettingsElement = (<ChatSettings settings={chatSettings} settingsUpdater={updateChatSettings} />);
+  usePageTitle('New chat');
 
   return (<div className={styles.RootPage}>
     <Card flexGrow withScrollArea={false}>
       <ChatLayout
+        inputRef={inputRef}
         onSend={(text) => {
           newChat.mutateAsync({
             providerId: selectedModel.providerId,
             modelId: selectedModel.modelId,
             text,
+            personaId: activePersona?.id,
             parameters: {
               temperature: chatSettings.temperature.enabled ? chatSettings.temperature.value : undefined,
               system: chatSettings.system.enabled ? chatSettings.system.value : undefined,
@@ -64,30 +95,53 @@ export const RootPage = withErrorBoundary(() => {
         }}
       >
         <ChatLayout.Title>New chat</ChatLayout.Title>
-        <ChatLayout.TitleRightActions>
-          <Button
-            onClick={() => setSettingsVisible(p => !p)}
-            variant='borderless'
-            icon={settingsVisible ? <HiChevronRight /> : <HiOutlineCog6Tooth />}
-          />
-        </ChatLayout.TitleRightActions>
+
         <ChatLayout.MessagesArea>
+          <div className={styles.startMenuWrapper}>
+            <div className={styles.startMenu}>
+              {personas.length > 0 && <section>
+                <div className={styles.sectionTitle}>Start with persona</div>
+                <div className={styles.personasList}>
+                  {personas.map(p => {
+                    return (<Button
+                      key={p.id}
+                      className={styles.personaButton}
+                      variant={activePersona?.id === p.id ? 'primary' : 'normal'}
+                      onClick={() => {
+                        if (activePersona?.id === p.id) {
+                          applyPersona(null);
+                        } else {
+                          applyPersona(p);
+                        }
+                      }}
+                    >
+                      <div className={styles.personaCard}>
+                        <div className={styles.avatar}>{p.avatar}</div>
+                        <div className={styles.name}>{p.name}</div>
+                      </div>
+                    </Button>)
+                  })}
+                </div>
+              </section>}
+              <section>
+                <div className={styles.sectionTitle}>{personas.length === 0 ? 'Chat parameters' : 'Or set chat parameters manually'}</div>
+                <Card className={styles.settingsCard} withScrollArea={false}>
+                  <ModelSelect
+                    value={selectedModel}
+                    onChange={setLastUsedModel}
+                  />
+                  <ChatSettings settings={chatSettings} settingsUpdater={updateChatSettings} />
+                </Card>
+              </section>
+            </div>
+          </div>
         </ChatLayout.MessagesArea>
+
         <ChatLayout.TextareaActions>
-          <ModelSelect
-            value={selectedModel}
-            onChange={setLastUsedModel}
-          />
+
         </ChatLayout.TextareaActions>
       </ChatLayout>
     </Card>
-
-    {isMobile && <Drawer open={settingsVisible} onOpenChange={setSettingsVisible}>
-      {chatSettingsElement}
-    </Drawer>}
-    {(settingsVisible && !isMobile) && <Card className={styles.settingsCard}>
-      {chatSettingsElement}
-    </Card>}
   </div>);
 });
 

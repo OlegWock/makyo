@@ -10,6 +10,7 @@ export const ChatSchema = z.object({
   isStarred: z.boolean(),
   lastMessageText: z.string(),
   lastMessageAt: z.number(),
+  personaId: z.number().nullable(),
   system: z.string().nullable(),
   temperature: z.number().nullable(),
 }).openapi('Chat');
@@ -20,6 +21,7 @@ export const NewChatSchema = z.object({
   providerId: z.string(),
   modelId: z.string(),
   text: z.string(),
+  personaId: z.number().optional(),
   parameters: ModelParametersSchema.partial().optional(),
 });
 

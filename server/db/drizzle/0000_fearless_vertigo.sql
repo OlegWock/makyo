@@ -6,7 +6,9 @@ CREATE TABLE `chat` (
 	`isStarred` integer DEFAULT false NOT NULL,
 	`system` text,
 	`temperature` real,
-	`createdAt` integer DEFAULT (unixepoch() * 1000) NOT NULL
+	`personaId` integer,
+	`createdAt` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	FOREIGN KEY (`personaId`) REFERENCES `persona`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `message` (

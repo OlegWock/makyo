@@ -1,4 +1,4 @@
-import { ComponentPropsWithoutRef } from 'react';
+import { ComponentPropsWithoutRef, Ref } from 'react';
 import styles from './Input.module.scss';
 import clsx from 'clsx';
 import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize';
@@ -20,6 +20,7 @@ export const Input = ({ onValueChange, onChange, className, ...props }: InputPro
 
 export type TextareaProps = {
   onValueChange?: (newVal: string) => void,
+  ref?: Ref<HTMLTextAreaElement>,
 } & TextareaAutosizeProps;
 
 export const Textarea = ({ onValueChange, onChange, className, ...props }: TextareaProps) => {

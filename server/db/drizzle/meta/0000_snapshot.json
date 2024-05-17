@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "d56f6558-d371-4f7d-a00a-f1ff5b6577d7",
+  "id": "4c1d79bc-8b4e-4c48-9767-fbc0964dbf57",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "chat": {
@@ -57,6 +57,13 @@
           "notNull": false,
           "autoincrement": false
         },
+        "personaId": {
+          "name": "personaId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "createdAt": {
           "name": "createdAt",
           "type": "integer",
@@ -67,7 +74,21 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "chat_personaId_persona_id_fk": {
+          "name": "chat_personaId_persona_id_fk",
+          "tableFrom": "chat",
+          "tableTo": "persona",
+          "columnsFrom": [
+            "personaId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },

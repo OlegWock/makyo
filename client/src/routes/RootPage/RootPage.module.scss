@@ -4,7 +4,69 @@
   gap: 1rem;
 }
 
-.settingsCard {
-  width: 400px;
+
+.startMenuWrapper {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
+.startMenu {
+  min-width: min(25rem, 100%);
+  max-width: min(50.5rem, 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2rem;
+
+  section {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+
+    .sectionTitle {
+      font-size: 1.5rem;
+    }
+
+    .personasList {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+
+      .personaButton {
+        padding: 1rem !important;
+        width: 8rem;
+        height: 6rem;
+      }
+
+      .personaCard {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 0.75rem;
+        align-self: stretch;
+        overflow: hidden;
+        max-width: 100%;
+
+        .avatar {
+          font-size: 2rem;
+        }
+        
+        .name {
+          font-size: 1rem;
+          text-overflow: ellipsis;
+          overflow: hidden;
+        }
+      }
+    }
+
+    .settingsCard {
+      background: white;
+      gap: 1rem;
+    }
+  }
+}

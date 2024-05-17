@@ -5,9 +5,6 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 
 ## Roadmap
 
-- [ ] Support for personas
-  - [ ] Essentially just a preset with name, icon and chat settings (model, temperature, system prompt)
-  - [ ] When creating new chat, parameters are copied + chat is associated with persona, but user can change any parameter
 - [ ] Better 'New chat' screen: suggest user some pre-defined questions or continue one of recent chats
 - [ ] Selection text menu: when user selects some text in chat, show menu proposing to ask LLM 'more about X', 'what is X', 'don't tell me about X', etc
 - [ ] Optimize frontend build size

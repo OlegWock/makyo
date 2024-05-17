@@ -2,7 +2,7 @@ import { UIEventHandler, useRef } from 'react';
 import styles from './ChatPage.module.scss';
 import { useMount } from '@client/utils/hooks';
 import { MessageBubble, MessageBubbleActionsProp } from '@client/components/MessageBubble';
-import { useDeleteMessageMutation, useDuplicateMessageMutation, useEditMessageMutation, useRegenerateMessageMutation } from '@client/api';
+import { useDeleteMessageMutation, useDuplicateMessageMutation, useEditMessageMutation, usePersonas, useRegenerateMessageMutation } from '@client/api';
 import { useChatPageContext } from '@client/routes/ChatPage/context';
 import { minmax } from '@client/utils/animations';
 import { mapOverMessagesTree, MessageTreeNode } from '@client/routes/ChatPage/tree';
@@ -11,13 +11,13 @@ import { useMotionValueEvent } from 'framer-motion';
 import { ProviderIcon } from '@client/components/icons';
 import { ScrollArea } from '@client/components/ScrollArea';
 import { produce } from 'immer';
+import { iife } from '@shared/utils';
 
 export type MessagesHistoryProps = {
-  modelName?: string;
-  defaultScrollTo?: number;
+
 };
 
-export const MessagesHistory = ({ modelName, defaultScrollTo }: MessagesHistoryProps) => {
+export const MessagesHistory = ({ }: MessagesHistoryProps) => {
   const onScroll: UIEventHandler<HTMLDivElement> = (e) => {
     const diff = Math.abs((e.currentTarget.scrollTop + e.currentTarget.clientHeight) - e.currentTarget.scrollHeight);
     const scrolledToBottom = diff < 40;
@@ -36,7 +36,9 @@ export const MessagesHistory = ({ modelName, defaultScrollTo }: MessagesHistoryP
     });
   };
 
-  const { chatId, messagesTree, treeChoices, setTreeChoices, providerId } = useChatPageContext();
+  const { chatId, messagesTree, treeChoices, setTreeChoices, chatInfo } = useChatPageContext();
+
+  const { data: personas } = usePersonas();
   const regenerateMessage = useRegenerateMessageMutation(chatId);
   const duplicateMessage = useDuplicateMessageMutation(chatId);
   const editMessage = useEditMessageMutation(chatId);
@@ -61,8 +63,19 @@ export const MessagesHistory = ({ modelName, defaultScrollTo }: MessagesHistoryP
     const isSingleRootMessage = !parent && totalVariants === 1;
     const isSingleAiMessage = message.sender === 'ai' && totalVariants === 1;
 
+    const icon = iife(() => {
+      if (message.sender !== 'ai') return null;
+      if (chatInfo.chat.personaId) {
+        const persona = personas.find(p => p.id === chatInfo.chat.personaId);
+        if (persona) {
+          return <div className={styles.personaAvatar}>{persona.avatar}</div>
+        }
+      }
+
+      return (<ProviderIcon provider={message.providerId!} />);
+    })
     const sender = <>
-      {message.sender === 'ai' && <ProviderIcon provider={message.providerId!} />}
+      {icon}
       {message.senderName}
     </>;
 

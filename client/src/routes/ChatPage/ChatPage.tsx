@@ -23,7 +23,6 @@ import { useIsMobile } from '@client/utils/responsive';
 export const ChatPage = withErrorBoundary(() => {
   const { id } = useStrictRouteParams({ id: z.coerce.number() });
   const { data: chatInfo } = useChat(id);
-  const { data: providers } = useModels();
   const sendMessage = useSendMessageMutation(id);
   const editChat = useEditChatMutation(id);
 
@@ -33,12 +32,6 @@ export const ChatPage = withErrorBoundary(() => {
 
   usePageTitle(chatInfo.chat.title);
 
-  const usedModel = useMemo(() => {
-    const provider = providers.find(p => p.provider.id === chatInfo.chat.providerId);
-    const model = provider?.models.find(m => m.id === chatInfo.chat.modelId);
-    return model?.name;
-  }, [providers, chatInfo.chat.modelId, chatInfo.chat.providerId]);
-
   const tree = useMemo(() => buildTreeFromMessages(chatInfo.messages), [chatInfo.messages]);
   const [treeChoices, setTreeChoices] = useTreeChoices(tree);
   const lastMessage = getLastMessage(tree, treeChoices);
@@ -47,6 +40,9 @@ export const ChatPage = withErrorBoundary(() => {
   const [titleDraft, setTitleDraft] = useState(() => chatInfo.chat.title);
 
   const [settingsVisible, setSettingsVisible] = useState(false);
+  // TODO: this is a bug probably. Chat settings depend 
+  // on model (though currently all models have same settings),
+  // so they should be reset if model changes
   const [chatSettings, updateChatSettings] = useChatSettings(chatInfo.chat);
 
   const isMobile = useIsMobile();
@@ -101,7 +97,7 @@ export const ChatPage = withErrorBoundary(() => {
   />);
 
 
-  return (<ChatPageContextProvider value={{ chatId: id, messagesTree: tree, treeChoices, setTreeChoices, providerId: chatInfo.chat.providerId }}>
+  return (<ChatPageContextProvider value={{ chatId: id, chatInfo, messagesTree: tree, treeChoices, setTreeChoices, providerId: chatInfo.chat.providerId }}>
     <div className={styles.ChatPage} ref={ref}>
       <Card flexGrow withScrollArea={false}>
         <ChatLayout
@@ -155,14 +151,11 @@ export const ChatPage = withErrorBoundary(() => {
             <Button
               onClick={() => setSettingsVisible(p => !p)}
               variant='borderless'
-              icon={(settingsVisible || !isMobile) ? <HiChevronRight /> : <HiOutlineCog6Tooth />}
+              icon={(settingsVisible && !isMobile) ? <HiChevronRight /> : <HiOutlineCog6Tooth />}
             />
           </ChatLayout.TitleRightActions>
           <ChatLayout.MessagesArea>
-            <MessagesHistory
-              modelName={usedModel}
-              defaultScrollTo={defaultScrollTo}
-            />
+            <MessagesHistory />
           </ChatLayout.MessagesArea>
 
         </ChatLayout>

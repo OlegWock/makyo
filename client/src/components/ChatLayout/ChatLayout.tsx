@@ -2,7 +2,7 @@ import { Textarea } from '@client/components/Input';
 import { Button } from '@client/components/Button';
 import { HiOutlinePaperAirplane } from 'react-icons/hi2';
 import styles from './ChatLayout.module.scss';
-import { ChangeEventHandler, KeyboardEvent, ReactNode, useState } from 'react';
+import { ChangeEventHandler, KeyboardEvent, ReactNode, Ref, useState } from 'react';
 import { createComponentWithSlotsFactory, SlotsPropsFromFactory } from '@client/components/slots';
 import { useIsMobile } from '@client/utils/responsive';
 import { useSnippets } from '@client/api';
@@ -19,11 +19,12 @@ const componentFactory = createComponentWithSlotsFactory({
 export type ChatLayoutProps = {
   children?: ReactNode
   onSend?: (text: string) => void;
+  inputRef?: Ref<HTMLTextAreaElement>,
 };
 
 type ChatLayoutPropsWithSlots = ChatLayoutProps & SlotsPropsFromFactory<typeof componentFactory>;
 
-export const ChatLayout = componentFactory('ChatLayout', ({ onSend, slots }: ChatLayoutPropsWithSlots) => {
+export const ChatLayout = componentFactory('ChatLayout', ({ onSend, inputRef, slots }: ChatLayoutPropsWithSlots) => {
   const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -33,27 +34,6 @@ export const ChatLayout = componentFactory('ChatLayout', ({ onSend, slots }: Cha
     }
   };
 
-  const onChange: ChangeEventHandler<HTMLTextAreaElement> = (e) => {
-    const target = e.target as HTMLTextAreaElement;
-    const textBeforeCursor = target.value.slice(0, target.selectionStart);
-    for (const snippet of snippets) {
-      if (textBeforeCursor.endsWith(snippet.shortcut)) {
-        console.log('Matched snippet shortcut!', snippet);
-        const unfoldedText =
-          textBeforeCursor.slice(0, textBeforeCursor.length - snippet.shortcut.length)
-          + snippet.text
-          + target.value.slice(target.selectionStart);
-        console.log('Unfolded text', unfoldedText);
-        setText(unfoldedText);
-        e.preventDefault();
-        return;
-      }
-    }
-
-    setText(target.value);
-  };
-
-  const { data: snippets } = useSnippets();
   const [text, setText] = useState('');
   const isMobile = useIsMobile();
 
@@ -92,6 +72,7 @@ export const ChatLayout = componentFactory('ChatLayout', ({ onSend, slots }: Cha
               placeholder='Enter your message...'
               onKeyDown={onKeyDown}
               onValueChange={setText}
+              ref={inputRef}
             />
           </WithSnippets>
           <Button

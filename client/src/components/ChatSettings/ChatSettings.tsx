@@ -43,25 +43,26 @@ export const useChatSettings = (defaultSettings: Model["defaultParameters"] | Ch
     }
   });
 
-  if (prevDefaultSettingsRef.current !== null && prevDefaultSettingsRef.current !== defaultSettings) {
-    prevDefaultSettingsRef.current = defaultSettings;
-    state[1]({
-      model: ('modelId' in defaultSettings) ? {
-        modelId: defaultSettings.modelId,
-        providerId: defaultSettings.providerId,
-      } : undefined,
-      system: {
-        enabled: typeof defaultSettings.system === 'string',
-        value: defaultSettings.system ?? '',
-      },
-      temperature: {
-        enabled: typeof defaultSettings.temperature === 'number',
-        value: defaultSettings.temperature ?? 0.8,
-      }
-    });
-  } else {
-    prevDefaultSettingsRef.current = defaultSettings;
-  }
+  // TODO: technically, we need to reset settings if model changes, but this doesn't work well with personas currently, might need to rewrite this part??
+  // if (prevDefaultSettingsRef.current !== null && prevDefaultSettingsRef.current !== defaultSettings) {
+    // prevDefaultSettingsRef.current = defaultSettings;
+    // state[1]({
+      // model: ('modelId' in defaultSettings) ? {
+        // modelId: defaultSettings.modelId,
+        // providerId: defaultSettings.providerId,
+      // } : undefined,
+      // system: {
+        // enabled: typeof defaultSettings.system === 'string',
+        // value: defaultSettings.system ?? '',
+      // },
+      // temperature: {
+        // enabled: typeof defaultSettings.temperature === 'number',
+        // value: defaultSettings.temperature ?? 0.8,
+      // }
+    // });
+  // } else {
+    // prevDefaultSettingsRef.current = defaultSettings;
+  // }
 
   return state;
 };
@@ -75,7 +76,7 @@ export type ChatSettingsProps = {
 
 export const ChatSettings = ({ settings, settingsUpdater, isSubmitting, onSubmit }: ChatSettingsProps) => {
   return (<div className={styles.ChatSettings}>
-    <div className={styles.title}>Chat settings</div>
+    {/* <div className={styles.title}>Chat settings</div> */}
     {!!settings.model && <div className={styles.row}>
       <ModelSelect
         value={settings.model}
@@ -91,7 +92,7 @@ export const ChatSettings = ({ settings, settingsUpdater, isSubmitting, onSubmit
           draft.system.enabled = enabled
         })}
       >
-        System message
+        Custom system message
       </Switch>
 
       {settings.system.enabled && <WithSnippets>
@@ -114,7 +115,7 @@ export const ChatSettings = ({ settings, settingsUpdater, isSubmitting, onSubmit
           draft.temperature.enabled = enabled
         })}
       >
-        Temperature
+        Adjust temperature
       </Switch>
       {settings.temperature.enabled && <Slider
         value={settings.temperature.value}

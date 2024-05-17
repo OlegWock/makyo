@@ -16,6 +16,7 @@ export const chat = sqliteTable('chat', {
   isStarred: integer('isStarred', { mode: 'boolean' }).notNull().default(false),
   system: text('system'),
   temperature: real('temperature'),
+  personaId: integer('personaId').references((): AnySQLiteColumn => persona.id, { onDelete: 'cascade' }),
   createdAt: integer('createdAt', { mode: 'timestamp_ms' }).notNull().default(sql`(unixepoch() * 1000)`),
 });
 

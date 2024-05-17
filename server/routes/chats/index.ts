@@ -380,7 +380,7 @@ export const chatsRouter = new OpenAPIHono()
     return c.json(response);
   })
   .openapi(createChat, async (c) => {
-    const { providerId, modelId, text, parameters } = c.req.valid('json');
+    const { providerId, modelId, text, parameters, personaId } = c.req.valid('json');
     const provider = getProviderById(providerId);
     const model = await provider.getModelById(modelId);
     if (!model) {
@@ -395,6 +395,7 @@ export const chatsRouter = new OpenAPIHono()
       title: tmpName,
       providerId,
       modelId,
+      personaId: personaId,
       temperature: parameters?.temperature,
       system: parameters?.system,
     }).returning();
