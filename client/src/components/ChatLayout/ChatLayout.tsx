@@ -85,6 +85,7 @@ export const ChatLayout = componentFactory('ChatLayout', ({ onSend, inputRef, sl
               onSend?.(text);
               setText('');
             }}
+            disabled={text.length === 0}
             children={isMobile ? undefined : 'Send'}
           />
         </div>

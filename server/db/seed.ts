@@ -53,6 +53,7 @@ await db.insert(schema.persona).values([
     name: 'Emet roleplay',
     avatar: '🏡',
     system: emetPrompt,
+    temperature: 0.9,
   }
 ]);
 
