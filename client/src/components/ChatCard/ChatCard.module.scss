@@ -1,3 +1,5 @@
+@use "../../styles/utils.scss" as *;
+
 .ChatCard {
   gap: 0.25rem;
   padding: 0.5rem 1rem !important;
@@ -17,7 +19,7 @@
       flex-grow: 1;
       text-underline-offset: 6px;
 
-      &:hover {
+      @include hover {
         text-decoration: underline 2px;
       }
     }

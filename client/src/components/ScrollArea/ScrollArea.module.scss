@@ -1,3 +1,5 @@
+@use "../../styles/utils.scss" as *;
+
 .ScrollArea {
   border-radius: 4px;
   overflow: hidden;
@@ -45,7 +47,7 @@
   position: relative;
   transition: background 160ms ease-in-out;
 
-  &:hover {
+  @include hover {
     background: var(--gray-6);
   }
 

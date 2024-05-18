@@ -1,3 +1,5 @@
+@use "../../styles/utils.scss" as *;
+
 .Button {
   box-sizing: border-box;
   white-space: nowrap;
@@ -39,8 +41,10 @@
     color: inherit;
     border: 1px solid var(--color-btn-border);
 
-    &:hover:not(.loading):not(:disabled) {
-      background-color: var(--color-btn-background-hover);
+    @include hover {
+      &:not(.loading):not(:disabled) {
+        background-color: var(--color-btn-background-hover);
+      }
     }
   }
 
