@@ -60,6 +60,10 @@
       display: flex;
       align-items: center;
       gap: 0.25rem;
+
+      button:disabled {
+        background: transparent !important;
+      }
     }
 
     .spacer {

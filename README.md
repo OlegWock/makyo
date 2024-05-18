@@ -10,6 +10,8 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 - [ ] Multimodal (start with vision, maybe expand to image generation) LLMs support
   Ref [MULTIMODALITY.md](/MULTIMODALITY.md)
 - [ ] Models management UI for Ollama (pull, remove, create from Modelfile)
+- [ ] Allow setting user message for personas
+- [ ] Local toast doesn't seem to work
 - [ ] Semantic/vector search across messages
 - [ ] Autocomplete for snippets when user types `/` or `@`
 - [ ] Support for perplexity.ai provider (with citations)
