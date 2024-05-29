@@ -13,9 +13,14 @@
     font-weight: 500;
   }
 
-  pre {
+  pre:has(code) {
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    background: var(--jade-2);
+    color: var(--jade-11);
+    font-weight: 500;
+
     code {
-      padding: unset;
       background: unset;
       color: unset;
       font-weight: inherit;

@@ -26,6 +26,8 @@ const queryPersister = createSyncStoragePersister({
 
 export const QueryClientProvider = ({ children }: { children?: ReactNode }) => {
   const [showContent, setShowContent] = useState(false);
+
+  // TODO: use some kind of buildId as buster to reset cache between deployments
   return (<PersistQueryClientProvider
     client={queryClient}
     persistOptions={{ persister: queryPersister }}

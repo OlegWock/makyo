@@ -119,8 +119,9 @@
   }
 
   &.loading, &:disabled {
-    --color-btn-background: var(--gray-6);
+    --color-btn-background: var(--gray-3);
     --color-btn-border: transparent;
+    color: inherit !important;
     cursor: not-allowed;
   }
 
