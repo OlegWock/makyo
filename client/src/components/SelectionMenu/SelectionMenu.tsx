@@ -33,52 +33,30 @@ export const SelectionMenu = ({ targetRef, onClick }: SelectionMenuProps) => {
 
 
   useEffect(() => {
-    function handleMouseUp(event: MouseEvent) {
-      if (refs.floating.current?.contains(event.target as Element | null)) {
-        return;
-      }
+    const handleSelectionChange = () => {
+      const selection = document.getSelection();
+      const range =
+        typeof selection?.rangeCount === "number" && selection.rangeCount > 0
+          ? selection.getRangeAt(0)
+          : null;
 
-      setTimeout(() => {
-        if (!targetRef.current) {
-          return;
-        }
-        const selection = window.getSelection();
-        const range =
-          typeof selection?.rangeCount === "number" && selection.rangeCount > 0
-            ? selection.getRangeAt(0)
-            : null;
-
-        console.log('Selection', selection, 'range', range);
-        if (selection?.isCollapsed || !range || !targetRef.current.contains(range.commonAncestorContainer)) {
-          setIsOpen(false);
-          return;
-        }
-
-        refs.setReference({
-          getBoundingClientRect: () => range.getBoundingClientRect(),
-          getClientRects: () => range.getClientRects()
-        });
-        rangeRef.current = range;
-        setIsOpen(true);
-      });
-    }
-
-    function handleMouseDown(event: MouseEvent) {
-      if (refs.floating.current?.contains(event.target as Element | null)) {
-        return;
-      }
-
-      if (window.getSelection()?.isCollapsed) {
+      console.log('Selection', selection, 'range', range);
+      if (selection?.isCollapsed || !range || !targetRef.current || !targetRef.current.contains(range.commonAncestorContainer)) {
         setIsOpen(false);
+        return;
       }
+
+      refs.setReference({
+        getBoundingClientRect: () => range.getBoundingClientRect(),
+        getClientRects: () => range.getClientRects()
+      });
+      rangeRef.current = range;
+      setIsOpen(true);
     }
 
-    window.addEventListener("pointerup", handleMouseUp);
-    window.addEventListener("pointerdown", handleMouseDown);
-
+    document.addEventListener('selectionchange', handleSelectionChange);
     return () => {
-      window.removeEventListener("pointerup", handleMouseUp);
-      window.removeEventListener("pointerdown", handleMouseDown);
+      document.removeEventListener('selectionchange', handleSelectionChange);
     };
   }, [refs]);
 
@@ -129,7 +107,7 @@ export const SelectionMenu = ({ targetRef, onClick }: SelectionMenuProps) => {
           setIsOpen(false);
         }}
       >
-        Provide examples
+        Examples
       </button>
       <button
         onClick={() => {
