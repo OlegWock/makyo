@@ -1,4 +1,4 @@
-import { ChatLayout } from '@client/components/ChatLayout';
+import { ChatLayout, ChatLayoutImperativeHandle } from '@client/components/ChatLayout';
 import styles from './ChatPage.module.scss';
 import { useStrictRouteParams } from '@client/utils/routing';
 import { z } from 'zod';
@@ -29,6 +29,7 @@ export const ChatPage = withErrorBoundary(() => {
   const [searchParams] = useSearchParams();
   const defaultScrollTo = searchParams.messageId ? parseInt(searchParams.messageId) : undefined;
   const ref = useRef<HTMLDivElement>(null);
+  const chatLayoutRef = useRef<ChatLayoutImperativeHandle>(null);
 
   usePageTitle(chatInfo.chat.title);
 
@@ -97,10 +98,25 @@ export const ChatPage = withErrorBoundary(() => {
   />);
 
 
-  return (<ChatPageContextProvider value={{ chatId: id, chatInfo, messagesTree: tree, treeChoices, setTreeChoices, providerId: chatInfo.chat.providerId }}>
+  return (<ChatPageContextProvider value={{
+    chatId: id,
+    chatInfo,
+    messagesTree: tree,
+    treeChoices,
+    setTreeChoices,
+    providerId: chatInfo.chat.providerId,
+    setMessageText: (text) => chatLayoutRef.current?.setText(text),
+    sendMessage: (text) => {
+      sendMessage.mutate({
+        text,
+        parentId: lastMessage.message.id,
+      })
+    },
+  }}>
     <div className={styles.ChatPage} ref={ref}>
       <Card flexGrow withScrollArea={false}>
         <ChatLayout
+        imperativeHandle={chatLayoutRef}
           onSend={(text) => {
             sendMessage.mutate({
               text,

@@ -13,6 +13,7 @@ import { Tooltip } from '@client/components/Tooltip';
 import { Markdown } from '@client/components/Markdown';
 import { ToastTarget, useLocalToast } from "@client/components/LocalToast";
 import { WithSnippets } from "@client/components/WithSnippets";
+import { SelectionMenu } from "@client/components/SelectionMenu";
 
 
 export type MessageBubbleActionsProp = {
@@ -35,6 +36,7 @@ export type MessageBubbleProps = {
   message: MessageSchemaType;
   senderName: ReactNode;
   actions?: MessageBubbleActionsProp;
+  onSelectionAction: (text: string, send: boolean) => void;
 }
 
 const [Provider, useBubbleContext] = createStrictContext<MessageBubbleProps & {
@@ -199,6 +201,7 @@ export const MessageBubble = (props: MessageBubbleProps) => {
               }
             </div>
             <MessageBubbleActions />
+            <SelectionMenu targetRef={ref} onClick={props.onSelectionAction} />
           </>);
         })}
       </div>

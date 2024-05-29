@@ -2,10 +2,9 @@ import { Textarea } from '@client/components/Input';
 import { Button } from '@client/components/Button';
 import { HiOutlinePaperAirplane } from 'react-icons/hi2';
 import styles from './ChatLayout.module.scss';
-import { ChangeEventHandler, KeyboardEvent, ReactNode, Ref, useState } from 'react';
+import { KeyboardEvent, ReactNode, Ref, useImperativeHandle, useState } from 'react';
 import { createComponentWithSlotsFactory, SlotsPropsFromFactory } from '@client/components/slots';
 import { useIsMobile } from '@client/utils/responsive';
-import { useSnippets } from '@client/api';
 import { WithSnippets } from '@client/components/WithSnippets';
 
 const componentFactory = createComponentWithSlotsFactory({
@@ -16,15 +15,20 @@ const componentFactory = createComponentWithSlotsFactory({
   'TextareaActions': { required: false },
 });
 
+export type ChatLayoutImperativeHandle = {
+  setText: (val: string) => void,
+};
+
 export type ChatLayoutProps = {
   children?: ReactNode
   onSend?: (text: string) => void;
   inputRef?: Ref<HTMLTextAreaElement>,
+  imperativeHandle?: Ref<ChatLayoutImperativeHandle>,
 };
 
 type ChatLayoutPropsWithSlots = ChatLayoutProps & SlotsPropsFromFactory<typeof componentFactory>;
 
-export const ChatLayout = componentFactory('ChatLayout', ({ onSend, inputRef, slots }: ChatLayoutPropsWithSlots) => {
+export const ChatLayout = componentFactory('ChatLayout', ({ onSend, inputRef, slots, imperativeHandle }: ChatLayoutPropsWithSlots) => {
   const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -36,6 +40,10 @@ export const ChatLayout = componentFactory('ChatLayout', ({ onSend, inputRef, sl
 
   const [text, setText] = useState('');
   const isMobile = useIsMobile();
+
+  useImperativeHandle(imperativeHandle, () => ({
+    setText,
+  }));
 
   return (<div className={styles.ChatLayout}>
     {!!(slots.Title || slots.TitleLeftActions || slots.TitleRightActions) && <div className={styles.header}>

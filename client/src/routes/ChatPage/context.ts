@@ -6,6 +6,8 @@ export const [ChatPageContextProvider, useChatPageContext] = createStrictContext
   chatId: number,
   chatInfo: ChatWithMessagesSchemaType,
   providerId: string,
+  setMessageText: (val: string) => void;
+  sendMessage: (message: string) => void;
   messagesTree: MessageTreeNode[],
   treeChoices: PreferredTreeBranchesMap,
   setTreeChoices: (update: (p: PreferredTreeBranchesMap) => PreferredTreeBranchesMap) => void,

@@ -36,7 +36,7 @@ export const MessagesHistory = ({ }: MessagesHistoryProps) => {
     });
   };
 
-  const { chatId, messagesTree, treeChoices, setTreeChoices, chatInfo } = useChatPageContext();
+  const { chatId, messagesTree, treeChoices, setTreeChoices, chatInfo, setMessageText, sendMessage } = useChatPageContext();
 
   const { data: personas } = usePersonas();
   const regenerateMessage = useRegenerateMessageMutation(chatId);
@@ -140,6 +140,10 @@ export const MessagesHistory = ({ }: MessagesHistoryProps) => {
         message={message}
         actions={actions}
         key={message.id}
+        onSelectionAction={(text, send) => {
+          if (send) sendMessage(text);
+          else setMessageText(text);
+        }}
       />
     );
   });

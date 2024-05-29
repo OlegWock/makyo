@@ -7,7 +7,7 @@ import remarkMath from 'remark-math';
 import 'katex/dist/katex.min.css';
 import styles from './Markdown.module.scss';
 import clsx from 'clsx';
-import { lazy, Suspense, useMemo } from 'react';
+import { lazy, Ref, Suspense, useMemo } from 'react';
 
 
 const LazyCodeBlock = lazy(() => import('./CodeBlock').then(m => ({ default: m.CodeBlock })));
@@ -97,11 +97,12 @@ const rehypePlugins = [rehypeKatex, () => rehypeExternalLinks({ target: '_blank'
 export type MarkdownProps = {
   content: string,
   className?: string,
+  ref?: Ref<HTMLDivElement>,
 };
 
-export const Markdown = ({ content, className }: MarkdownProps) => {
+export const Markdown = ({ content, className, ref }: MarkdownProps) => {
   const patchedContent = useMemo(() => pathLatex(content), [content]);
-  return (<div className={clsx(styles.Markdown, className)}>
+  return (<div className={clsx(styles.Markdown, className)} ref={ref}>
     <ReactMarkdown
       remarkPlugins={remarkPlugins}
       rehypePlugins={rehypePlugins}

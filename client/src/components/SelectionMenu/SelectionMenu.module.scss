@@ -1,0 +1,30 @@
+@use "../../styles/utils.scss" as *;
+
+
+.SelectionMenu {
+  user-select: none;
+  max-width: min(90vw, 600px);
+  overflow: hidden;
+
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.1rem;
+
+  button {
+    background-color: rgba(0, 0, 0, 0.9);
+    padding: 0.35rem 0.5rem;
+    color: inherit;
+    cursor: pointer;
+    border: 0.5px solid rgba(255, 255, 255, 0.2);
+    transition: 0.1s ease-in-out;
+    border-radius: 0.25rem;
+    font-size: 0.9rem;
+  color: white;
+  box-shadow: rgba(17, 17, 26, 0.05) 0px 1px 0px, rgba(17, 17, 26, 0.1) 0px 0px 8px;
+
+    @include hover {
+      background-color: rgba(0, 0, 0, 0.75);
+    }
+  }
+}

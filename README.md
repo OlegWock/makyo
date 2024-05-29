@@ -5,8 +5,6 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 
 ## Roadmap
 
-- [ ] Selection text menu: when user selects some text in chat, show menu proposing to ask LLM 'more about X', 'what is X', 'don't tell me about X', etc. Add separate option 'Quote' which will prefill message field with selected quote, but won't send a message
-  Ref: https://codesandbox.io/p/sandbox/floating-ui-react-range-selection-tkpj9v?file=%2Fsrc%2FApp.tsx%3A21%2C22
 - [ ] Multimodal (start with vision, maybe expand to image generation) LLMs support
   Ref [MULTIMODALITY.md](/MULTIMODALITY.md)
 - [ ] Models management UI for Ollama (pull, remove, create from Modelfile)
