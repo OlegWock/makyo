@@ -6,6 +6,11 @@
     }
   }
 
+  blockquote {
+    border-left: 0.2rem solid var(--jade-10);
+    padding: 0.25rem 0 0.25rem 0.75rem;
+  }
+
   code {
     padding: 0.125rem 0.25rem;
     background: var(--jade-2);

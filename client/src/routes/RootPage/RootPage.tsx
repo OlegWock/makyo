@@ -90,6 +90,7 @@ export const RootPage = withErrorBoundary(() => {
               system: chatSettings.system.enabled ? chatSettings.system.value : undefined,
             }
           }).then((res) => {
+            // TODO: we need to handle error and don't navigate if chat wasn't created (e.g. selected invalid/no longer available model)
             navigate(`/chats/${res.id}`);
           })
         }}

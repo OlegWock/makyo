@@ -3,8 +3,8 @@
   "type": "module",
   "scripts": {
     "server": "MAKYO_API_TOKEN=testtoken bun --watch run server/index.ts",
-    "client": "bunx vite --config client/vite.config.ts",
-    "client:build": "bunx tsc --project client/tsconfig.json && bunx --bun vite --config client/vite.config.ts build",
+    "client": "VITE_MAKYO_BUILDID=$(date +%s) bunx vite --config client/vite.config.ts",
+    "client:build": "VITE_MAKYO_BUILDID=$(date +%s) bunx tsc --project client/tsconfig.json && bunx --bun vite --config client/vite.config.ts build",
     "client:preview": "bunx --bun vite --config client/vite.config.ts preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "scaffold": "bunx --bun hygen",

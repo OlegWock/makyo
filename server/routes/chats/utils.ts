@@ -76,7 +76,6 @@ export const sendMessageAndSave = async ({ parentId, provider, modelId, text, ch
     }).where(eq(message.id, responseMessage.id)).returning();
   }).then(([responseMessage]) => {
     responseGenerated = true;
-    // TODO: Sometimes this isn't being sent??
     broadcastSubscriptionMessage({
       type: 'updateMessage',
       data: {
@@ -86,6 +85,17 @@ export const sendMessageAndSave = async ({ parentId, provider, modelId, text, ch
         isGenerating: responseMessage.isGenerating,
       }
     });
+    setTimeout(() => {
+      broadcastSubscriptionMessage({
+        type: 'updateMessage',
+        data: {
+          messageId: responseMessage.id,
+          chatId,
+          text: responseMessage.text,
+          isGenerating: responseMessage.isGenerating,
+        }
+      });
+    }, 200);
   }).catch((err) => {
     broadcastSubscriptionMessage({
       type: 'updateMessage',
@@ -167,6 +177,17 @@ export const regenerateResponseForMessage = async ({ chatId, parentId, modelId, 
         isGenerating: responseMessage.isGenerating,
       }
     });
+    setTimeout(() => {
+      broadcastSubscriptionMessage({
+        type: 'updateMessage',
+        data: {
+          messageId: responseMessage.id,
+          chatId,
+          text: responseMessage.text,
+          isGenerating: responseMessage.isGenerating,
+        }
+      });
+    }, 200);
   }).catch((err) => {
     broadcastSubscriptionMessage({
       type: 'updateMessage',

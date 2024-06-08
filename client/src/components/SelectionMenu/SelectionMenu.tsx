@@ -17,6 +17,12 @@ export type SelectionMenuProps = {
 };
 
 export const SelectionMenu = ({ targetRef, onClick }: SelectionMenuProps) => {
+  const handleClick = (template: string, send = true) => {
+    const result = template.replaceAll('<##text##>', rangeRef.current?.toString() ?? '');
+    onClick(result, send);
+    setIsOpen(false);
+  };
+
   const [isOpen, setIsOpen] = useState(false);
   const rangeRef = useRef<Range | null>(null);
   const { refs, floatingStyles, context } = useFloating({
@@ -70,66 +76,42 @@ export const SelectionMenu = ({ targetRef, onClick }: SelectionMenuProps) => {
       {...getFloatingProps()}
     >
       <button
-        onClick={() => {
-          onClick(`You said:\n\n> ${rangeRef.current?.toString()}\n\n`, false);
-          setIsOpen(false);
-        }}
+        onClick={() => handleClick(`You said:\n\n> <##text##>\n\n`, false)}
       >
         Quote
       </button>
       <button
-        onClick={() => {
-          onClick(`Rephrase this part: "${rangeRef.current?.toString()}".`, true);
-          setIsOpen(false);
-        }}
+        onClick={() => handleClick(`Rephrase this part: "<##text##>"`)}
       >
         Rephrase
       </button>
       <button
-        onClick={() => {
-          onClick(`What is ${rangeRef.current?.toString()}?`, true);
-          setIsOpen(false);
-        }}
+        onClick={() => handleClick(`What is <##text##>?`)}
       >
         What is this
       </button>
       <button
-        onClick={() => {
-          onClick(`Tell me more about ${rangeRef.current?.toString()}.`, true);
-          setIsOpen(false);
-        }}
+        onClick={() => handleClick(`Tell me more about <##text##>.`)}
       >
         Tell me more
       </button>
       <button
-        onClick={() => {
-          onClick(`Provide examples of ${rangeRef.current?.toString()}.`, true);
-          setIsOpen(false);
-        }}
+        onClick={() => handleClick(`Provide examples of <##text##>.`)}
       >
         Examples
       </button>
       <button
-        onClick={() => {
-          onClick(`What are advantages of ${rangeRef.current?.toString()}?`, true);
-          setIsOpen(false);
-        }}
+        onClick={() => handleClick(`What are advantages of <##text##>?`)}
       >
         Advantages
       </button>
       <button
-        onClick={() => {
-          onClick(`What are disadvantages of ${rangeRef.current?.toString()}?`, true);
-          setIsOpen(false);
-        }}
+        onClick={() => handleClick(`What are disadvantages of <##text##>?`)}
       >
         Disadvantages
       </button>
       <button
-        onClick={() => {
-          onClick(`${rangeRef.current?.toString()} isn't relevant here.`, true);
-          setIsOpen(false);
-        }}
+        onClick={() => handleClick(`<##text##> isn't relevant here.`)}
       >
         Not relevant
       </button>

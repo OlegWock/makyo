@@ -60,6 +60,7 @@ const MessageBubbleActions = () => {
       const data = new ClipboardItem(payload);
       await navigator.clipboard.write([data]);
     }
+    // TODO: this doesn't seem to work
     showToast(`copy-${message.id}`, 'success', 'Copied!', { placement: 'bottom' });
   };
 

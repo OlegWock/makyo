@@ -44,6 +44,7 @@ export const providersRouter = new OpenAPIHono()
   .get(
     '/api/providers/ollama-proxy-ws',
     upgradeWebSocket((c) => {
+      // TODO: send notification message to client to update available models once proxy is connected/disconnected
       const { handlers, proxiedFetch, signal } = createProxiedFetch();
       if (!ollamaFetch.current) {
         ollamaFetch.current = proxiedFetch;
