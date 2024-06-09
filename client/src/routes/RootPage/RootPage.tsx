@@ -79,21 +79,22 @@ export const RootPage = withErrorBoundary(() => {
     <Card flexGrow withScrollArea={false}>
       <ChatLayout
         inputRef={inputRef}
-        onSend={(text) => {
-          newChat.mutateAsync({
-            providerId: selectedModel.providerId,
-            modelId: selectedModel.modelId,
-            text,
-            personaId: activePersona?.id,
-            parameters: {
-              temperature: chatSettings.temperature.enabled ? chatSettings.temperature.value : undefined,
-              system: chatSettings.system.enabled ? chatSettings.system.value : undefined,
-            }
-          }).then((res) => {
-            // TODO: we need to handle error and don't navigate if chat wasn't created (e.g. selected invalid/no longer available model)
-            navigate(`/chats/${res.id}`);
-          })
-        }}
+        onSend={(text) => newChat.mutateAsync({
+          providerId: selectedModel.providerId,
+          modelId: selectedModel.modelId,
+          text,
+          personaId: activePersona?.id,
+          parameters: {
+            temperature: chatSettings.temperature.enabled ? chatSettings.temperature.value : undefined,
+            system: chatSettings.system.enabled ? chatSettings.system.value : undefined,
+          }
+        }).then((res) => {
+          navigate(`/chats/${res.id}`);
+          return true;
+        }).catch((err) => {
+          return false;
+        })
+        }
       >
         <ChatLayout.Title>New chat</ChatLayout.Title>
 

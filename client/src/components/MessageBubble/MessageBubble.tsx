@@ -60,8 +60,8 @@ const MessageBubbleActions = () => {
       const data = new ClipboardItem(payload);
       await navigator.clipboard.write([data]);
     }
-    // TODO: this doesn't seem to work
-    showToast(`copy-${message.id}`, 'success', 'Copied!', { placement: 'bottom' });
+    
+    showToast(`copy-${message.id}`, 'success', 'Copied!', { placement: 'top' });
   };
 
   const { actions = {}, message, initiateEditing, ref } = useBubbleContext();
@@ -90,30 +90,30 @@ const MessageBubbleActions = () => {
       <div className={styles.spacer} />
       <div className={styles.actions}>
         {copy && <ToastTarget name={`copy-${message.id}`}>
-          <Tooltip text='Copy message' side='bottom'>
+          <Tooltip text='Copy message' side='top'>
             <Button onClick={onCopy} variant="borderless"><PiCopyLight /></Button>
           </Tooltip>
         </ToastTarget>}
         {!!onRegenerate && <Tooltip
-          side='bottom'
+          side='top'
           text='Regenerate response'
         >
           <Button onClick={onRegenerate} variant="borderless"><HiArrowPath /></Button>
         </Tooltip>}
         {!!onDuplicate && <Tooltip
-          side='bottom'
+          side='top'
           text='Duplicate message'
         >
           <Button onClick={onDuplicate} variant="borderless"><PiArrowsSplit /></Button>
         </Tooltip>}
         {!!editing && <Tooltip
-          side='bottom'
+          side='top'
           text='Edit message'
         >
           <Button onClick={initiateEditing} variant="borderless"><HiOutlinePencil /></Button>
         </Tooltip>}
         {!!onDelete && <ToastTarget name={`delete-${message.id}`}><Tooltip
-          side='bottom'
+          side='top'
           text='Delete message'
         >
           <Button onClick={() => {

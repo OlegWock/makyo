@@ -69,7 +69,6 @@ const createMutationHook = <In, Out>({ mutation, onSuccess, invalidate }: {
     return useMutation({
       mutationFn: async (payload: In) => {
         const resp = await mutation(api, payload);
-        // TODO: some global (toast?) handler for mutation errors?
         throwExceptionOnFailedResponse(resp);
         return resp.json() as Promise<Out>;
       },

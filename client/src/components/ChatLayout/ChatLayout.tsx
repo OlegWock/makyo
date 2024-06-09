@@ -21,7 +21,7 @@ export type ChatLayoutImperativeHandle = {
 
 export type ChatLayoutProps = {
   children?: ReactNode
-  onSend?: (text: string) => void;
+  onSend?: (text: string) => void | Promise<boolean>;
   inputRef?: Ref<HTMLTextAreaElement>,
   imperativeHandle?: Ref<ChatLayoutImperativeHandle>,
 };
@@ -29,11 +29,13 @@ export type ChatLayoutProps = {
 type ChatLayoutPropsWithSlots = ChatLayoutProps & SlotsPropsFromFactory<typeof componentFactory>;
 
 export const ChatLayout = componentFactory('ChatLayout', ({ onSend, inputRef, slots, imperativeHandle }: ChatLayoutPropsWithSlots) => {
-  const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+  const onKeyDown = async (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      onSend?.(text);
-      setText('');
+      const result = await onSend?.(text);
+      if (result !== false) {
+        setText('');
+      }
       return;
     }
   };

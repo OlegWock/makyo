@@ -16,6 +16,7 @@ import { ToastProvider } from "@client/components/LocalToast";
 import { LocalOllamaProxyProvider } from "@client/api/ollama-proxy";
 import { PersonasPage } from "@client/routes/PersonasPage";
 import { LazyMotion } from "framer-motion";
+import { Toaster } from 'react-hot-toast';
 
 
 const fmFeatures = () => import('./utils/lazy-fm').then(m => m.default);
@@ -49,6 +50,10 @@ export const App = () => {
           {/* <ReactQueryDevtools /> */}
         </Router>
       </QueryClientProvider>
+      <Toaster 
+        position="bottom-right"
+        
+      />
     </ToastProvider>
   );
 };

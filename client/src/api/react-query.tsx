@@ -1,8 +1,9 @@
-import { QueryClient } from '@tanstack/react-query';
+import { MutationCache, QueryCache, QueryClient } from '@tanstack/react-query';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { broadcastQueryClient } from '@tanstack/query-broadcast-client-experimental';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { ReactNode, useState } from 'react';
+import toast from 'react-hot-toast';
 
 
 const queryClient = new QueryClient({
@@ -12,7 +13,13 @@ const queryClient = new QueryClient({
       retryDelay: 0.2,
       gcTime: 1000 * 60 * 60 * 24, // 24 hours
     }
-  }
+  },
+  queryCache: new QueryCache({
+    onError: (error) => toast.error(`Something went wrong: ${error.message}`),
+  }),
+  mutationCache: new MutationCache({
+    onError: (error) => toast.error(`Something went wrong: ${error.message}`),
+  }),
 });
 
 broadcastQueryClient({

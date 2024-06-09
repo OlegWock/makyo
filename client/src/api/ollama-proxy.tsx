@@ -95,7 +95,6 @@ const wrapWebSocket = (factory: () => WebSocket) => {
 }
 
 export const initiateLocalOllamaProxy = (api: ApiClient) => {
-  // TODO: automatically reconnect on abort
   console.log('Initiating local Ollama proxy');
   const ws = wrapWebSocket(() => api.providers["ollama-proxy-ws"].$ws());
   ws.onMessage(async (message) => {

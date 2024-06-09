@@ -15,3 +15,4 @@ export type SubscriptionMessage =
     chatId: number,
     title?: string,
   }>
+  | SubscriptionMessageGeneric<"updateModels", {}>

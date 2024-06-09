@@ -2,6 +2,7 @@ import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { allProviders } from "@server/providers";
 import { createProxiedFetch, ollamaFetch } from "@server/providers/ollama/proxy";
 import { ModelResponseSchema } from "@server/schemas/provider";
+import { broadcastSubscriptionMessage } from "@server/utils/subscriptions";
 import { upgradeWebSocket } from "@server/utils/websockets";
 
 
@@ -44,11 +45,10 @@ export const providersRouter = new OpenAPIHono()
   .get(
     '/api/providers/ollama-proxy-ws',
     upgradeWebSocket((c) => {
-      // TODO: send notification message to client to update available models once proxy is connected/disconnected
       const { handlers, proxiedFetch, signal } = createProxiedFetch();
       if (!ollamaFetch.current) {
         ollamaFetch.current = proxiedFetch;
-
+        broadcastSubscriptionMessage({type: 'updateModels', data: {}});
         signal.addEventListener('abort', () => {
           ollamaFetch.current = null;
         });

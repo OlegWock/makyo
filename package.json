@@ -30,6 +30,7 @@
     "hono": "^4.2.5",
     "ollama": "^0.5.0",
     "openai": "^4.38.2",
+    "react-hot-toast": "^2.4.1",
     "rehype-katex": "^7.0.0",
     "remark-math": "^6.0.0",
     "uuid": "^9.0.1",

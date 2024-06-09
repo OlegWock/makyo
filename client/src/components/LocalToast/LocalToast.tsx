@@ -1,7 +1,6 @@
 import { createCustomLocalToast, ToastComponentProps, ToastPlacement } from 'react-local-toast';
 import styles from './LocalToast.module.scss';
 import { Ref, useMemo } from 'react';
-import { type Variants, m } from 'framer-motion';
 import clsx from 'clsx';
 import { iife } from '@shared/utils';
 import { HiOutlineCheckCircle, HiOutlineExclamationCircle, HiOutlineExclamationTriangle, HiOutlineInformationCircle, HiOutlineQuestionMarkCircle } from 'react-icons/hi2';
@@ -25,34 +24,7 @@ type ToastDataConfirm = {
 
 type ToastData = ToastDataText | ToastDataConfirm;
 
-const variants: Variants = {
-  initial: (placement: ToastPlacement) => {
-    if (placement === 'top' || placement === 'bottom') return { x: '-10%', opacity: 0 };
-    if (placement === 'left' || placement === 'right') return { y: '-10%', opacity: 0 };
-
-    return {};
-  },
-  visible: (placement: ToastPlacement) => {
-    return {
-      x: 0,
-      y: 0,
-      opacity: 1,
-    };
-  },
-  exit: (placement: ToastPlacement) => {
-    if (placement === 'top' || placement === 'bottom') return { x: '10%', opacity: 0 };
-    if (placement === 'left' || placement === 'right') return { y: '10%', opacity: 0 };
-
-    return {};
-  },
-};
-
 const LocalToast = ({ id, style, data, ref, removeMe, animation, placement }: ToastComponentProps<ToastData>) => {
-  const currentVariant = iife(() => {
-    if (['entering', 'entered'].includes(animation.state)) return 'visible'
-    if (animation.state === 'exiting') return 'exit';
-  });
-
   const icon = useMemo(() => {
     if (data.type === 'success') return <HiOutlineCheckCircle />;
     if (data.type === 'error') return <HiOutlineExclamationCircle />;
@@ -72,18 +44,14 @@ const LocalToast = ({ id, style, data, ref, removeMe, animation, placement }: To
       '--transition-duration': `${animation.duration}ms`,
     }}
   >
-    <m.div
+    <div
       className={clsx(
         styles.LocalToast,
         styles[data.type],
+        styles[animation.state],
+        styles[placement],
         data.type === 'confirm' && data.destructive && styles.destructive
       )}
-      variants={variants}
-      custom={placement}
-      initial="initial"
-      animate={currentVariant}
-      transition={{ duration: animation.duration / 1000, ease: [0.65, 0, 0.35, 1] }}
-      layout={animation.state !== 'entering'}
     >
       {icon}
       <div>{data.text}</div>
@@ -108,7 +76,7 @@ const LocalToast = ({ id, style, data, ref, removeMe, animation, placement }: To
           {data.cancelText ?? 'Cancel'}
         </Button>
       </div>}
-    </m.div>
+    </div>
   </div>);
 };
 
