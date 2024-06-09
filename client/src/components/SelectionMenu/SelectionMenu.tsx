@@ -23,6 +23,7 @@ export const SelectionMenu = ({ targetRef, onClick }: SelectionMenuProps) => {
     setIsOpen(false);
   };
 
+  const isMouseDownRef = useRef(false);
   const [isOpen, setIsOpen] = useState(false);
   const rangeRef = useRef<Range | null>(null);
   const { refs, floatingStyles, context } = useFloating({
@@ -40,13 +41,13 @@ export const SelectionMenu = ({ targetRef, onClick }: SelectionMenuProps) => {
 
   useEffect(() => {
     const handleSelectionChange = () => {
+      if (isMouseDownRef.current) return;
       const selection = document.getSelection();
       const range =
         typeof selection?.rangeCount === "number" && selection.rangeCount > 0
           ? selection.getRangeAt(0)
           : null;
 
-      console.log('Selection', selection, 'range', range);
       if (selection?.isCollapsed || !range || !targetRef.current || !targetRef.current.contains(range.commonAncestorContainer)) {
         setIsOpen(false);
         return;
@@ -58,11 +59,24 @@ export const SelectionMenu = ({ targetRef, onClick }: SelectionMenuProps) => {
       });
       rangeRef.current = range;
       setIsOpen(true);
+    };
+
+    const handlePointerDown = () => {
+      isMouseDownRef.current = true;
+    };
+
+    const handlePointerUp = () => {
+      isMouseDownRef.current = false;
+      handleSelectionChange();
     }
 
     document.addEventListener('selectionchange', handleSelectionChange);
+    document.addEventListener('pointerdown', handlePointerDown, true);
+    document.addEventListener('pointerup', handlePointerUp, true);
     return () => {
       document.removeEventListener('selectionchange', handleSelectionChange);
+      document.removeEventListener('pointerdown', handlePointerDown, true);
+      document.removeEventListener('pointerup', handlePointerUp, true);
     };
   }, [refs]);
 
