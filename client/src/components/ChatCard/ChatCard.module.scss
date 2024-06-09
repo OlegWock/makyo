@@ -3,6 +3,7 @@
 .ChatCard {
   gap: 0.25rem;
   padding: 0.5rem 1rem !important;
+  background: white;
 
   &.ghost {
     pointer-events: none;

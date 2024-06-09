@@ -1,6 +1,6 @@
 import { ChatLayout } from '@client/components/ChatLayout';
 import styles from './RootPage.module.scss';
-import { useModels, useNewChatMutation, usePersonas } from '@client/api';
+import { useChats, useModels, useNewChatMutation, usePersonas } from '@client/api';
 import { useMemo, useRef, useState } from 'react';
 import { useAtom } from 'jotai/react';
 import { lastUsedModelAtom } from '@client/atoms/chat';
@@ -12,6 +12,8 @@ import { usePageTitle } from '@client/utils/hooks';
 import { useLocation } from 'wouter';
 import { ModelSelect } from '@client/components/ModelSelect';
 import { PersonaSchemaType } from '@server/schemas/personas';
+import { Link } from '@client/components/Link';
+import { HiChevronRight } from 'react-icons/hi2';
 
 export const RootPage = withErrorBoundary(() => {
   const applyPersona = (persona: PersonaSchemaType | null) => {
@@ -50,6 +52,7 @@ export const RootPage = withErrorBoundary(() => {
 
   const newChat = useNewChatMutation();
   const { data: providers } = useModels();
+  const { data: chats } = useChats();
 
   const options = useMemo(() => {
     return providers.flatMap(p => p.models.map(m => {
@@ -135,6 +138,16 @@ export const RootPage = withErrorBoundary(() => {
                   <ChatSettings settings={chatSettings} settingsUpdater={updateChatSettings} />
                 </Card>
               </section>
+
+              {chats.length > 0 && <section>
+                <div className={styles.sectionTitle}>Pick up where you left off</div>
+                <div className={styles.chatsList}>
+                  {chats.slice(0, 5).map(chat => <Link variant='unstyled' key={chat.id} className={styles.chatCard} href={`/chats/${chat.id}`}>
+                    <div>{chat.title}</div>
+                    <HiChevronRight />
+                  </Link>)}
+                </div>
+              </section>}
             </div>
           </div>
         </ChatLayout.MessagesArea>

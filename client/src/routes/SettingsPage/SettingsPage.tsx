@@ -4,6 +4,7 @@ import { HiNoSymbol, HiOutlineCheckCircle } from 'react-icons/hi2';
 import { withErrorBoundary } from '@client/components/ErrorBoundary';
 import { Card } from '@client/components/Card';
 import { usePageTitle } from '@client/utils/hooks';
+import { localOllamaProxyEnabled } from '@client/api/ollama-proxy';
 
 export const SettingsPage = withErrorBoundary(() => {
   const { data: { openai, anthropic, ollama } } = useSettings();
@@ -25,7 +26,7 @@ export const SettingsPage = withErrorBoundary(() => {
           <div className={styles.sectionTitle}>Ollama</div>
           <div className={styles.status}>
             {ollama.enabled ? <>
-              <HiOutlineCheckCircle /> – Enabled
+              <HiOutlineCheckCircle /> – Enabled {localOllamaProxyEnabled ? '(through proxy in browser)' : ''}
             </> : <>
               <HiNoSymbol /> – Disabled
             </>}

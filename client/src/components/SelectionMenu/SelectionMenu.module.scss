@@ -24,7 +24,6 @@
     background: #ffffff;
 
     @include hover {
-      // background: var(--gray-2);
       background: var(--jade-2);
       color: var(--jade-11);
     }

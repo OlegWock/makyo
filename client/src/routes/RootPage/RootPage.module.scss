@@ -1,7 +1,10 @@
+@use "../../styles/utils.scss" as *;
+
 .RootPage {
   flex-grow: 1;
   display: flex;
   gap: 1rem;
+  overflow: hidden;
 }
 
 
@@ -14,6 +17,7 @@
 
 .startMenu {
   margin: auto;
+  // margin-top: 25%;
   min-width: min(27rem, 100%);
   max-width: min(52.5rem, 100%);
   padding: 1rem;
@@ -56,7 +60,7 @@
         .avatar {
           font-size: 2rem;
         }
-        
+
         .name {
           font-size: 1rem;
           text-overflow: ellipsis;
@@ -68,6 +72,27 @@
     .settingsCard {
       background: white;
       gap: 1rem;
+    }
+
+    .chatsList {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      .chatCard {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: white;
+        border: 1px solid var(--gray-4);
+        border-radius: 0.25rem;
+        padding: 0.5rem 1rem;
+        transition: 0.1s ease-in-out;
+
+        @include hover {
+          background: var(--gray-1);
+        }
+      }
     }
   }
 }
