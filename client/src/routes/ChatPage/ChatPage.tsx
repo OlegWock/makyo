@@ -2,7 +2,7 @@ import { ChatLayout, ChatLayoutImperativeHandle } from '@client/components/ChatL
 import styles from './ChatPage.module.scss';
 import { useStrictRouteParams } from '@client/utils/routing';
 import { z } from 'zod';
-import { useChat, useSendMessageMutation, useModels, useEditChatMutation } from '@client/api';
+import { useChat, useSendMessageMutation, useEditChatMutation } from '@client/api';
 import { useMemo, useRef, useState } from 'react';
 import { MessagesHistory } from './MessagesHistory';
 import { ChatPageContextProvider } from './context';
@@ -23,8 +23,8 @@ import { useIsMobile } from '@client/utils/responsive';
 export const ChatPage = withErrorBoundary(() => {
   const { id } = useStrictRouteParams({ id: z.coerce.number() });
   const { data: chatInfo } = useChat(id);
-  const sendMessage = useSendMessageMutation(id);
-  const editChat = useEditChatMutation(id);
+  const sendMessage = useSendMessageMutation();
+  const editChat = useEditChatMutation();
 
   const [searchParams] = useSearchParams();
   const defaultScrollTo = searchParams.messageId ? parseInt(searchParams.messageId) : undefined;
@@ -84,13 +84,16 @@ export const ChatPage = withErrorBoundary(() => {
     isSubmitting={editChat.isPending}
     onSubmit={async () => {
       await editChat.mutateAsync({
-        parameters: {
-          temperature: chatSettings.temperature.enabled ? chatSettings.temperature.value : undefined,
-          system: chatSettings.system.enabled ? chatSettings.system.value : undefined,
-        },
-        model: {
-          providerId: chatSettings.model!.providerId,
-          modelId: chatSettings.model!.modelId,
+        chatId: id,
+        payload: {
+          parameters: {
+            temperature: chatSettings.temperature.enabled ? chatSettings.temperature.value : undefined,
+            system: chatSettings.system.enabled ? chatSettings.system.value : undefined,
+          },
+          model: {
+            providerId: chatSettings.model!.providerId,
+            modelId: chatSettings.model!.modelId,
+          }
         }
       });
       setSettingsVisible(false);
@@ -108,19 +111,25 @@ export const ChatPage = withErrorBoundary(() => {
     setMessageText: (text) => chatLayoutRef.current?.setText(text),
     sendMessage: (text) => {
       sendMessage.mutate({
-        text,
-        parentId: lastMessage.message.id,
+        chatId: id,
+        payload: {
+          text,
+          parentId: lastMessage.message.id,
+        }
       })
     },
   }}>
     <div className={styles.ChatPage} ref={ref}>
       <Card flexGrow withScrollArea={false}>
         <ChatLayout
-        imperativeHandle={chatLayoutRef}
+          imperativeHandle={chatLayoutRef}
           onSend={(text) => {
             sendMessage.mutate({
-              text,
-              parentId: lastMessage.message.id,
+              chatId: id,
+              payload: {
+                text,
+                parentId: lastMessage.message.id,
+              }
             })
           }}
         >
@@ -134,7 +143,7 @@ export const ChatPage = withErrorBoundary(() => {
                   variant='primary'
                   loading={editChat.isPending}
                   onClick={async () => {
-                    await editChat.mutateAsync({ title: titleDraft });
+                    await editChat.mutateAsync({ chatId: id, payload: { title: titleDraft } });
                     setIsEditingTitle(false);
                   }}
                 >

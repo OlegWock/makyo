@@ -9,6 +9,9 @@ import { ReactNode, useEffect, useMemo } from "react";
 import { initiateLocalOllamaProxy, localOllamaProxyEnabled } from "@client/api/ollama-proxy";
 
 
+// TODO: both websockets and SSE seem to be aborted exactly in a minute. Might need to implement regular pings
+// https://stackoverflow.com/questions/49408031/websockets-in-chrome-and-firefox-disconnecting-after-one-minute-of-inactivity
+
 type SubscriptionClient = {
   onMessage: (cb: (val: SubscriptionMessage) => void) => VoidFunction;
   onClose: (cb: (e: CloseEvent) => void) => VoidFunction;

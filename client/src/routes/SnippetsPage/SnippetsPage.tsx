@@ -66,8 +66,8 @@ const SnippetForm = ({ onCancel, onSave, loading, defaultValue, title }: Snippet
 const Snippet = ({ id, name, shortcut, text, createdAt }: SnippetSchemaType) => {
   const [isEditing, setIsEditing] = useState(false);
 
-  const editSnippet = useEditSnippetMutation(id);
-  const deleteSnippet = useDeleteSnippetMutation(id);
+  const editSnippet = useEditSnippetMutation();
+  const deleteSnippet = useDeleteSnippetMutation();
   const date = useMemo(() => dayjs(createdAt).fromNow(), [createdAt]);
 
   let trimmedText = text.split('\n').slice(0, 4).join('\n').slice(0, 500);
@@ -92,7 +92,7 @@ const Snippet = ({ id, name, shortcut, text, createdAt }: SnippetSchemaType) => 
             <DropdownMenu.Item
               type='danger-with-confirmation'
               icon={<HiOutlineTrash />}
-              onSelect={() => deleteSnippet.mutate()}
+              onSelect={() => deleteSnippet.mutate(id)}
             >
               Delete
             </DropdownMenu.Item>
@@ -109,7 +109,7 @@ const Snippet = ({ id, name, shortcut, text, createdAt }: SnippetSchemaType) => 
       defaultValue={{ name, shortcut, text }}
       onCancel={() => setIsEditing(false)}
       onSave={async (val) => {
-        await editSnippet.mutateAsync(val);
+        await editSnippet.mutateAsync({ snippetId: id, payload: val });
         setIsEditing(false);
       }}
       loading={editSnippet.isPending}

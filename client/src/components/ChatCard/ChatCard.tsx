@@ -17,8 +17,8 @@ export type ChatCardProps = {
 
 export const ChatCard = ({ chat }: ChatCardProps) => {
   const date = useMemo(() => dayjs(chat.lastMessageAt).fromNow(), [chat.lastMessageAt]);
-  const deleteChat = useDeleteChatMutation(chat.id);
-  const editChat = useEditChatMutation(chat.id);
+  const deleteChat = useDeleteChatMutation();
+  const editChat = useEditChatMutation();
 
   return (<Card className={clsx(styles.ChatCard, deleteChat.isPending && styles.ghost)} withScrollArea={false}>
     <div className={styles.titleWrapper}>
@@ -31,14 +31,14 @@ export const ChatCard = ({ chat }: ChatCardProps) => {
           <DropdownMenu.Item
             type='normal'
             icon={chat.isStarred ? <HiOutlineStar /> : <HiStar />}
-            onSelect={() => editChat.mutate({ isStarred: !chat.isStarred })}
+            onSelect={() => editChat.mutate({ chatId: chat.id, payload: { isStarred: !chat.isStarred } })}
           >
             {chat.isStarred ? 'Unstar' : 'Star'}
           </DropdownMenu.Item>
           <DropdownMenu.Item
             type='danger-with-confirmation'
             icon={<HiOutlineTrash />}
-            onSelect={() => deleteChat.mutate()}
+            onSelect={() => deleteChat.mutate(chat.id)}
           >
             Delete
           </DropdownMenu.Item>

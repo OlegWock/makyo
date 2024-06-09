@@ -3,8 +3,8 @@ import { useApiClient } from "@client/api/context";
 import { throwExceptionOnFailedResponse } from "@client/api/exceptions";
 import { PersonaInSchemaType, PersonaSchemaType } from "@server/schemas/personas";
 import { SnippetInSchemaType, SnippetSchemaType } from "@server/schemas/snippets";
-import { ChatSchemaType, ChatWithMessagesSchemaType, MessageSchemaType, NewChatSchemaType, NewMessageSchemaType, UpdateChatSchemaType } from "@shared/api";
-import { useMutation, useQuery, useQueryClient, UseQueryOptions, UseQueryResult, useSuspenseQuery, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
+import { ChatSchemaType, ChatWithMessagesSchemaType, NewChatSchemaType, NewMessageSchemaType, UpdateChatSchemaType } from "@shared/api";
+import { QueryClient, useMutation, useQuery, useQueryClient, UseQueryOptions, UseQueryResult, useSuspenseQuery, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
 import { ClientResponse } from "hono/client";
 import { produce } from "immer";
 
@@ -57,280 +57,214 @@ export const usePersonas = createSuspenseQueryHook(['personas'], (api) => api.pe
 
 // ------------------------------------------------------------------
 
-// TODO: maybe create a hook factory for mutations too (like we have for queries)
+const createMutationHook = <In, Out>({ mutation, onSuccess, invalidate }: {
+  mutation: (api: ApiClient, arg: In) => Promise<ClientResponse<Out>>,
+  onSuccess?: (client: QueryClient, data: Out, input: In) => void,
+  invalidate?: (Array<string | number> | ((input: In, output: Out) => Array<string | number>))[],
+}) => {
+  return () => {
+    const api = useApiClient();
+    const client = useQueryClient();
 
-export const useNewChatMutation = () => {
-  const api = useApiClient();
-  const client = useQueryClient();
-  return useMutation({
-    mutationFn: async (payload: NewChatSchemaType) => {
-      const resp = await api.chats.$post({
-        json: payload,
-      });
-      return resp.json();
-    },
-    onSuccess(data) {
-      client.setQueryData(['chats'], (old: ChatSchemaType[]) => [data, ...(old || [])]);
-      client.invalidateQueries({ queryKey: ['chats'] });
-    },
-  });
+    return useMutation({
+      mutationFn: async (payload: In) => {
+        const resp = await mutation(api, payload);
+        // TODO: some global (toast?) handler for mutation errors?
+        throwExceptionOnFailedResponse(resp);
+        return resp.json() as Promise<Out>;
+      },
+      onSuccess(data: Out, input: In) {
+        if (invalidate) {
+          invalidate.forEach((key) => {
+            const finalKey = typeof key === 'function' ? key(input, data) : key;
+            client.invalidateQueries({ queryKey: finalKey });
+          });
+        }
+        if (onSuccess) {
+          return onSuccess(client, data, input);
+        }
+      },
+    });
+  };
 };
 
-export const useDeleteChatMutation = (chatId: number) => {
-  const api = useApiClient();
-  const client = useQueryClient();
-  return useMutation({
-    mutationFn: async () => {
-      const resp = await api.chats[":chatId"].$delete({
-        param: { chatId: chatId.toString() }
-      });
-      return resp.json();
-    },
-    onSuccess(data) {
-      client.setQueryData(['chats'], (old: ChatSchemaType[]) => {
-        if (!old) return old;
-        return old.filter(c => c.id !== chatId);
-      });
-    },
-  });
-};
 
-export const useEditChatMutation = (chatId: number) => {
-  const api = useApiClient();
-  const client = useQueryClient();
-  return useMutation({
-    mutationFn: async (payload: UpdateChatSchemaType) => {
-      const resp = await api.chats[":chatId"].$patch({
-        param: { chatId: chatId.toString() },
-        json: payload,
-      });
-      return resp.json();
-    },
-    onSuccess(data) {
-      client.setQueryData(['chats', chatId], () => data);
-      client.setQueryData(['chats'], (old: ChatSchemaType[]) => {
-        if (!old) return old;
-        return produce(old, (draft) => {
-          const chat = draft.find(c => c.id === chatId);
-          if (chat) {
-            Object.assign(chat, data.chat);
-          }
-        })
-      });
-    },
-  });
-};
+export const useNewChatMutation = createMutationHook({
+  mutation: (api, arg: NewChatSchemaType) => api.chats.$post({ json: arg }),
+  invalidate: [
+    ['chats']
+  ],
+  onSuccess: (client, data) => client.setQueryData<ChatSchemaType[]>(['chats'], (old) => [data, ...(old || [])]),
+});
 
-export const useSendMessageMutation = (chatId: number) => {
-  const api = useApiClient();
-  const client = useQueryClient();
-  return useMutation({
-    mutationFn: async (payload: NewMessageSchemaType) => {
-      const resp = await api.chats[":chatId"].$put({
-        param: { chatId: chatId.toString() },
-        json: payload,
-      });
-      return resp.json();
-    },
-    onSuccess(data) {
-      client.setQueryData(['chats', chatId], () => data);
-    },
-  });
-};
+export const useDeleteChatMutation = createMutationHook({
+  mutation: (api, chatId: number) => api.chats[":chatId"].$delete({
+    param: { chatId: chatId.toString() }
+  }),
+  onSuccess(client, data, input) {
+    client.setQueryData(['chats'], (old: ChatSchemaType[]) => {
+      if (!old) return old;
+      return old.filter(c => c.id !== input);
+    });
+  },
+});
 
-export const useRegenerateMessageMutation = (chatId: number) => {
-  const api = useApiClient();
-  const client = useQueryClient();
-  return useMutation({
-    mutationFn: async ({ messageId }: { messageId: number }) => {
-      const resp = await api.chats[":chatId"][":messageId"].regenerate.$post({
-        param: { chatId: chatId.toString(), messageId: messageId.toString() }
-      });
-      return resp.json();
-    },
-    onSuccess(data: MessageSchemaType) {
-      client.setQueryData(['chats', chatId], (old: ChatWithMessagesSchemaType | undefined) => {
-        if (!old) return old;
+export const useEditChatMutation = createMutationHook({
+  mutation: (api, { chatId, payload }: { chatId: number, payload: UpdateChatSchemaType }) => api.chats[":chatId"].$patch({
+    param: { chatId: chatId.toString() },
+    json: payload,
+  }),
+  onSuccess(client, data, { chatId }) {
+    client.setQueryData(['chats', chatId], () => data);
+    client.setQueryData(['chats'], (old: ChatSchemaType[]) => {
+      if (!old) return old;
+      return produce(old, (draft) => {
+        const chat = draft.find(c => c.id === chatId);
+        if (chat) {
+          Object.assign(chat, data.chat);
+        }
+      })
+    });
+  },
+});
 
-        return produce(old, (draft) => {
-          draft.messages.push(data);
-        });
-      });
-    },
-  });
-};
+export const useSendMessageMutation = createMutationHook({
+  mutation: (api, { chatId, payload }: { chatId: number, payload: NewMessageSchemaType }) => api.chats[":chatId"].$put({
+    param: { chatId: chatId.toString() },
+    json: payload,
+  }),
+  onSuccess(client, data, { chatId }) {
+    client.setQueryData(['chats', chatId], () => data);
+  },
+});
 
-export const useDuplicateMessageMutation = (chatId: number) => {
-  const api = useApiClient();
-  const client = useQueryClient();
-  return useMutation({
-    mutationFn: async ({ messageId }: { messageId: number }) => {
-      const resp = await api.chats[":chatId"][":messageId"].duplicate.$post({
-        param: { chatId: chatId.toString(), messageId: messageId.toString() }
-      });
-      return resp.json();
-    },
-    onSuccess(data: MessageSchemaType) {
-      client.setQueryData(['chats', chatId], (old: ChatWithMessagesSchemaType | undefined) => {
-        if (!old) return old;
-        return produce(old, (draft) => {
-          draft.messages.push(data);
-        });
-      });
-    },
-  });
-};
+export const useRegenerateMessageMutation = createMutationHook({
+  mutation: (api, { chatId, messageId }: { chatId: number, messageId: number }) => api.chats[":chatId"][":messageId"].regenerate.$post({
+    param: { chatId: chatId.toString(), messageId: messageId.toString() }
+  }),
+  onSuccess(client, data, { chatId }) {
+    client.setQueryData(['chats', chatId], (old: ChatWithMessagesSchemaType | undefined) => {
+      if (!old) return old;
 
-export const useEditMessageMutation = (chatId: number) => {
-  const api = useApiClient();
-  const client = useQueryClient();
-  return useMutation({
-    mutationFn: async ({ messageId, text, regenerateResponse }: { messageId: number, text: string, regenerateResponse: boolean }) => {
-      const resp = await api.chats[":chatId"][":messageId"].$patch({
-        param: { chatId: chatId.toString(), messageId: messageId.toString() },
-        json: {
-          text,
-          regenerateResponse,
+      return produce(old, (draft) => {
+        draft.messages.push(data);
+      });
+    });
+  },
+});
+
+export const useDuplicateMessageMutation = createMutationHook({
+  mutation: (api, { chatId, messageId }: { chatId: number, messageId: number }) => api.chats[":chatId"][":messageId"].duplicate.$post({
+    param: { chatId: chatId.toString(), messageId: messageId.toString() }
+  }),
+  onSuccess(client, data, { chatId }) {
+    client.setQueryData(['chats', chatId], (old: ChatWithMessagesSchemaType | undefined) => {
+      if (!old) return old;
+      return produce(old, (draft) => {
+        draft.messages.push(data);
+      });
+    });
+  },
+});
+
+export const useEditMessageMutation = createMutationHook({
+  mutation: (api, { chatId, payload: { messageId, text, regenerateResponse } }: { chatId: number, payload: { messageId: number, text: string, regenerateResponse: boolean } }) => {
+    return api.chats[":chatId"][":messageId"].$patch({
+      param: { chatId: chatId.toString(), messageId: messageId.toString() },
+      json: {
+        text,
+        regenerateResponse,
+      }
+    });
+  },
+  onSuccess(client, data, { chatId }) {
+    client.setQueryData(['chats', chatId], () => data);
+  },
+});
+
+export const useDeleteMessageMutation = createMutationHook({
+  mutation: (api, { chatId, messageId }: { chatId: number, messageId: number }) => api.chats[":chatId"][":messageId"].$delete({
+    param: { chatId: chatId.toString(), messageId: messageId.toString() },
+  }),
+  onSuccess(client, data, { chatId }) {
+    client.setQueryData(['chats', chatId], () => data);
+  },
+});
+
+export const useNewSnippetMutation = createMutationHook({
+  mutation: (api, payload: SnippetInSchemaType) => api.snippets.$put({
+    json: payload,
+  }),
+  invalidate: [['snippets']],
+  onSuccess(client, data) {
+    client.setQueryData(['snippets'], (old: SnippetSchemaType[]) => [data, ...(old || [])]);
+  },
+});
+
+export const useEditSnippetMutation = createMutationHook({
+  mutation: (api, {snippetId, payload}: {snippetId: number, payload: Partial<SnippetInSchemaType>}) => api.snippets[":snippetId"].$patch({
+    param: { snippetId: snippetId.toString() },
+    json: payload,
+  }),
+  invalidate: [['snippets']],
+  onSuccess(client, data) {
+    client.setQueryData(['snippets'], (old: SnippetSchemaType[]) => {
+      if (!old) return [data];
+      return produce(old, (draft) => {
+        const snippet = draft.find(s => s.id === data.id);
+        if (snippet) {
+          Object.assign(snippet, data);
         }
       });
-      return resp.json();
-    },
-    onSuccess(data) {
-      client.setQueryData(['chats', chatId], () => data);
-    },
-  });
-};
+    });
+  },
+});
 
-export const useDeleteMessageMutation = (chatId: number) => {
-  const api = useApiClient();
-  const client = useQueryClient();
-  return useMutation({
-    mutationFn: async (messageId: number) => {
-      const resp = await api.chats[":chatId"][":messageId"].$delete({
-        param: { chatId: chatId.toString(), messageId: messageId.toString() },
-      });
-      return resp.json();
-    },
-    onSuccess(data) {
-      client.setQueryData(['chats', chatId], () => data);
-    },
-  });
-};
+export const useDeleteSnippetMutation = createMutationHook({
+  mutation: (api, snippetId: number) => api.snippets[":snippetId"].$delete({
+    param: { snippetId: snippetId.toString() },
+  }),
+  onSuccess(client, data) {
+    client.setQueryData(['snippets'], () => data);
+  },
+});
 
-export const useNewSnippetMutation = () => {
-  const api = useApiClient();
-  const client = useQueryClient();
-  return useMutation({
-    mutationFn: async (payload: SnippetInSchemaType) => {
-      const resp = await api.snippets.$put({
-        json: payload,
-      });
-      return resp.json();
-    },
-    onSuccess(data) {
-      client.setQueryData(['snippets'], (old: SnippetSchemaType[]) => [data, ...(old || [])]);
-      client.invalidateQueries({ queryKey: ['snippets'] });
-    },
-  });
-};
+export const useNewPersonaMutation = createMutationHook({
+  mutation: (api, payload: PersonaInSchemaType) => api.personas.$put({
+    json: payload,
+  }),
+  invalidate: [['personas']],
+  onSuccess(client, data) {
+    client.setQueryData(['personas'], (old: PersonaSchemaType[]) => [data, ...(old || [])]);
+  },
+});
 
-export const useEditSnippetMutation = (snippetId: number) => {
-  const api = useApiClient();
-  const client = useQueryClient();
-  return useMutation({
-    mutationFn: async (payload: Partial<SnippetInSchemaType>) => {
-      const resp = await api.snippets[":snippetId"].$patch({
-        param: { snippetId: snippetId.toString() },
-        json: payload,
+export const useEditPersonaMutation = createMutationHook({
+  mutation: (api, {personaId, payload}: {personaId: number, payload: Partial<PersonaInSchemaType>}) => {
+    return api.personas[":personaId"].$patch({
+      param: { personaId: personaId.toString() },
+      json: payload,
+    });
+  },
+  invalidate: [['personas']],
+  onSuccess(client, data) {
+    client.setQueryData(['personas'], (old: PersonaSchemaType[]) => {
+      if (!old) return [data];
+      return produce(old, (draft) => {
+        const persona = draft.find(p => p.id === data.id);
+        if (persona) {
+          Object.assign(persona, data);
+        }
       });
-      return resp.json();
-    },
-    onSuccess(data) {
-      client.setQueryData(['snippets'], (old: SnippetSchemaType[]) => {
-        if (!old) return [data];
-        return produce(old, (draft) => {
-          const snippet = draft.find(s => s.id === data.id);
-          if (snippet) {
-            Object.assign(snippet, data);
-          }
-        });
-      });
-      client.invalidateQueries({ queryKey: ['snippets'] });
-    },
-  });
-};
+    });
+  },
+});
 
-export const useDeleteSnippetMutation = (snippetId: number) => {
-  const api = useApiClient();
-  const client = useQueryClient();
-  return useMutation({
-    mutationFn: async () => {
-      const resp = await api.snippets[":snippetId"].$delete({
-        param: { snippetId: snippetId.toString() },
-      });
-      return resp.json();
-    },
-    onSuccess(data) {
-      client.setQueryData(['snippets'], () => data);
-    },
-  });
-};
-
-export const useNewPersonaMutation = () => {
-  const api = useApiClient();
-  const client = useQueryClient();
-  return useMutation({
-    mutationFn: async (payload: PersonaInSchemaType) => {
-      const resp = await api.personas.$put({
-        json: payload,
-      });
-      return resp.json();
-    },
-    onSuccess(data) {
-      client.setQueryData(['personas'], (old: PersonaSchemaType[]) => [data, ...(old || [])]);
-      client.invalidateQueries({ queryKey: ['personas'] });
-    },
-  });
-};
-
-export const useEditPersonaMutation = (personaId: number) => {
-  const api = useApiClient();
-  const client = useQueryClient();
-  return useMutation({
-    mutationFn: async (payload: Partial<PersonaInSchemaType>) => {
-      const resp = await api.personas[":personaId"].$patch({
-        param: { personaId: personaId.toString() },
-        json: payload,
-      });
-      return resp.json();
-    },
-    onSuccess(data) {
-      client.setQueryData(['personas'], (old: PersonaSchemaType[]) => {
-        if (!old) return [data];
-        return produce(old, (draft) => {
-          const persona = draft.find(p => p.id === data.id);
-          if (persona) {
-            Object.assign(persona, data);
-          }
-        });
-      });
-      client.invalidateQueries({ queryKey: ['personas'] });
-    },
-  });
-};
-
-export const useDeletePersonaMutation = (personaId: number) => {
-  const api = useApiClient();
-  const client = useQueryClient();
-  return useMutation({
-    mutationFn: async () => {
-      const resp = await api.personas[":personaId"].$delete({
-        param: { personaId: personaId.toString() },
-      });
-      return resp.json();
-    },
-    onSuccess(data) {
-      client.setQueryData(['personas'], () => data);
-    },
-  });
-};
+export const useDeletePersonaMutation = createMutationHook({
+  mutation: (api, personaId: number) => api.personas[":personaId"].$delete({
+    param: { personaId: personaId.toString() },
+  }),
+  onSuccess(client, data) {
+    client.setQueryData(['personas'], () => data);
+  },
+});

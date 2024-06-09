@@ -136,8 +136,8 @@ const Persona = (props: PersonaSchemaType) => {
   const { id, avatar, name } = props;
   const [isEditing, setIsEditing] = useState(false);
 
-  const editPersona = useEditPersonaMutation(id);
-  const deletePersona = useDeletePersonaMutation(id);
+  const editPersona = useEditPersonaMutation();
+  const deletePersona = useDeletePersonaMutation();
 
   return (<Card className={clsx(styles.persona, deletePersona.isPending && styles.ghost)} withScrollArea={false}>
     {isEditing && <PersonaForm
@@ -145,7 +145,7 @@ const Persona = (props: PersonaSchemaType) => {
       defaultValue={props}
       onCancel={() => setIsEditing(false)}
       onSave={async (val) => {
-        await editPersona.mutateAsync(val);
+        await editPersona.mutateAsync({ personaId: id, payload: val });
         setIsEditing(false);
       }}
       loading={editPersona.isPending}
@@ -165,7 +165,7 @@ const Persona = (props: PersonaSchemaType) => {
           <DropdownMenu.Item
             type='danger-with-confirmation'
             icon={<HiOutlineTrash />}
-            onSelect={() => deletePersona.mutate()}
+            onSelect={() => deletePersona.mutate(id)}
           >
             Delete
           </DropdownMenu.Item>

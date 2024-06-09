@@ -25,7 +25,7 @@ export const MessagesHistory = ({ }: MessagesHistoryProps) => {
   };
 
   const onEditMessage = (node: MessageTreeNode, text: string, regenerateResponse: boolean) => {
-    editMessage.mutateAsync({ messageId: node.message.id, text, regenerateResponse }).then(() => {
+    editMessage.mutateAsync({ chatId, payload: { messageId: node.message.id, text, regenerateResponse } }).then(() => {
       if (regenerateResponse) {
         const parentId = node.parent ? node.parent.message.id : 'root';
         const parentChildren = node.parent ? node.parent.children : messagesTree;
@@ -39,10 +39,10 @@ export const MessagesHistory = ({ }: MessagesHistoryProps) => {
   const { chatId, messagesTree, treeChoices, setTreeChoices, chatInfo, setMessageText, sendMessage } = useChatPageContext();
 
   const { data: personas } = usePersonas();
-  const regenerateMessage = useRegenerateMessageMutation(chatId);
-  const duplicateMessage = useDuplicateMessageMutation(chatId);
-  const editMessage = useEditMessageMutation(chatId);
-  const deleteMessage = useDeleteMessageMutation(chatId);
+  const regenerateMessage = useRegenerateMessageMutation();
+  const duplicateMessage = useDuplicateMessageMutation();
+  const editMessage = useEditMessageMutation();
+  const deleteMessage = useDeleteMessageMutation();
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const shouldControlScrollRef = useRef(true);
@@ -81,7 +81,7 @@ export const MessagesHistory = ({ }: MessagesHistoryProps) => {
           return `${persona.name} (${message.senderName})`;
         }
       }
-        
+
       return message.senderName;
     })
     const sender = <>
@@ -108,7 +108,7 @@ export const MessagesHistory = ({ }: MessagesHistoryProps) => {
         onEdit: (text, regenerateMessage) => onEditMessage(node, text, regenerateMessage),
       },
       onDelete: (isSingleRootMessage || isSingleAiMessage) ? undefined : async () => {
-        await deleteMessage.mutateAsync(message.id);
+        await deleteMessage.mutateAsync({ chatId, messageId: message.id });
         const treeChoiceOutOfBounds = (treeChoices[parentId] ?? 0) > (parentChildren.length - 2) && parentChildren.length > 1;
         if (treeChoiceOutOfBounds) {
           setTreeChoices((p) => produce(p, (draft) => {
@@ -122,13 +122,13 @@ export const MessagesHistory = ({ }: MessagesHistoryProps) => {
     } : {
       ...sharedActions,
       onRegenerate: async () => {
-        await regenerateMessage.mutateAsync({ messageId: message.id });
+        await regenerateMessage.mutateAsync({ chatId, messageId: message.id });
         setTreeChoices((p) => produce(p, (draft) => {
           draft[parent!.message.id] = parent!.children.length;
         }));
       },
       onDuplicate: message.error ? undefined : async () => {
-        await duplicateMessage.mutateAsync({ messageId: message.id })
+        await duplicateMessage.mutateAsync({ chatId, messageId: message.id })
         setTreeChoices((p) => produce(p, (draft) => {
           draft[parent!.message.id] = parent!.children.length;
         }));

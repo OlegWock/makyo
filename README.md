@@ -30,6 +30,8 @@ And then run container with docker compose (might require using sudo, depending 
 docker-compose up -d
 ```
 
+**Note:** if hosting behind nginx (or other reverse proxy), make sure to increase `proxy_read_timeout` (or equivalent for your proxy) to allow for SSE and WebSockets to work properly.
+
 ## Local development
 
 **Due to usage of pre-compiled SQLite extensions, local development only supported for Mac OS on ARM and Linux (ARM/x64).**

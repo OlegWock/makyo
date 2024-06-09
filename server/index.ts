@@ -84,5 +84,9 @@ export type ApiType = typeof router;
 export default {
   port: 8440,
   fetch: app.fetch,
-  websocket: bunWebSocket,
+  websocket: {
+    ...bunWebSocket,
+    idleTimeout: 960, // max value (seconds)
+    maxPayloadLength: 1024 * 1024 * 128,
+  },
 };
