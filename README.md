@@ -5,6 +5,7 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 
 ## Roadmap
 
+- [ ] Mark persona as deafult (will be preselected when creating chat)
 - [ ] Multimodal (start with vision, maybe expand to image generation) LLMs support
   Ref [MULTIMODALITY.md](/MULTIMODALITY.md)
 - [ ] Models management UI for Ollama (pull, remove, create from Modelfile)
