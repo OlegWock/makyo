@@ -12,6 +12,7 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 - [ ] Allow setting user message for personas
 - [ ] Semantic/vector search across messages
 - [ ] Autocomplete for snippets when user types `/` or `@`
+- [ ] Support for Google provider
 - [ ] Support for perplexity.ai provider (with citations)
 
 

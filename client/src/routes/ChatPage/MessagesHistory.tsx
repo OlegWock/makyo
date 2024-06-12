@@ -25,7 +25,7 @@ export const MessagesHistory = ({ }: MessagesHistoryProps) => {
   };
 
   const onEditMessage = (node: MessageTreeNode, text: string, regenerateResponse: boolean) => {
-    editMessage.mutateAsync({ chatId, payload: { messageId: node.message.id, text, regenerateResponse } }).then(() => {
+    editMessage.mutateAsync({ chatId, payload: { messageId: node.message.id, text, regenerateResponse } }).then((resp) => {
       if (regenerateResponse) {
         const parentId = node.parent ? node.parent.message.id : 'root';
         const parentChildren = node.parent ? node.parent.children : messagesTree;

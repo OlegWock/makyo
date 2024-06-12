@@ -27,5 +27,9 @@
       background: var(--jade-2);
       color: var(--jade-11);
     }
+
+    &:last-child:not(:nth-child(2n)) {
+      grid-column: 1/3;
+    }
   }
 }

@@ -73,7 +73,7 @@ export const buildTreeFromMessages = (messages: MessageSchemaType[]) => {
     return node;
   };
 
-  return rootMessages.map(message => createNode(message, null));
+  return rootMessages.map(message => createNode(message, null)).sort((a, b) => a.message.createdAt - b.message.createdAt);
 };
 
 export const getLastMessage = (tree: MessageTreeNode[], treeChoices: PreferredTreeBranchesMap): MessageTreeNode => {

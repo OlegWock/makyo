@@ -23,6 +23,13 @@ export const SelectionMenu = ({ targetRef, onClick }: SelectionMenuProps) => {
     setIsOpen(false);
   };
 
+  const handleSearch = () => {
+    const text = rangeRef.current?.toString();
+    if (text) {
+      window.open(`https://www.google.com/search?q=${encodeURIComponent(text)}`, '_blank');
+    }
+  };
+
   const isMouseDownRef = useRef(false);
   const [isOpen, setIsOpen] = useState(false);
   const rangeRef = useRef<Range | null>(null);
@@ -128,6 +135,9 @@ export const SelectionMenu = ({ targetRef, onClick }: SelectionMenuProps) => {
         onClick={() => handleClick(`<##text##> isn't relevant here.`)}
       >
         Not relevant
+      </button>
+      <button onClick={handleSearch}>
+        Google
       </button>
     </div>;
   }
