@@ -48,6 +48,15 @@ class AnthropicProvider extends Provider {
         },
       },
       {
+        id: 'claude-3-5-sonnet-20240620',
+        name: 'Claude 3.5 Sonnet',
+        availableParameters: ['system', 'temperature'],
+        defaultParameters: {
+          system: undefined,
+          temperature: undefined,
+        },
+      },
+      {
         id: 'claude-3-sonnet-20240229',
         name: 'Claude 3 Sonnet',
         availableParameters: ['system', 'temperature'],

@@ -6,6 +6,7 @@ import type { Element } from 'hast';
 export type CodeBlockProps = ComponentPropsWithoutRef<"code"> & { node?: Element | undefined };
 
 export const CodeBlock = (props: CodeBlockProps) => {
+  // TODO: add copy button
   const { children, className, node, ...rest } = props;
   const match = /language-(\w+)/.exec(className || '');
   return match ? (

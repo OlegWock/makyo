@@ -91,6 +91,7 @@ export { useSubscriptionClient };
 
 const USE_SSE = true;
 
+// TODO: add some kind of indicator when subscription isn't connected?
 export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   const api = useApiClient();
   const queryClient = useQueryClient();
