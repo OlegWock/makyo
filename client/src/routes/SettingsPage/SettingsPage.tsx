@@ -21,7 +21,7 @@ export const SettingsPage = withErrorBoundary(() => {
 
           <div className={styles.status}>{openai.enabled ? <HiOutlineCheckCircle /> : <HiNoSymbol />} OpenAI – {openai.enabled ? 'enabled' : 'API key not set'}</div>
           <div className={styles.status}>{anthropic.enabled ? <HiOutlineCheckCircle /> : <HiNoSymbol />} Anthropic – {anthropic.enabled ? 'enabled' : 'API key not set'}</div>
-          <div className={styles.status}>{ollama.enabled ? <HiOutlineCheckCircle /> : <HiNoSymbol />} Ollama – {ollama.enabled ? `enabled${localOllamaProxyEnabled ? '(through proxy in browser)' : ''}` : 'disabled'}</div>
+          <div className={styles.status}>{ollama.enabled ? <HiOutlineCheckCircle /> : <HiNoSymbol />} Ollama – {ollama.enabled ? `enabled${localOllamaProxyEnabled ? ' (through proxy in browser)' : ''}` : 'disabled'}</div>
         </section>
 
         {ollama.enabled && <section>
