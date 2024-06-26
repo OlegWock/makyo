@@ -1,0 +1,52 @@
+.CheckboxWrapper {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+
+  &:not([data-disabled]) {
+
+    button,
+    label {
+      cursor: pointer;
+    }
+  }
+
+  &[data-disabled] {
+
+    button,
+    label {
+      cursor: not-allowed;
+    }
+
+    color: var(--gray-6);
+  }
+
+  .checkbox {
+    background-color: white;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--jade-10);
+
+    &[data-state="checked"] {
+      background-color: var(--jade-10);
+
+      &:hover {
+        background-color: var(--jade-9);
+      }
+    }
+
+    &:hover {
+      background-color: var(--jade-2);
+    }
+
+    .indicator {
+      color: var(--jade-11);
+      display: flex;
+      color: white;
+    }
+  }
+}

@@ -28,6 +28,7 @@ CREATE TABLE `message` (
 --> statement-breakpoint
 CREATE TABLE `persona` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`isStarred` integer DEFAULT false NOT NULL,
 	`name` text NOT NULL,
 	`avatar` text NOT NULL,
 	`providerId` text,

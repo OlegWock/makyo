@@ -43,6 +43,7 @@ export const snippet = sqliteTable('snippet', {
 
 export const persona = sqliteTable('persona', {
   id: integer('id').primaryKey({ autoIncrement: true }),
+  isDefault: integer('isStarred', { mode: 'boolean' }).notNull().default(false),
   name: text('name').notNull(),
   avatar: text('avatar').notNull(),
   providerId: text('providerId'),

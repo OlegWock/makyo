@@ -85,11 +85,20 @@
     font-size: 2rem;
     padding: 0.5rem;
     line-height: 1;
+    position: relative;
   }
 
   .name {
     font-size: 1.5rem;
     flex-grow: 1;
+
+    .defaultIndicator {
+      color: var(--gray-8);
+      margin-left: 1.5rem;
+      font-size: 1rem;
+      transform: translateY(-0.1em);
+      display: inline-block;
+    }
   }
 
   .menuButton {

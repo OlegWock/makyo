@@ -4,6 +4,7 @@ export const PersonaSchema = z.object({
   id: z.number(),
   name: z.string(),
   avatar: z.string(),
+  isDefault: z.boolean(),
   system: z.string().nullable(),
   temperature: z.number().nullable(),
   providerId: z.string().nullable(),

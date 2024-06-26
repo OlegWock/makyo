@@ -1,7 +1,7 @@
 import { ChatLayout } from '@client/components/ChatLayout';
 import styles from './RootPage.module.scss';
 import { useChats, useModels, useNewChatMutation, usePersonas } from '@client/api';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useAtom } from 'jotai/react';
 import { lastUsedModelAtom } from '@client/atoms/chat';
 import { withErrorBoundary } from '@client/components/ErrorBoundary';
@@ -77,6 +77,13 @@ export const RootPage = withErrorBoundary(() => {
   const { data: personas } = usePersonas();
 
   usePageTitle('New chat');
+
+  useEffect(() => {
+    const defaultPersona = personas.find(p => p.isDefault);
+    if (defaultPersona) {
+      applyPersona(defaultPersona);
+    }
+  }, []);
 
   return (<div className={styles.RootPage}>
     <Card flexGrow withScrollArea={false}>

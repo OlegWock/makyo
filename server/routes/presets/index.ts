@@ -252,12 +252,18 @@ export const presetsRouter = new OpenAPIHono()
   })
   .openapi(createPersona, async (c) => {
     const personaPayload = c.req.valid('json');
+    if (personaPayload.isDefault) {
+      await db.update(persona).set({isDefault: false}).where(eq(persona.isDefault, true)).returning();
+    }
     const [personaFromDb] = await db.insert(persona).values(personaPayload).returning();
     return c.json(serialize(personaFromDb));
   })
   .openapi(updatePersona, async (c) => {
     const { personaId } = c.req.valid('param');
     const personaPayload = c.req.valid('json');
+    if (personaPayload.isDefault) {
+      await db.update(persona).set({isDefault: false}).where(eq(persona.isDefault, true)).returning();
+    }
     const [personaFromDb] = await db.update(persona).set(personaPayload).where(eq(persona.id, personaId)).returning();
     return c.json(serialize(personaFromDb));
   })

@@ -1,7 +1,7 @@
 import { Card } from '@client/components/Card';
 import styles from './PersonasPage.module.scss';
 import { Button } from '@client/components/Button';
-import { HiOutlinePencil, HiOutlineTrash, HiPlus } from 'react-icons/hi2';
+import { HiMiniStar, HiOutlinePencil, HiOutlineTrash, HiPlus } from 'react-icons/hi2';
 import { lazy, Suspense, useMemo, useState } from 'react';
 import { usePageTitle } from '@client/utils/hooks';
 import { PersonaInSchemaType, PersonaSchemaType } from '@server/schemas/personas';
@@ -16,6 +16,7 @@ import { DropdownMenu } from '@client/components/DropdownMenu';
 import { HiOutlineDotsVertical } from 'react-icons/hi';
 import clsx from 'clsx';
 import { ModelSelect } from '@client/components/ModelSelect';
+import { Checkbox } from '@client/components/Checkbox';
 
 const LazyEmojiPopover = lazy(() => import('@client/components/EmojiPopover').then(m => ({ default: m.EmojiPopover })));
 
@@ -36,6 +37,7 @@ const PersonaForm = ({ onCancel, onSave, loading, defaultValue, title }: Persona
   const [personaAvatar, setPersonaAvatar] = useState(defaultValue?.avatar ?? '👩🏻‍🦰');
   const [personaSystem, setPersonaSystem] = useState(defaultValue?.system ?? null);
   const [personaTemperature, setPersonaTemperature] = useState(defaultValue?.temperature ?? null);
+  const [isDefault, setIsDefault] = useState(defaultValue?.isDefault ?? false);
 
   return (<div className={styles.newPersonaWizard}>
     <div className={styles.formTitle}>{title}</div>
@@ -106,6 +108,8 @@ const PersonaForm = ({ onCancel, onSave, loading, defaultValue, title }: Persona
       precision={2}
     />}
 
+    <Checkbox checked={isDefault} onCheckedChange={setIsDefault}>Set as default persona</Checkbox>
+
     <div className={styles.actions}>
       <Button
         variant='primary'
@@ -118,6 +122,7 @@ const PersonaForm = ({ onCancel, onSave, loading, defaultValue, title }: Persona
           modelId: personaModelId,
           system: personaSystem,
           temperature: personaTemperature,
+          isDefault,
         })}
       >
         Save
@@ -133,7 +138,7 @@ const PersonaForm = ({ onCancel, onSave, loading, defaultValue, title }: Persona
 };
 
 const Persona = (props: PersonaSchemaType) => {
-  const { id, avatar, name } = props;
+  const { id, avatar, name, isDefault } = props;
   const [isEditing, setIsEditing] = useState(false);
 
   const editPersona = useEditPersonaMutation();
@@ -152,7 +157,7 @@ const Persona = (props: PersonaSchemaType) => {
     />}
     {!isEditing && <>
       <div className={styles.avatar}>{avatar}</div>
-      <div className={styles.name}>{name}</div>
+      <div className={styles.name}>{name}{isDefault && <span className={styles.defaultIndicator}>default</span>}</div>
       <DropdownMenu
         menu={<>
           <DropdownMenu.Item
