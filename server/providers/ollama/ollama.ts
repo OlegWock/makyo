@@ -9,6 +9,16 @@ class OllamaProvider extends Provider {
   name = 'Ollama';
   type: ProviderType = 'local';
 
+  #getApiClient() {
+    const host = process.env.MAKYO_OLLAMA_HOST ?? undefined;
+    const localProxy = ['1', 'true'].includes(process.env.VITE_MAKYO_OLLAMA_USE_LOCAL_PROXY ?? '');
+    if (!host && !localProxy) {
+      throw new Error(`Ollama provider isn't enabled`);
+    }
+    const ollama = new Ollama({ host, fetch: ollamaFetch.current ?? undefined });
+    return ollama;
+  }
+
   async #getConfiguration() {
     const host = process.env.MAKYO_OLLAMA_HOST ?? undefined;
     const localProxy = ['1', 'true'].includes(process.env.VITE_MAKYO_OLLAMA_USE_LOCAL_PROXY ?? '');
@@ -21,8 +31,7 @@ class OllamaProvider extends Provider {
     }
 
     try {
-      console.log('Get ollama configuration. Is proxy active:', !!ollamaFetch.current);
-      const ollama = new Ollama({ host, fetch: ollamaFetch.current ?? undefined });
+      const ollama = this.#getApiClient();
       const { models } = await ollama.list();
 
       return {
@@ -79,6 +88,17 @@ class OllamaProvider extends Provider {
         temperature: undefined,
       },
     }));
+  }
+
+  async getModelsWithDetails() {
+    const ollama = this.#getApiClient();
+    const { models } = await ollama.list();
+    return models;
+  }
+
+  async deleteModel(id: string) {
+    const ollama = this.#getApiClient();
+    await ollama.delete({ model: id });
   }
 }
 

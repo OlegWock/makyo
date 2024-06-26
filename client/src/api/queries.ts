@@ -55,6 +55,9 @@ export const useSnippetsNonBlocking = createQueryHook(['snippets'], (api) => api
 
 export const usePersonas = createSuspenseQueryHook(['personas'], (api) => api.personas.$get())
 
+
+export const useOllamaModels = createSuspenseQueryHook(['ollama', 'models'], (api) => api.providers.ollama.models.$get());
+
 // ------------------------------------------------------------------
 
 const createMutationHook = <In, Out>({ mutation, onSuccess, invalidate }: {
@@ -201,7 +204,7 @@ export const useNewSnippetMutation = createMutationHook({
 });
 
 export const useEditSnippetMutation = createMutationHook({
-  mutation: (api, {snippetId, payload}: {snippetId: number, payload: Partial<SnippetInSchemaType>}) => api.snippets[":snippetId"].$patch({
+  mutation: (api, { snippetId, payload }: { snippetId: number, payload: Partial<SnippetInSchemaType> }) => api.snippets[":snippetId"].$patch({
     param: { snippetId: snippetId.toString() },
     json: payload,
   }),
@@ -239,7 +242,7 @@ export const useNewPersonaMutation = createMutationHook({
 });
 
 export const useEditPersonaMutation = createMutationHook({
-  mutation: (api, {personaId, payload}: {personaId: number, payload: Partial<PersonaInSchemaType>}) => {
+  mutation: (api, { personaId, payload }: { personaId: number, payload: Partial<PersonaInSchemaType> }) => {
     return api.personas[":personaId"].$patch({
       param: { personaId: personaId.toString() },
       json: payload,
@@ -267,3 +270,16 @@ export const useDeletePersonaMutation = createMutationHook({
     client.setQueryData(['personas'], () => data);
   },
 });
+
+export const useDeleteOllamaModelMutation = createMutationHook({
+  mutation: (api, modelId: string) => api.providers.ollama.models[":modelId"].$delete({
+    param: { modelId },
+  }),
+  invalidate: [
+    ['models'],
+  ],
+  onSuccess(client, data) {
+    client.setQueryData(['ollama', 'models'], () => data);
+  },
+});
+

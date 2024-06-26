@@ -1,6 +1,7 @@
-import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { allProviders } from "@server/providers";
 import { createProxiedFetch, ollamaFetch } from "@server/providers/ollama/proxy";
+import { ollamaRouter } from "@server/routes/providers/ollama";
 import { ModelResponseSchema } from "@server/schemas/provider";
 import { broadcastSubscriptionMessage } from "@server/utils/subscriptions";
 import { upgradeWebSocket } from "@server/utils/websockets";
@@ -55,6 +56,6 @@ export const providersRouter = new OpenAPIHono()
       }
       return handlers;
     }),
-  );
+  ).route('/', ollamaRouter);
 
 

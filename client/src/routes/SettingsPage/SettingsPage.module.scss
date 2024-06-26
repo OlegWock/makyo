@@ -15,7 +15,7 @@
       max-width: 600px;
       display: flex;
       flex-direction: column;
-      gap: 2rem;
+      gap: 1rem;
 
       .sectionTitle {
         font-size: 2rem;
@@ -39,6 +39,37 @@
           height: 1.5rem;
           width: auto;
         }
+      }
+    }
+  }
+}
+
+.OllamaSettings {
+  .models {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .modelCard {
+      flex-direction: row;
+      justify-content: space-between;
+
+      &.ghost {
+        pointer-events: none;
+        opacity: 0.65;
+      }
+
+      .menuButton {
+        color: var(--gray-8);
+      }
+
+      .modelTag {
+        color: var(--gray-9);
+      }
+  
+      .modelSize {
+        margin-left: 0.75rem;
+        color: var(--gray-9);
       }
     }
   }

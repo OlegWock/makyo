@@ -10,13 +10,13 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
   We already store messages as tree, why not let user see this in UI
 - [ ] Multimodal (start with vision, maybe expand to image generation) LLMs support
   Ref [MULTIMODALITY.md](/MULTIMODALITY.md)
-- [ ] Models management UI for Ollama (pull, remove, create from Modelfile)
 - [ ] Speech to text for user messages
-- [ ] Allow setting user message for personas
-- [ ] Semantic/vector search across messages
 - [ ] Autocomplete for snippets when user types `/` or `@`
 - [ ] Support for Google provider
 - [ ] Support for perplexity.ai provider (with citations)
+- [ ] Semantic/vector search across messages
+- [ ] Allow setting user message for personas
+- [ ] Models management UI for Ollama: pull and create from Modelfile
 
 
 ## Deploy
