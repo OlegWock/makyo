@@ -5,7 +5,7 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 
 ## Roadmap
 
-
+- [ ] Slow is VERY slow with sufficient database size and short 1-2 letter queries
 - [ ] Tree like structure for messages window?
   We already store messages as tree, why not let user see this in UI
 - [ ] Multimodal (start with vision, maybe expand to image generation) LLMs support
