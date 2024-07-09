@@ -10,7 +10,7 @@ services:
       - "8440:8440" 
     restart: unless-stopped 
     volumes:
-      - ./makyo.db:/usr/src/data/makyo.db
+      - ./makyo:/usr/src/data
 
     # Create your own .env based on .env.example
     env_file:
