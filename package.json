@@ -11,7 +11,7 @@
     "drizzle:schema": "bunx drizzle-kit generate",
     "drizzle:migrate": "bun run ./server/db/migrate.ts",
     "drizzle:seed": "bun run ./server/db/seed.ts",
-    "drizzle:nuke": "rm -f ${MAKYO_DB_PATH:-makyo.db} && rm -rf ./server/db/drizzle && bun run drizzle:schema && bun run drizzle:migrate && bun run drizzle:seed",
+    "drizzle:nuke": "rm -f ${MAKYO_DATA_FOLDER}/makyo.db && rm -rf ./server/db/drizzle && bun run drizzle:schema && bun run drizzle:migrate && bun run drizzle:seed",
     "typecheck": "tsc --noEmit -p server/tsconfig.json && tsc --noEmit -p client/tsconfig.json"
   },
   "dependencies": {

@@ -6,7 +6,7 @@ set -e
 
 
 echo "Nuking database"
-rm -f ${MAKYO_DB_PATH} 
+rm -rf ${MAKYO_DATA_FOLDER}/makyo.db
 
 echo "Migrating database"
 bun run drizzle:migrate

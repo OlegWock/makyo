@@ -24,7 +24,7 @@ FROM base AS prerelease
 FROM base AS release
   ENV NODE_ENV=production
   ENV MAKYO_FRONTEND_FILES_PATH=./client
-  ENV MAKYO_DB_PATH=/usr/src/data/makyo.db
+  ENV MAKYO_DATA_FOLDER=/usr/src/data
 
   COPY --from=install-production /temp/production/node_modules node_modules
   COPY --from=prerelease /usr/src/app/package.json .
