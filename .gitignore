@@ -177,6 +177,6 @@ dist
 .vscode/*
 !.vscode/extensions.json
 
-makyo.db
+makyo/
 .env.local
 .env
