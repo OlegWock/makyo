@@ -12,8 +12,7 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
   Ref [MULTIMODALITY.md](/MULTIMODALITY.md)
 - [ ] Speech to text for user messages
 - [ ] Autocomplete for snippets when user types `/` or `@`
-- [ ] Support for Google provider
-- [ ] Support for perplexity.ai provider (with citations)
+- [ ] Migrate current cloud providers to single OpenRouter provider
 - [ ] Semantic/vector search across messages
 - [ ] Allow setting user message for personas
 - [ ] Models management UI for Ollama: pull and create from Modelfile

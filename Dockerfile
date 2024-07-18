@@ -1,4 +1,4 @@
-FROM oven/bun:1 as base
+FROM oven/bun:1 AS base
   WORKDIR /usr/src/app
 
 FROM base AS install-dev
@@ -16,7 +16,7 @@ FROM base AS prerelease
   COPY . .
   ENV NODE_ENV=production
   ARG VITE_MAKYO_OLLAMA_USE_LOCAL_PROXY=${VITE_MAKYO_OLLAMA_USE_LOCAL_PROXY}
-  ENV VITE_MAKYO_OLLAMA_USE_LOCAL_PROXY ${VITE_MAKYO_OLLAMA_USE_LOCAL_PROXY}
+  ENV VITE_MAKYO_OLLAMA_USE_LOCAL_PROXY=${VITE_MAKYO_OLLAMA_USE_LOCAL_PROXY}
   # Might be good idea to bundle backend into single file, but this doesn't seem to work for some reason
   # RUN bun build --target=bun server/index.ts --outdir ./server/dist
   RUN bun run client:build
