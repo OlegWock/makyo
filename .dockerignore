@@ -1,0 +1,4 @@
+node_modules
+makyo
+.env.local
+.env

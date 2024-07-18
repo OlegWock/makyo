@@ -12,8 +12,8 @@ FROM base AS install-production
   RUN cd /temp/production && bun install --frozen-lockfile --production
 
 FROM base AS prerelease
-  COPY --from=install-dev /temp/dev/node_modules node_modules
   COPY . .
+  COPY --from=install-dev /temp/dev/node_modules node_modules
   ENV NODE_ENV=production
   ARG VITE_MAKYO_OLLAMA_USE_LOCAL_PROXY=${VITE_MAKYO_OLLAMA_USE_LOCAL_PROXY}
   ENV VITE_MAKYO_OLLAMA_USE_LOCAL_PROXY=${VITE_MAKYO_OLLAMA_USE_LOCAL_PROXY}
