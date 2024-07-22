@@ -28,6 +28,7 @@ export const SelectionMenu = ({ targetRef, onClick }: SelectionMenuProps) => {
     if (text) {
       window.open(`https://www.google.com/search?q=${encodeURIComponent(text)}`, '_blank');
     }
+    setIsOpen(false);
   };
 
   const isMouseDownRef = useRef(false);

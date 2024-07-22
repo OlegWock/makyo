@@ -4,26 +4,40 @@ import { withErrorBoundary } from '@client/components/ErrorBoundary';
 import { Card } from '@client/components/Card';
 import { usePageTitle } from '@client/utils/hooks';
 import { ChatCard } from '@client/components/ChatCard';
-import { Suspense, useDeferredValue, useMemo } from 'react';
+import { RefObject, Suspense, useDeferredValue, useMemo, useRef } from 'react';
 import { Input } from '@client/components/Input';
 import { MessageCard } from '@client/components/MessageCard';
 import { useSearchParams } from '@client/components/Router/hooks';
 import { Empty } from '@client/components/Empty';
+import { Virtuoso, ListProps } from 'react-virtuoso'
+import { ChatSchemaType, MessageSearchResultSchemaType, SearchResultSchemaType } from '@shared/api';
+import clsx from 'clsx';
+
+
+const VirtuosoList = (props: ListProps) => {
+  return (<div className={clsx(styles.searchResultsList)} {...props} />)
+}
+
+const VirtualizedResults = ({ items }: { items: (SearchResultSchemaType | ChatSchemaType)[] }) => {
+  if (items.length === 0) return <Empty />;
+
+  return (<Virtuoso
+    className={styles.searchResultsWrapper}
+    totalCount={items.length}
+    components={{ List: VirtuosoList }}
+    itemContent={index => {
+      const r = items[index];
+      const type = 'type' in r ? r.type : 'chat';
+      return type === 'chat'
+        ? <ChatCard key={type + r.id} chat={r as ChatSchemaType} />
+        : <MessageCard key={type + r.id} message={r as MessageSearchResultSchemaType} />;
+    }}
+  />);
+};
 
 const SearchResults = ({ query }: { query: string }) => {
   const search = useSearch(query);
-  return <>
-    {search.data.length === 0 && <Empty />}
-    {search.data.map(r => {
-      if (r.type === 'chat') {
-        return (<ChatCard
-          key={'chat' + r.id}
-          chat={r}
-        />);
-      }
-      return (<MessageCard key={'message' + r.id} message={r} />);
-    })}
-  </>
+  return (<VirtualizedResults items={search.data} />);
 };
 
 export const ChatsPage = withErrorBoundary(() => {
@@ -39,7 +53,7 @@ export const ChatsPage = withErrorBoundary(() => {
 
   usePageTitle('All chats');
 
-  return (<Card flexGrow>
+  return (<Card flexGrow withScrollArea={false}>
     <div className={styles.ChatsPage}>
       <div className={styles.content}>
         <div className={styles.title}>All chats</div>
@@ -50,17 +64,10 @@ export const ChatsPage = withErrorBoundary(() => {
           placeholder='Search...'
         />
         <Suspense>
-          {!!params.query ? <SearchResults query={deferredSearchQuery} /> : <>
-            {sortedChats.length === 0 && <div>
-              <Empty text='No chats yet' />
-            </div>}
-            {sortedChats.map((chat) => {
-              return (<ChatCard
-                key={chat.id}
-                chat={chat}
-              />);
-            })}
-          </>}
+          {!!params.query
+            ? <SearchResults query={deferredSearchQuery} />
+            : <VirtualizedResults items={sortedChats} />
+          }
         </Suspense>
       </div>
     </div>

@@ -6,6 +6,7 @@ import { m, type MotionProps } from 'framer-motion';
 
 export type CardProps = {
   withScrollArea?: boolean;
+  
   padding?: 'small' | 'medium';
   flexGrow?: boolean;
   className?: string;

@@ -5,17 +5,28 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 
 ## Roadmap
 
-- [ ] Slow is VERY slow with sufficient database size and short 1-2 letter queries
-- [ ] Tree like structure for messages window?
-  We already store messages as tree, why not let user see this in UI
-- [ ] Multimodal (start with vision, maybe expand to image generation) LLMs support
+Top priority:
+* Fix lags on search
+* Migrate from OpenAI/Anthropic libraries to using OpenRouter for both
+* Tree interface for messaging (using react flow)
+
+---
+
+Nice to have:
+- Multimodal (start with vision, maybe expand to image generation) LLMs support
   Ref [MULTIMODALITY.md](/MULTIMODALITY.md)
-- [ ] Speech to text for user messages
-- [ ] Autocomplete for snippets when user types `/` or `@`
-- [ ] Migrate current cloud providers to single OpenRouter provider
-- [ ] Semantic/vector search across messages
-- [ ] Allow setting user message for personas
-- [ ] Models management UI for Ollama: pull and create from Modelfile
+- Long term memory. 
+  `@remember` or something to add fact to LLM memory. Not sure how to implement though
+- RAG
+    - Ability to create ‘folders’ and upload documents there
+    - Ability to share folder with a persona/specific chat
+    - Use RAG to answer questions related to the documents
+- Plugins / functions calling
+    - Like search in google or make calls to API and so on
+- Autocomplete for snippets when user types `/` or `@`
+- Allow setting user message for personas
+- Speech to text for user messages
+- Models management UI for Ollama: pull and create from Modelfile
 
 
 ## Deploy

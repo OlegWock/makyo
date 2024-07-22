@@ -1,7 +1,18 @@
 import { db } from './index';
+import { generate } from "random-words";
 import * as schema from './schema';
+import type { InferInsertModel } from 'drizzle-orm';
 
 // TODO: ensure that seed is run only once (i.e. not run when rolling update)
+
+const menuSnippet = `I need to make a menu for a week for a family of 3. My requirements are:
+1. It should be possible to prepare big portions of dish, at least for 2 days worth (so, 12 potions)
+2. It shouldn't take more than 2 hours to prepare something
+3. It should be relatively healthy, with more focus on proteins (meat and fish) and fiber than carbs. 
+
+We don't have dietary restrictions. I'm looking for 3-4 dishes for week. We have stove and oven. I'm experienced cook.
+
+Please ask a list of clarifying questions which are absolutely required to create a menu and then write at least 12 dish options according to answers and requirements.`;
 
 await db.insert(schema.snippet).values([
   { 
@@ -23,6 +34,11 @@ await db.insert(schema.snippet).values([
     name: 'Simplify',
     shortcut: '/simplify',
     text: `Rewrite your last message in more simple terms. Avoid using extravagant adjectives.`,
+  },
+  {
+    name: 'Menu planning',
+    shortcut: '/menu',
+    text: menuSnippet
   }
 ]);
 
@@ -88,5 +104,26 @@ await db.insert(schema.persona).values([
     temperature: 0.95,
   }
 ]);
+
+for (let i = 0; i < 200; i++) {
+  const [chat] = await db.insert(schema.chat).values({
+    title: (generate(3) as string[]).join(' '),
+    providerId: '',
+    modelId: '',
+    system: '',
+    temperature: 1,
+  }).returning();
+
+  const messages = new Array(200).fill(null).map((_, ind): InferInsertModel<typeof schema.message> => {
+    return {
+      text: (generate(50) as string[]).join(' '),
+      senderName: ind % 2 === 0 ? 'LLM' : 'user',
+      sender: ind % 2 === 0 ? 'ai' : 'user',
+      chatId: chat.id,
+    };
+  });
+
+  await db.insert(schema.message).values(messages).returning();
+}
 
 console.log(`Seeding complete.`);
