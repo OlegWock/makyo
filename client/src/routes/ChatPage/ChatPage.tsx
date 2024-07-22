@@ -1,10 +1,8 @@
-import { ChatLayout, ChatLayoutImperativeHandle } from '@client/components/ChatLayout';
 import styles from './ChatPage.module.scss';
 import { useStrictRouteParams } from '@client/utils/routing';
 import { z } from 'zod';
 import { useChat, useSendMessageMutation, useEditChatMutation } from '@client/api';
 import { useMemo, useRef, useState } from 'react';
-import { MessagesHistory } from './MessagesHistory';
 import { ChatPageContextProvider } from './context';
 import { buildTreeFromMessages, getLastMessage, useTreeChoices, walkOverAllMessagesInTree } from './tree';
 import { withErrorBoundary } from '@client/components/ErrorBoundary';
@@ -18,6 +16,7 @@ import { useSearchParams } from '@client/components/Router/hooks';
 import { produce } from 'immer';
 import { Drawer } from '@client/components/Drawer';
 import { useIsMobile } from '@client/utils/responsive';
+import { FlowHistory } from './FlowHistory';
 
 
 export const ChatPage = withErrorBoundary(() => {
@@ -29,7 +28,6 @@ export const ChatPage = withErrorBoundary(() => {
   const [searchParams] = useSearchParams();
   const defaultScrollTo = searchParams.messageId ? parseInt(searchParams.messageId) : undefined;
   const ref = useRef<HTMLDivElement>(null);
-  const chatLayoutRef = useRef<ChatLayoutImperativeHandle>(null);
 
   usePageTitle(chatInfo.chat.title);
 
@@ -108,7 +106,7 @@ export const ChatPage = withErrorBoundary(() => {
     treeChoices,
     setTreeChoices,
     providerId: chatInfo.chat.providerId,
-    setMessageText: (text) => chatLayoutRef.current?.setText(text),
+    setMessageText: (text) => {/* TODO: implement this? */ },
     sendMessage: (text) => {
       sendMessage.mutate({
         chatId: id,
@@ -121,69 +119,59 @@ export const ChatPage = withErrorBoundary(() => {
   }}>
     <div className={styles.ChatPage} ref={ref}>
       <Card flexGrow withScrollArea={false}>
-        <ChatLayout
-          imperativeHandle={chatLayoutRef}
-          onSend={(text) => {
-            sendMessage.mutate({
-              chatId: id,
-              payload: {
-                text,
-                parentId: lastMessage.message.id,
-              }
-            })
-          }}
-        >
-          <ChatLayout.Title>
-            <div className={styles.titleWrapper}>
-              {isEditingTitle ? (<>
-                <Input className={styles.titleInput} value={titleDraft} onValueChange={setTitleDraft} autoFocus />
-                <Button
-                  key='save'
-                  size='medium'
-                  variant='primary'
-                  loading={editChat.isPending}
-                  onClick={async () => {
-                    await editChat.mutateAsync({ chatId: id, payload: { title: titleDraft } });
-                    setIsEditingTitle(false);
-                  }}
-                >
-                  Save
-                </Button>
-                <Button
-                  size='medium'
-                  onClick={() => setIsEditingTitle(false)}
-                >
-                  Cancel
-                </Button>
-              </>) : (<>
-                {chatInfo.chat.title}
-                <Button
-                  key='edit'
-                  variant='borderless'
-                  className={styles.editButton}
-                  icon={<HiOutlinePencil />}
-                  size='small'
-                  onClick={() => {
-                    setIsEditingTitle(true);
-                    setTitleDraft(chatInfo.chat.title);
-                  }}
-                />
-              </>)}
+        <div className={styles.layout}>
+          <div className={styles.header}>
+            <div className={styles.leftActions}></div>
+            <div className={styles.title}>
+              <div className={styles.titleWrapper}>
+                {isEditingTitle ? (<>
+                  <Input className={styles.titleInput} value={titleDraft} onValueChange={setTitleDraft} autoFocus />
+                  <Button
+                    key='save'
+                    size='medium'
+                    variant='primary'
+                    loading={editChat.isPending}
+                    onClick={async () => {
+                      await editChat.mutateAsync({ chatId: id, payload: { title: titleDraft } });
+                      setIsEditingTitle(false);
+                    }}
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    size='medium'
+                    onClick={() => setIsEditingTitle(false)}
+                  >
+                    Cancel
+                  </Button>
+                </>) : (<>
+                  {chatInfo.chat.title}
+                  <Button
+                    key='edit'
+                    variant='borderless'
+                    className={styles.editButton}
+                    icon={<HiOutlinePencil />}
+                    size='small'
+                    onClick={() => {
+                      setIsEditingTitle(true);
+                      setTitleDraft(chatInfo.chat.title);
+                    }}
+                  />
+                </>)}
+              </div>
             </div>
-
-          </ChatLayout.Title>
-          <ChatLayout.TitleRightActions>
-            <Button
-              onClick={() => setSettingsVisible(p => !p)}
-              variant='borderless'
-              icon={(settingsVisible && !isMobile) ? <HiChevronRight /> : <HiOutlineCog6Tooth />}
-            />
-          </ChatLayout.TitleRightActions>
-          <ChatLayout.MessagesArea>
-            <MessagesHistory />
-          </ChatLayout.MessagesArea>
-
-        </ChatLayout>
+            <div className={styles.rightActions}>
+              <Button
+                onClick={() => setSettingsVisible(p => !p)}
+                variant='borderless'
+                icon={(settingsVisible && !isMobile) ? <HiChevronRight /> : <HiOutlineCog6Tooth />}
+              />
+            </div>
+          </div>
+          <div className={styles.chat}>
+            <FlowHistory />
+          </div>
+        </div>
       </Card>
 
       {isMobile && <Drawer open={settingsVisible} onOpenChange={setSettingsVisible}>

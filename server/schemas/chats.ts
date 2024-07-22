@@ -58,7 +58,12 @@ export const ChatWithMessagesSchema = z.object({
   messages: z.array(MessageSchema)
 }).openapi('ChatWithMessages');
 
+export const SendMessageResponseSchema = ChatWithMessagesSchema.extend({
+  newMessage: MessageSchema.optional(),
+});
+
 export type ChatWithMessagesSchemaType = z.infer<typeof ChatWithMessagesSchema>;
+export type SendMessageResponseSchemaType = z.infer<typeof SendMessageResponseSchema>;
 
 export const NewMessageSchema = z.object({
   parentId: z.number(),

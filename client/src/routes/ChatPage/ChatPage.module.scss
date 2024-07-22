@@ -5,6 +5,41 @@
   display: flex;
   gap: 1rem;
   max-width: 100%;
+
+  .layout {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    gap: 0.5rem;
+    max-height: 100%;
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+
+      .title {
+        display: flex;
+        align-items: center;
+        text-align: center;
+      }
+
+      .rightActions,
+      .leftActions {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+      }
+    }
+
+    .chat {
+      flex: 1;
+      border: 1px solid var(--gray-4);
+      background: var(--gray-2);
+      padding: 0.25rem;
+      border-radius: 0.25rem;
+      overflow: hidden;
+    }
+  }
 }
 
 .titleWrapper {
@@ -62,7 +97,11 @@
     }
   }
 
-  .personaAvatar {
-    
-  }
+  .personaAvatar {}
+}
+
+.messageNode {
+  pointer-events: all !important;
+  user-select: text !important;
+  cursor: auto !important;
 }

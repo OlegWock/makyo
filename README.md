@@ -5,9 +5,7 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 
 ## Roadmap
 
-Top priority:
-* Migrate from OpenAI/Anthropic libraries to using OpenRouter for both
-* Tree interface for messaging (using react flow)
+* Polish new React Flow UI
 
 ---
 

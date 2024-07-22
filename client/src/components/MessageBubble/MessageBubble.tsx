@@ -1,4 +1,5 @@
 import SyncLoader from "react-spinners/SyncLoader";
+import { KeyboardEvent } from 'react';
 import { MessageSchemaType } from "@shared/api";
 import styles from './MessageBubble.module.scss';
 import clsx from 'clsx';
@@ -18,11 +19,6 @@ import { SelectionMenu } from "@client/components/SelectionMenu";
 
 export type MessageBubbleActionsProp = {
   copy?: boolean;
-  variants?: {
-    total: number;
-    current: number;
-    onSwitchVariant: (forward: boolean) => void;
-  },
   editing?: {
     allowRegenerateResponse: boolean;
     onEdit: (newText: string, regenerateResponse: boolean) => void;
@@ -30,13 +26,13 @@ export type MessageBubbleActionsProp = {
   onRegenerate?: VoidFunction;
   onDuplicate?: VoidFunction;
   onDelete?: VoidFunction;
+  onSend?: (message: string) => void;
 };
 
 export type MessageBubbleProps = {
   message: MessageSchemaType;
   senderName: ReactNode;
   actions?: MessageBubbleActionsProp;
-  onSelectionAction: (text: string, send: boolean) => void;
 }
 
 const [Provider, useBubbleContext] = createStrictContext<MessageBubbleProps & {
@@ -60,79 +56,73 @@ const MessageBubbleActions = () => {
       const data = new ClipboardItem(payload);
       await navigator.clipboard.write([data]);
     }
-    
+
     showToast(`copy-${message.id}`, 'success', 'Copied!', { placement: 'top' });
   };
 
   const { actions = {}, message, initiateEditing, ref } = useBubbleContext();
-  const { variants, editing, onRegenerate, onDuplicate, onDelete, copy = true } = actions;
+  const { editing, onRegenerate, onDuplicate, onDelete, copy = true } = actions;
   const { showToast, showConfirm } = useLocalToast();
 
-  return (
-    <div className={styles.actionsWrapper}>
-      {!!variants && <div className={styles.variants}>
-        <Button
-          variant="borderless"
-          disabled={variants.current === 1}
-          onClick={() => variants.onSwitchVariant(false)}
-        >
-          <HiChevronLeft />
-        </Button>
-        <span>{variants.current}/{variants.total}</span>
-        <Button
-          variant="borderless"
-          disabled={variants.current === variants.total}
-          onClick={() => variants.onSwitchVariant(true)}
-        >
-          <HiChevronRight />
-        </Button>
-      </div>}
-      <div className={styles.spacer} />
-      <div className={styles.actions}>
-        {copy && <ToastTarget name={`copy-${message.id}`}>
-          <Tooltip text='Copy message' side='top'>
-            <Button onClick={onCopy} variant="borderless"><PiCopyLight /></Button>
-          </Tooltip>
-        </ToastTarget>}
-        {!!onRegenerate && <Tooltip
-          side='top'
-          text='Regenerate response'
-        >
-          <Button onClick={onRegenerate} variant="borderless"><HiArrowPath /></Button>
-        </Tooltip>}
-        {!!onDuplicate && <Tooltip
-          side='top'
-          text='Duplicate message'
-        >
-          <Button onClick={onDuplicate} variant="borderless"><PiArrowsSplit /></Button>
-        </Tooltip>}
-        {!!editing && <Tooltip
-          side='top'
-          text='Edit message'
-        >
-          <Button onClick={initiateEditing} variant="borderless"><HiOutlinePencil /></Button>
-        </Tooltip>}
-        {!!onDelete && <ToastTarget name={`delete-${message.id}`}><Tooltip
-          side='top'
-          text='Delete message'
-        >
-          <Button onClick={() => {
-            showConfirm(`delete-${message.id}`, 'Please confirm you want to delete this message and all its descendants', {
-              onConfirm: () => onDelete(),
-              destructive: true,
-              duration: 5000,
-            });
-          }} variant="borderless"><HiOutlineTrash /></Button>
-        </Tooltip>
-        </ToastTarget>}
-      </div>
-    </div >)
+  return (<div className={styles.actions}>
+    {copy && <ToastTarget name={`copy-${message.id}`}>
+      <Tooltip text='Copy message' side='top'>
+        <Button onClick={onCopy} variant="borderless"><PiCopyLight /></Button>
+      </Tooltip>
+    </ToastTarget>}
+    {!!onRegenerate && <Tooltip
+      side='top'
+      text='Regenerate response'
+    >
+      <Button onClick={onRegenerate} variant="borderless"><HiArrowPath /></Button>
+    </Tooltip>}
+    {!!onDuplicate && <Tooltip
+      side='top'
+      text='Duplicate message'
+    >
+      <Button onClick={onDuplicate} variant="borderless"><PiArrowsSplit /></Button>
+    </Tooltip>}
+    {!!editing && <Tooltip
+      side='top'
+      text='Edit message'
+    >
+      <Button onClick={initiateEditing} variant="borderless"><HiOutlinePencil /></Button>
+    </Tooltip>}
+    {!!onDelete && <ToastTarget name={`delete-${message.id}`}><Tooltip
+      side='top'
+      text='Delete message'
+    >
+      <Button onClick={() => {
+        showConfirm(`delete-${message.id}`, 'Please confirm you want to delete this message and all its descendants', {
+          onConfirm: () => onDelete(),
+          destructive: true,
+          duration: 5000,
+        });
+      }} variant="borderless"><HiOutlineTrash /></Button>
+    </Tooltip>
+    </ToastTarget>}
+  </div>);
 }
 
 export const MessageBubble = (props: MessageBubbleProps) => {
+  const onSelectionAction = (text: string, send: boolean) => {
+    if (send) props.actions?.onSend?.(text);
+    else setReplyMessageDraft(text);
+  };
+
+  const onKeyDown = async (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (replyMessageDraft.length === 0) return;
+      props.actions?.onSend?.(replyMessageDraft);
+      setReplyMessageDraft('');
+    }
+  };
+
   const { message, senderName, actions } = props;
   const [isEditing, setIsEditing] = useState(false);
-  const [messageDraft, setMessageDraft] = useState(() => message.text);
+  const [editMessageDraft, setEditMessageDraft] = useState(() => message.text);
+  const [replyMessageDraft, setReplyMessageDraft] = useState('');
   const showPlaceholder = message.isGenerating && !message.text;
   const ref = useRef<HTMLDivElement>(null);
 
@@ -141,25 +131,21 @@ export const MessageBubble = (props: MessageBubbleProps) => {
       ...props,
       ref,
       initiateEditing: () => {
-        setMessageDraft(message.text);
+        setEditMessageDraft(message.text);
         setIsEditing(true);
       },
     }}>
-      <div className={clsx(styles.MessageBubble, styles[message.sender])} data-message-id={message.id}>
+      <div className={clsx(styles.MessageBubble, styles[message.sender], "nodrag")} data-message-id={message.id} onMouseDownCapture={e => e.stopPropagation()}>
         <div className={styles.senderName}>{senderName}</div>
         {iife(() => {
-          if (showPlaceholder) {
-            return (<SyncLoader loading className={styles.loader} color='var(--gray-4)' size='0.5rem' />);
-          }
-
           if (isEditing && !!actions?.editing) {
             const { onEdit } = actions.editing;
             return (<>
               <WithSnippets>
                 <Textarea
-                  className={styles.textarea}
-                  value={messageDraft}
-                  onValueChange={setMessageDraft}
+                  className={styles.editTextarea}
+                  value={editMessageDraft}
+                  onValueChange={setEditMessageDraft}
                   minRows={3}
                 />
               </WithSnippets>
@@ -172,7 +158,7 @@ export const MessageBubble = (props: MessageBubbleProps) => {
                 {actions.editing.allowRegenerateResponse && <Button
                   variant="primary"
                   onClick={() => {
-                    onEdit(messageDraft, true);
+                    onEdit(editMessageDraft, true);
                     setIsEditing(false);
                   }}
                 >
@@ -181,7 +167,7 @@ export const MessageBubble = (props: MessageBubbleProps) => {
                 <Button
                   variant="primary"
                   onClick={() => {
-                    onEdit(messageDraft, false);
+                    onEdit(editMessageDraft, false);
                     setIsEditing(false);
                   }}
                 >
@@ -196,13 +182,41 @@ export const MessageBubble = (props: MessageBubbleProps) => {
               ref={ref}
               className={styles.content}
             >
-              {message.error
-                ? <div className={styles.errorAlert}>{message.error}</div>
-                : <Markdown content={message.text} />
-              }
+              {iife(() => {
+                if (showPlaceholder) return <SyncLoader loading className={styles.loader} color='var(--gray-4)' size='0.5rem' />;
+                if (message.error) return <div className={styles.errorAlert}>{message.error}</div>;
+                return <Markdown content={message.text} />;
+              })}
             </div>
-            <MessageBubbleActions />
-            <SelectionMenu targetRef={ref} onClick={props.onSelectionAction} />
+
+            <div className={styles.footer}>
+              {!!actions?.onSend && !message.error && <WithSnippets>
+                <Textarea
+                  className={styles.messageTextarea}
+                  value={replyMessageDraft}
+                  onValueChange={setReplyMessageDraft}
+                  onKeyDown={onKeyDown}
+                  minRows={1}
+                  maxRows={20}
+                  placeholder="Reply"
+                  data-reply-textarea={message.id}
+                />
+              </WithSnippets>}
+              <div className={styles.footerActions}>
+                <MessageBubbleActions />
+                {!!actions?.onSend && !message.error && <Button
+                  variant="primary"
+                  disabled={replyMessageDraft.length === 0}
+                  onClick={() => {
+                    actions.onSend?.(replyMessageDraft)
+                    setReplyMessageDraft('');
+                  }}
+                >
+                  Send
+                </Button>}
+              </div>
+            </div>
+            <SelectionMenu targetRef={ref} onClick={onSelectionAction} />
           </>);
         })}
       </div>

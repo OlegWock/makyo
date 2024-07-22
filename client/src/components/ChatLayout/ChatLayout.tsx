@@ -20,8 +20,8 @@ export type ChatLayoutImperativeHandle = {
 };
 
 export type ChatLayoutProps = {
-  children?: ReactNode
-  onSend?: (text: string) => void | Promise<boolean>;
+  children?: ReactNode,
+  onSend?: (text: string) => void | Promise<boolean>,
   inputRef?: Ref<HTMLTextAreaElement>,
   imperativeHandle?: Ref<ChatLayoutImperativeHandle>,
 };

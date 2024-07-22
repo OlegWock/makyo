@@ -1,14 +1,15 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { db } from "@server/db";
+import { getMessageHistoryDownwards } from "@server/db/queries/messages";
 import { chat, message } from "@server/db/schema";
 import { getProviderById } from "@server/providers";
 import { augmentChatWithLastMessage, augmentMessagesWithModelAndChatTitle, getChatWithMessagesFromDb, getMessageFromDb, regenerateResponseForMessage, sendMessageAndSave } from "@server/routes/chats/utils";
-import { ChatSchema, ChatWithMessagesSchema, EditMessageSchema, MessageSchema, NewChatSchema, NewMessageSchema, SearchResultSchema, UpdateChatSchema } from "@server/schemas/chats";
+import { ChatSchema, ChatWithMessagesSchema, EditMessageSchema, MessageSchema, NewChatSchema, NewMessageSchema, SearchResultSchema, SendMessageResponseSchema, UpdateChatSchema } from "@server/schemas/chats";
 import { createTitlePrompt } from "@server/utils/prompts";
 import { omit, serialize } from "@server/utils/serialization";
 import { broadcastSubscriptionMessage } from "@server/utils/subscriptions";
 import { transformStringToNumber } from "@server/utils/zod";
-import { and, eq, isNull, type InferInsertModel, like } from "drizzle-orm";
+import { and, eq, isNull, type InferInsertModel, like, inArray } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
 const getChats = createRoute({
@@ -202,7 +203,7 @@ const sendMessage = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ChatWithMessagesSchema,
+          schema: SendMessageResponseSchema,
         },
       },
       description: '',
@@ -471,7 +472,7 @@ export const chatsRouter = new OpenAPIHono()
     const provider = getProviderById(chatFromDb.providerId);
     const modelId = chatFromDb.modelId;
 
-    await sendMessageAndSave({
+    const { responseMessage } = await sendMessageAndSave({
       provider,
       modelId,
       text,
@@ -480,7 +481,10 @@ export const chatsRouter = new OpenAPIHono()
       system: chatFromDb.system ?? undefined,
       temperature: chatFromDb.temperature ?? undefined,
     });
-    return c.json(await getChatWithMessagesFromDb(chatId));
+    return c.json({
+      ...(await getChatWithMessagesFromDb(chatId)),
+      newMessage: serialize(omit(responseMessage, ['chatId'])),
+    });
   })
   .openapi(regenerateResponse, async (c) => {
     const { chatId, messageId } = c.req.valid('param');
@@ -561,7 +565,9 @@ export const chatsRouter = new OpenAPIHono()
         throw new HTTPException(400, { message: `can't delete AI message if there are no alternative messages` });
       }
     }
-    await db.delete(message).where(eq(message.id, messageId));
+    // TODO: get all child messages
+    const messages = await getMessageHistoryDownwards(messageId);
+    await db.delete(message).where(inArray(message.id, messages.map(m => m.id)));
     return c.json(await getChatWithMessagesFromDb(chatId));
   });
 

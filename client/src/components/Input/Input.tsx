@@ -9,7 +9,7 @@ export type InputProps = {
 
 export const Input = ({ onValueChange, onChange, className, ...props }: InputProps) => {
   return (<input
-    className={clsx(styles.Input, className)}
+    className={clsx(styles.Input, "nodrag", className)}
     onChange={(e) => {
       onChange?.(e);
       onValueChange?.(e.target.value);
@@ -25,7 +25,7 @@ export type TextareaProps = {
 
 export const Textarea = ({ onValueChange, onChange, className, ...props }: TextareaProps) => {
   return (<TextareaAutosize
-    className={clsx(styles.Input, styles.Textarea, className)}
+    className={clsx(styles.Input, styles.Textarea, "nodrag", className)}
     onChange={(e) => {
       onChange?.(e);
       onValueChange?.(e.target.value);

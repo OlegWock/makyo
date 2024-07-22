@@ -21,7 +21,7 @@ export const sendMessageAndSave = async ({ parentId, provider, modelId, text, ch
   if (!model) {
     throw new HTTPException(404, { message: 'unknown model' });
   }
-  const { messagesHistory, responseMessage } = await db.transaction(async (tx) => {
+  const { messagesHistory, responseMessage, userMessage } = await db.transaction(async (tx) => {
     const [userMessage] = await tx.insert(message).values({
       parentId: parentId ?? null,
       text: text,
@@ -45,7 +45,7 @@ export const sendMessageAndSave = async ({ parentId, provider, modelId, text, ch
       createdAt: new Date(Date.now() + 1),
     }).returning();
 
-    return { messagesHistory, responseMessage };
+    return { messagesHistory, responseMessage, userMessage };
   });
 
   let responseGenerated = false;
@@ -114,7 +114,7 @@ export const sendMessageAndSave = async ({ parentId, provider, modelId, text, ch
     }).where(eq(message.id, responseMessage.id)).returning();
   });
 
-  return responseMessage;
+  return { responseMessage, userMessage };
 };
 
 export const regenerateResponseForMessage = async ({ chatId, parentId, modelId, provider, temperature, system }: {

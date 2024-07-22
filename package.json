@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.20.6",
+    "@dagrejs/dagre": "^1.1.3",
     "@emoji-mart/data": "^1.2.1",
     "@emoji-mart/react": "^1.1.1",
     "@floating-ui/react": "^0.26.16",
@@ -24,6 +25,7 @@
     "@radix-ui/react-checkbox": "^1.1.0",
     "@radix-ui/react-popover": "^1.0.7",
     "@scalar/hono-api-reference": "^0.5.3",
+    "@xyflow/react": "^12.0.3",
     "base64-arraybuffer": "^1.0.2",
     "bun-compression": "^0.0.4",
     "drizzle-orm": "^0.30.10",
