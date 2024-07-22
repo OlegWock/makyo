@@ -15,15 +15,15 @@ We don't have dietary restrictions. I'm looking for 3-4 dishes for week. We have
 Please ask a list of clarifying questions which are absolutely required to create a menu and then write at least 12 dish options according to answers and requirements.`;
 
 await db.insert(schema.snippet).values([
-  { 
-    name: 'Humane', 
-    shortcut: '/humane', 
-    text: `This sounds too marketingy/selling or unnatural. Rewrite this text to be more humane, like you're writing for a distant friend. Use direct, calm, and friendly, but polite language. Don't use overhyped language.` 
+  {
+    name: 'Humane',
+    shortcut: '/humane',
+    text: `This sounds too marketingy/selling or unnatural. Rewrite this text to be more humane, like you're writing for a distant friend. Use direct, calm, and friendly, but polite language. Don't use overhyped language.`
   },
-  { 
-    name: 'Shorter', 
-    shortcut: '/shorter', 
-    text: `Rewrite your last message to make it shorter.` 
+  {
+    name: 'Shorter',
+    shortcut: '/shorter',
+    text: `Rewrite your last message to make it shorter.`
   },
   {
     name: 'Casual',
@@ -105,25 +105,28 @@ await db.insert(schema.persona).values([
   }
 ]);
 
-for (let i = 0; i < 200; i++) {
-  const [chat] = await db.insert(schema.chat).values({
-    title: (generate(3) as string[]).join(' '),
-    providerId: '',
-    modelId: '',
-    system: '',
-    temperature: 1,
-  }).returning();
+// Disabled for now
+if (false) {
+  for (let i = 0; i < 200; i++) {
+    const [chat] = await db.insert(schema.chat).values({
+      title: (generate(3) as string[]).join(' '),
+      providerId: '',
+      modelId: '',
+      system: '',
+      temperature: 1,
+    }).returning();
 
-  const messages = new Array(200).fill(null).map((_, ind): InferInsertModel<typeof schema.message> => {
-    return {
-      text: (generate(50) as string[]).join(' '),
-      senderName: ind % 2 === 0 ? 'LLM' : 'user',
-      sender: ind % 2 === 0 ? 'ai' : 'user',
-      chatId: chat.id,
-    };
-  });
+    const messages = new Array(200).fill(null).map((_, ind): InferInsertModel<typeof schema.message> => {
+      return {
+        text: (generate(50) as string[]).join(' '),
+        senderName: ind % 2 === 0 ? 'LLM' : 'user',
+        sender: ind % 2 === 0 ? 'ai' : 'user',
+        chatId: chat.id,
+      };
+    });
 
-  await db.insert(schema.message).values(messages).returning();
+    await db.insert(schema.message).values(messages).returning();
+  }
 }
 
 console.log(`Seeding complete.`);

@@ -60,7 +60,7 @@ class OllamaProvider extends Provider {
       messages: patchedMessages,
       stream: true,
       options: {
-        temperature,
+        temperature: temperature !== undefined ? temperature * 2 : undefined,
       }
     });
     let response = '';
