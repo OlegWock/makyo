@@ -1,38 +1,35 @@
 @use "../../styles/utils.scss" as *;
 
-.TopNav {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  height: 100%;
+.item {
+  text-decoration: none;
+  text-align: left;
 
-  @include mobile {
-    flex-direction: row;
+  svg {
+    width: 1.4rem !important;
   }
+}
 
-  .item {
-    text-decoration: none;
-    text-align: left;
+.logo {
+  padding: 0.5rem;
+  -webkit-user-drag: none;
+}
 
-    svg {
-      width: 1.4rem !important;
-    }
+.active {
+  --color-btn-background: var(--gray-2) !important;
+
+  svg {
+    color: var(--jade-11) !important;
   }
+}
 
-  .logo {
-    padding: 0.5rem;
-    -webkit-user-drag: none;
-  }
+.spacer {
+  flex-grow: 1;
+}
 
-  .active {
-    --color-btn-background: var(--gray-2) !important;
+.card {
+  padding: 0.25rem !important;
+}
 
-    svg {
-      color: var(--jade-11) !important;
-    }
-  }
-
-  .spacer {
-    flex-grow: 1;
-  }
+.mainCard {
+  flex-grow: 1;
 }

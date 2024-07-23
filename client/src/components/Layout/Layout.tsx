@@ -9,9 +9,7 @@ export type LayoutProps = {
 
 export const Layout = ({ children }: LayoutProps) => {
   return (<div className={styles.Layout}>
-    <Card padding='small' className={styles.navigationCard}>
-      <TopNav />
-    </Card>
+    <div className={styles.navigationWrapper}><TopNav /></div>
     <div className={styles.content}>
     {children}
     </div>
