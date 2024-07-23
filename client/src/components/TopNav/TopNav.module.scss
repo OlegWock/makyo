@@ -19,6 +19,11 @@
     }
   }
 
+  .logo {
+    padding: 0.5rem;
+    -webkit-user-drag: none;
+  }
+
   .active {
     --color-btn-background: var(--gray-2) !important;
 

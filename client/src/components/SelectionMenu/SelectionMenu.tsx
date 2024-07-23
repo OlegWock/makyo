@@ -90,6 +90,7 @@ export const SelectionMenu = ({ targetRef, onClick }: SelectionMenuProps) => {
 
   if (isOpen) {
     return <div
+      onPointerDown={e => e.stopPropagation()}
       className={styles.SelectionMenu}
       ref={refs.setFloating}
       style={{

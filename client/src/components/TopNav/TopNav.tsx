@@ -19,6 +19,7 @@ export type TopNavProps = {
 
 export const TopNav = ({ }: TopNavProps) => {
   return (<div className={styles.TopNav}>
+    <img src="/favicon.svg" className={styles.logo} />
     <Item icon={<HiPlus />} href="/" />
     <Item href="/chats" icon={<HiOutlineChatBubbleLeftRight />} />
     <Item href="/snippets" icon={<HiListBullet />} />

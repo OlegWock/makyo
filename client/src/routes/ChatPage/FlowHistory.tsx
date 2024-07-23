@@ -235,7 +235,7 @@ const FlowHistoryComponent = () => {
         proOptions={{ hideAttribution: true }}
         onNodesChange={onNodesChagne}
 
-        onViewportChange={() => window.getSelection()?.removeAllRanges()}
+        onPointerDown={() => window.getSelection()?.removeAllRanges()}
 
         zoomOnScroll={false}
         zoomOnPinch={true}
