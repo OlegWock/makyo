@@ -91,13 +91,13 @@ const MessageNode = ({ data: message }: NodeProps<MessageNodeType>) => {
 
   return (
     <>
-      <Handle isConnectable={false} type="target" position={Position.Top} />
+      <Handle className={styles.nodeHandle} isConnectable={false} type="target" position={Position.Top} />
       <MessageBubble
         senderName={sender}
         message={message}
         actions={actions}
       />
-      <Handle isConnectable={false} type="source" position={Position.Bottom} />
+      <Handle className={styles.nodeHandle} isConnectable={false} type="source" position={Position.Bottom} />
     </>
   );
 };
