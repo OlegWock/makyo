@@ -1,3 +1,5 @@
+@use "../../styles/utils.scss" as *;
+
 .SettingsPage {
   display: flex;
   justify-content: center;
@@ -10,6 +12,10 @@
     flex-direction: column;
     gap: 4rem;
     margin-top: 6rem;
+
+    @include mobile {
+      margin-top: 0;
+    }
 
     section {
       max-width: 600px;
