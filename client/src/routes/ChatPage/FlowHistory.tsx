@@ -1,9 +1,8 @@
 import { useChatPageContext } from "@client/routes/ChatPage/context";
-import { Background, BackgroundVariant, Controls, MiniMap, ReactFlow, Node, Edge, useReactFlow, ReactFlowProvider, NodeProps, Handle, Position, MarkerType, useNodesState, useEdgesState } from '@xyflow/react';
+import { Background, BackgroundVariant, Controls, MiniMap, ReactFlow, Edge, useReactFlow, ReactFlowProvider, NodeProps, Handle, Position, MarkerType, useNodesState, useEdgesState, CoordinateExtent } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import styles from './ChatPage.module.scss';
 import { useEffect, useMemo, useRef } from "react";
-import Dagre from '@dagrejs/dagre';
 import { MessageSchemaType } from "@shared/api";
 import { MessageBubble, MessageBubbleActionsProp } from "@client/components/MessageBubble";
 import { iife } from "@shared/utils";
@@ -11,10 +10,10 @@ import { useDeleteMessageMutation, useDuplicateMessageMutation, useEditMessageMu
 import { ProviderIcon } from "@client/components/icons";
 import useMotionMeasure from 'react-use-motion-measure'
 import { createStrictContext } from "@client/utils/context";
+import { MessageNodeType } from "@client/routes/ChatPage/types";
+import { layoutNodes } from "@client/routes/ChatPage/layout";
 
 const [ScrollToNodeProvider, useScrollToNode] = createStrictContext<{ scrollToNode: (id: string | number, activateReply?: boolean) => void }>('ScrollToNode');
-
-type MessageNodeType = Node<MessageSchemaType, 'message'>;
 
 const MessageNode = ({ data: message }: NodeProps<MessageNodeType>) => {
   const { scrollToNode } = useScrollToNode();
@@ -165,77 +164,74 @@ const FlowHistoryComponent = () => {
   const { chatInfo } = useChatPageContext();
   const { setCenter, getNode } = useReactFlow();
 
-  const shouldLoadPostionRef = useRef(true);
   const [nodes, setNodes, onNodesChagne] = useNodesState<MessageNodeType>([]);
   const [edges, setEdges] = useEdgesState<Edge>([]);
 
   useEffect(() => {
-    setNodes(transformMessagesIntoNodes(chatInfo.messages));
     setEdges(transformMessagesIntoEdges(chatInfo.messages));
+    setNodes(prevNodes => {
+      const newNodes = transformMessagesIntoNodes(chatInfo.messages);
+      return newNodes.map(node => {
+        const matchingOldNode = prevNodes.find(n => n.id === node.id);
+        if (matchingOldNode) {
+          return {
+            ...structuredClone(matchingOldNode),
+            data: node.data,
+          };
+        }
+        return node;
+      })
+    });
   }, [chatInfo.messages]);
 
-  useEffect(() => {
-    // TODO: load position from storage, or focus on last message if none saved
-    const allMeasured = nodes.every(n => n.measured?.height !== undefined);
-    if (!shouldLoadPostionRef.current || nodes.length === 0 || !allMeasured) return;
-    const sortedMessages = [...chatInfo.messages].sort((a, b) => a.createdAt - b.createdAt);
-    const lastMessage = sortedMessages[sortedMessages.length - 1];
-    console.log('Last message', lastMessage);
-    console.log('Nodes', nodes);
-    scrollToNode(lastMessage.id);
-    shouldLoadPostionRef.current = false;
-  }, [nodes]);
-
-  const layouted = useMemo(() => {
-    const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
-    g.setGraph({
-      rankdir: 'TB',
-      nodesep: 100,
-      ranksep: 100
-    });
-
-    edges.forEach((edge) => g.setEdge(edge.source, edge.target));
-    nodes.forEach((node) => {
-      g.setNode(node.id, {
-        ...node,
-        width: node.measured?.width ?? 200,
-        height: node.measured?.height ?? 200,
-      });
-    });
-
-    Dagre.layout(g);
-
-    return {
-      nodes: nodes.map((node) => {
-        const position = g.node(node.id);
-        const x = position.x - (node.measured?.width ?? 200) / 2;
-        const y = position.y - (node.measured?.height ?? 200) / 2;
-
-        return { ...node, position: { x, y } };
-      }),
-      edges,
-    };
+  const layoutedNodes = useMemo(() => {
+    return layoutNodes(nodes, edges);
   }, [nodes, edges]);
 
+  const translateExtent = useMemo<CoordinateExtent>(() => {
+    if (layoutedNodes.length === 0) return [[-Infinity, -Infinity], [Infinity, Infinity]];
+
+    const PADDING = 600;
+    let left = layoutedNodes[0];
+    let top = layoutedNodes[0];
+    let right = layoutedNodes[0];
+    let bottom = layoutedNodes[0];
+    layoutedNodes.forEach(n => {
+      const { x, y } = n.position;
+      const { width = 200, height = 100 } = n.measured ?? {};
+      if (x < left.position.x) left = n;
+      if (y < top.position.y) top = n;
+      if (x + width > right.position.x + (right.measured?.width ?? 200)) right = n;
+      if (y + height > bottom.position.y + (bottom.measured?.height ?? 100)) bottom = n;
+    });
+
+    const topLeft: [number, number] = [left.position.x - PADDING, top.position.y - PADDING];
+    const bottomRight: [number, number] = [right.position.x + (right.measured?.width ?? 200) + PADDING, bottom.position.y + (bottom.measured?.height ?? 100) + PADDING];
+    return [topLeft, bottomRight];
+  }, [layoutedNodes]);
+
   const [ref, bounds] = useMotionMeasure();
+
+  console.log('Render flow', nodes);
 
   return (
     <ScrollToNodeProvider value={{ scrollToNode }}>
       <ReactFlow<MessageNodeType>
         ref={ref}
-        nodes={layouted.nodes}
+        nodes={layoutedNodes}
         nodeTypes={nodeTypes}
         nodesConnectable={false}
         nodesDraggable={false}
         nodesFocusable={true}
 
-        edges={layouted.edges}
+        edges={edges}
         edgesFocusable={false}
 
         proOptions={{ hideAttribution: true }}
         onNodesChange={onNodesChagne}
 
         onPointerDown={() => window.getSelection()?.removeAllRanges()}
+        onEdgeClick={(e, edge) => scrollToNode(edge.target)}
 
         zoomOnScroll={false}
         zoomOnPinch={true}
@@ -243,6 +239,7 @@ const FlowHistoryComponent = () => {
         panOnScroll
         minZoom={0.1}
         maxZoom={1}
+        translateExtent={translateExtent}
       >
         <Controls showInteractive={false} />
         <MiniMap<MessageNodeType>

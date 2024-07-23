@@ -29,6 +29,7 @@ export const OllamaSettings = () => {
       {models.map(m => {
         const [name, tag] = m.name.split(':');
         return (<Card
+          key={m.name}
           withScrollArea={false}
           className={clsx(styles.modelCard, deleteModel.isPending && deleteModel.variables === m.id && styles.ghost)}
         >

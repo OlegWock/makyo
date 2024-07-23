@@ -1,11 +1,11 @@
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
-import { ComponentPropsWithoutRef } from 'react';
+import { ComponentPropsWithoutRef, memo } from 'react';
 import type { Element } from 'hast';
 
 export type CodeBlockProps = ComponentPropsWithoutRef<"code"> & { node?: Element | undefined };
 
-export const CodeBlock = (props: CodeBlockProps) => {
+export const CodeBlock = memo((props: CodeBlockProps) => {
   // TODO: add copy button
   const { children, className, node, ...rest } = props;
   const match = /language-(\w+)/.exec(className || '');
@@ -23,4 +23,6 @@ export const CodeBlock = (props: CodeBlockProps) => {
       {children}
     </code>
   );
-};
+}, (oldProps, newProps) => {
+  return oldProps.className === newProps.className && oldProps.children === newProps.children;
+});

@@ -7,7 +7,7 @@ import remarkMath from 'remark-math';
 import 'katex/dist/katex.min.css';
 import styles from './Markdown.module.scss';
 import clsx from 'clsx';
-import { lazy, Ref, Suspense, useMemo } from 'react';
+import { lazy, memo, Ref, Suspense, useMemo } from 'react';
 
 
 const LazyCodeBlock = lazy(() => import('./CodeBlock').then(m => ({ default: m.CodeBlock })));
@@ -100,7 +100,7 @@ export type MarkdownProps = {
   ref?: Ref<HTMLDivElement>,
 };
 
-export const Markdown = ({ content, className, ref }: MarkdownProps) => {
+export const Markdown = memo(({ content, className, ref }: MarkdownProps) => {
   const patchedContent = useMemo(() => pathLatex(content), [content]);
   return (<div className={clsx(styles.Markdown, className)} ref={ref}>
     <ReactMarkdown
@@ -112,4 +112,4 @@ export const Markdown = ({ content, className, ref }: MarkdownProps) => {
       }}
     />
   </div>);
-};
+});
