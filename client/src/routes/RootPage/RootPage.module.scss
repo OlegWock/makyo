@@ -7,6 +7,72 @@
   overflow: hidden;
 }
 
+.ChatLayout {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: 0.5rem;
+  max-height: 100%;
+
+  .chat {
+    flex: 1;
+    border: 1px solid var(--gray-4);
+    background: var(--gray-2);
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+    overflow: hidden;
+  }
+
+  .messageArea {
+    display: grid;
+    grid-template-columns: 1fr minmax(0, 800px) 1fr;
+    gap: 0.5rem;
+
+    @include mobile {
+      grid-template-columns: 1fr;
+    }
+
+
+
+    .contentWrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      grid-column: 2/2;
+
+      @include mobile {
+        grid-column: 1/1;
+      }
+
+      .secondaryActions {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-start;
+      }
+
+      .textareaWrapper {
+        display: flex;
+        align-items: flex-end;
+        gap: 0.5rem;
+
+        .textarea {
+          flex-grow: 1;
+          resize: none;
+          padding: 0.6rem;
+        }
+      }
+
+      .sendButton {
+        @include mobile {
+          svg {
+            width: auto;
+            height: 1.20rem !important;
+          }
+        }
+      }
+    }
+  }
+}
 
 .startMenuWrapper {
   height: 100%;

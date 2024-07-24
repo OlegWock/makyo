@@ -1,7 +1,6 @@
-import { ChatLayout } from '@client/components/ChatLayout';
 import styles from './RootPage.module.scss';
 import { useChats, useModels, useNewChatMutation, usePersonas } from '@client/api';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, KeyboardEvent } from 'react';
 import { useAtom } from 'jotai/react';
 import { lastUsedModelAtom } from '@client/atoms/chat';
 import { withErrorBoundary } from '@client/components/ErrorBoundary';
@@ -13,7 +12,10 @@ import { useLocation } from 'wouter';
 import { ModelSelect } from '@client/components/ModelSelect';
 import { PersonaSchemaType } from '@server/schemas/personas';
 import { Link } from '@client/components/Link';
-import { HiChevronRight } from 'react-icons/hi2';
+import { HiChevronRight, HiOutlinePaperAirplane } from 'react-icons/hi2';
+import { useIsMobile } from '@client/utils/responsive';
+import { WithSnippets } from '@client/components/WithSnippets';
+import { Textarea } from '@client/components/Input';
 
 export const RootPage = withErrorBoundary(() => {
   const applyPersona = (persona: PersonaSchemaType | null) => {
@@ -85,30 +87,41 @@ export const RootPage = withErrorBoundary(() => {
     }
   }, []);
 
+  const onKeyDown = async (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      const result = await onSend?.(text);
+      if (result !== false) {
+        setText('');
+      }
+      return;
+    }
+  };
+
+  const [text, setText] = useState('');
+  const isMobile = useIsMobile();
+
+  const onSend = (text: string) => newChat.mutateAsync({
+    providerId: selectedModel.providerId,
+    modelId: selectedModel.modelId,
+    text,
+    personaId: activePersona?.id,
+    parameters: {
+      temperature: chatSettings.temperature.enabled ? chatSettings.temperature.value : undefined,
+      system: chatSettings.system.enabled ? chatSettings.system.value : undefined,
+    }
+  }).then((res) => {
+    navigate(`/chats/${res.id}`);
+    return true;
+  }).catch((err) => {
+    return false;
+  });
+
   return (<div className={styles.RootPage}>
     <Card flexGrow withScrollArea={false}>
-      <ChatLayout
-        inputRef={inputRef}
-        onSend={(text) => newChat.mutateAsync({
-          providerId: selectedModel.providerId,
-          modelId: selectedModel.modelId,
-          text,
-          personaId: activePersona?.id,
-          parameters: {
-            temperature: chatSettings.temperature.enabled ? chatSettings.temperature.value : undefined,
-            system: chatSettings.system.enabled ? chatSettings.system.value : undefined,
-          }
-        }).then((res) => {
-          navigate(`/chats/${res.id}`);
-          return true;
-        }).catch((err) => {
-          return false;
-        })
-        }
-      >
-        <ChatLayout.Title>New chat</ChatLayout.Title>
 
-        <ChatLayout.MessagesArea>
+      <div className={styles.ChatLayout}>
+        <div className={styles.chat}>
           <div className={styles.startMenuWrapper}>
             <div className={styles.startMenu}>
               {personas.length > 0 && <section>
@@ -157,14 +170,43 @@ export const RootPage = withErrorBoundary(() => {
               </section>}
             </div>
           </div>
-        </ChatLayout.MessagesArea>
+        </div>
 
-        <ChatLayout.TextareaActions>
-
-        </ChatLayout.TextareaActions>
-      </ChatLayout>
+        <div className={styles.messageArea}>
+          <div className={styles.contentWrapper}>
+            <div className={styles.textareaWrapper}>
+              <WithSnippets>
+                <Textarea
+                  className={styles.textarea}
+                  autoFocus={!isMobile}
+                  minRows={1}
+                  maxRows={20}
+                  value={text}
+                  placeholder='Enter your message...'
+                  onKeyDown={onKeyDown}
+                  onValueChange={setText}
+                  ref={inputRef}
+                />
+              </WithSnippets>
+              <Button
+                className={styles.sendButton}
+                icon={<HiOutlinePaperAirplane />}
+                iconPosition='after'
+                size='large'
+                variant='primary'
+                onClick={() => {
+                  onSend?.(text);
+                  setText('');
+                }}
+                disabled={text.length === 0}
+                children={isMobile ? undefined : 'Send'}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
     </Card>
-  </div>);
+  </div >);
 });
 
 RootPage.displayName = 'RootPage'

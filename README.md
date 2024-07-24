@@ -5,7 +5,6 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 
 ## Roadmap
 
-* Remove ChatLayout component
 * Merge Layout with TopNav and rename to something like `Root`
 * Replace OpenAPI with just RPC
 

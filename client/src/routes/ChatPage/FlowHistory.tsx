@@ -222,7 +222,7 @@ const FlowHistoryComponent = () => {
   const translateExtent = useMemo<CoordinateExtent>(() => {
     if (layoutedNodes.length === 0) return [[-Infinity, -Infinity], [Infinity, Infinity]];
 
-    const PADDING = 600;
+    const PADDING = 1200;
     let left = layoutedNodes[0];
     let top = layoutedNodes[0];
     let right = layoutedNodes[0];
