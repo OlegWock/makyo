@@ -1,6 +1,4 @@
-import { OpenAPIHono } from '@hono/zod-openapi';
 import { cors } from 'hono/cors';
-import { apiReference } from '@scalar/hono-api-reference';
 import { prettyJSON } from 'hono/pretty-json'
 import { authRouter, cookieAuthMiddleware } from '@server/routes/auth';
 import { configurationRouter } from '@server/routes/configuration';
@@ -14,8 +12,9 @@ import { resolve } from 'path';
 import { bunWebSocket } from '@server/utils/websockets';
 import { presetsRouter } from '@server/routes/presets';
 import { compress } from 'bun-compression';
+import { Hono } from 'hono';
 
-const app = new OpenAPIHono();
+const app = new Hono();
 
 app.use('/*', cors({
   origin: '*',
@@ -33,31 +32,6 @@ const router = app
   .route('/', subscriptionsRouter)
   .route('/', presetsRouter)
   .route('/', configurationRouter);
-
-app.openAPIRegistry.registerComponent('securitySchemes', 'CookieAuth', {
-  type: 'apiKey',
-  in: 'cookie',
-  name: 'token'
-});
-
-app.doc('/swagger.json', {
-  openapi: '3.0.0',
-  info: {
-    version: '1.0.0',
-    title: 'Makyo API',
-  },
-});
-
-app.get(
-  '/scalar',
-  apiReference({
-    spec: {
-      url: '/swagger.json',
-    },
-    theme: 'kepler',
-  }),
-);
-
 
 console.log('Will be serving content of', resolve(process.cwd(), process.env.MAKYO_FRONTEND_FILES_PATH!), 'as static files');
 app.get('*', etag(), compress(), serveStatic({

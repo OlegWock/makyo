@@ -1,59 +1,11 @@
-import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import { Hono } from "hono";
+import { z } from 'zod';
+import { zValidator } from '@hono/zod-validator';
+
 import type { MiddlewareHandler } from "hono";
 import { getCookie, setCookie } from 'hono/cookie';
 import { HTTPException } from 'hono/http-exception'
 
-const AuthCheckSchema = z
-  .object({
-    valid: z.literal(true),
-  })
-  .openapi('AuthCheckResponse')
-
-const loginRoute = createRoute({
-  method: 'post',
-  path: '/authenticate',
-  summary: 'Authenticate',
-  tags: ['Auth'],
-  request: {
-    body: {
-      content: {
-        'application/json': {
-          schema: z.object({
-            token: z.string(),
-          })
-        }
-      }
-    }
-  },
-  responses: {
-    200: {
-      content: {
-        'application/json': {
-          schema: AuthCheckSchema,
-        },
-      },
-      description: 'Pass token, get secure cookie',
-    },
-  },
-});
-
-const verifyRoute = createRoute({
-  method: 'get',
-  path: '/api/auth/verify',
-  summary: 'Verify auth cookie',
-  tags: ['Auth'],
-  security: [{ CookieAuth: [] }],
-  responses: {
-    200: {
-      content: {
-        'application/json': {
-          schema: AuthCheckSchema,
-        },
-      },
-      description: 'Check if cookie is in place',
-    },
-  },
-});
 
 const AUTH_COOKIE = 'token';
 
@@ -88,21 +40,26 @@ export const cookieAuthMiddleware = (): MiddlewareHandler => async (c, next) => 
   return next();
 };
 
-export const authRouter = new OpenAPIHono()
-  .openapi(loginRoute, (c) => {
-    const { token } = c.req.valid('json');
-    validateToken(token);
+export const authRouter = new Hono()
+  .post(
+    '/authenticate',
+    zValidator('json', z.object({
+      token: z.string(),
+    })),
+    (c) => {
+      const { token } = c.req.valid('json');
+      validateToken(token);
 
-    setCookie(c, AUTH_COOKIE, token, {
-      secure: true,
-      httpOnly: true,
-      expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 300),
-    });
-    return c.json({
-      valid: true,
-    } as const);
-  })
-  .openapi(verifyRoute, async (c) => {
+      setCookie(c, AUTH_COOKIE, token, {
+        secure: true,
+        httpOnly: true,
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 300),
+      });
+      return c.json({
+        valid: true,
+      } as const);
+    })
+  .get('/api/auth/verify', async (c) => {
     return c.json({
       valid: true
     } as const);

@@ -6,7 +6,7 @@ export const SnippetSchema = z.object({
   shortcut: z.string(),
   text: z.string(),
   createdAt: z.number(),
-}).openapi('Snippet');
+});
 
 export type SnippetSchemaType = z.infer<typeof SnippetSchema>;
 

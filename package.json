@@ -15,9 +15,7 @@
     "typecheck": "tsc --noEmit -p server/tsconfig.json && tsc --noEmit -p client/tsconfig.json"
   },
   "dependencies": {
-    "@hono/zod-openapi": "^0.11.0",
-    "@hono/zod-validator": "^0.2.1",
-    "@scalar/hono-api-reference": "^0.5.3",
+    "@hono/zod-validator": "^0.2.2",
     "base64-arraybuffer": "^1.0.2",
     "bun-compression": "^0.0.4",
     "drizzle-orm": "^0.30.10",

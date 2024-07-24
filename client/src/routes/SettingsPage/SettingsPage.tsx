@@ -28,6 +28,8 @@ export const SettingsPage = withErrorBoundary(() => {
           <div className={styles.sectionTitle}>Ollama</div>
           <OllamaSettings />
         </section>}
+
+        {/* TODO: Add log out button */}
       </div>
     </div>
   </Card>);

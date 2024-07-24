@@ -1,32 +1,13 @@
-import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
+import { Hono } from "hono";
 import { allProviders } from "@server/providers";
 import { createProxiedFetch, ollamaFetch } from "@server/providers/ollama/proxy";
 import { ollamaRouter } from "@server/routes/providers/ollama";
-import { ModelResponseSchema } from "@server/schemas/provider";
 import { broadcastSubscriptionMessage } from "@server/utils/subscriptions";
 import { upgradeWebSocket } from "@server/utils/websockets";
 
 
-const getModels = createRoute({
-  method: 'get',
-  path: '/api/providers/models',
-  summary: 'Get models',
-  tags: ['Providers'],
-  security: [{ CookieAuth: [] }],
-  responses: {
-    200: {
-      content: {
-        'application/json': {
-          schema: ModelResponseSchema,
-        },
-      },
-      description: 'Get current configuration',
-    },
-  },
-});
-
-export const providersRouter = new OpenAPIHono()
-  .openapi(getModels, async (c) => {
+export const providersRouter = new Hono()
+  .get('/api/providers/models', async (c) => {
     const promises = allProviders.map(async (provider) => {
       const enabled = await provider.isEnabled();
       if (!enabled) return null;

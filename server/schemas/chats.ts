@@ -13,7 +13,7 @@ export const ChatSchema = z.object({
   personaId: z.number().nullable(),
   system: z.string().nullable(),
   temperature: z.number().nullable(),
-}).openapi('Chat');
+});
 
 export type ChatSchemaType = z.infer<typeof ChatSchema>;
 
@@ -49,14 +49,14 @@ export const MessageSchema = z.object({
   providerId: z.string().nullable(),
   parentId: z.number().nullable(),
   createdAt: z.number(),
-}).openapi('Message');
+});
 
 export type MessageSchemaType = z.infer<typeof MessageSchema>;
 
 export const ChatWithMessagesSchema = z.object({
   chat: ChatSchema,
   messages: z.array(MessageSchema)
-}).openapi('ChatWithMessages');
+});
 
 export const SendMessageResponseSchema = ChatWithMessagesSchema.extend({
   newMessage: MessageSchema.optional(),

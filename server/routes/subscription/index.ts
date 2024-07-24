@@ -1,42 +1,11 @@
-import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import { Hono } from "hono";
 import { sseEmitter } from "@server/utils/subscriptions";
 import { upgradeWebSocket } from "@server/utils/websockets";
 import { streamSSE } from 'hono/streaming';
 import { v4 as uuid4 } from 'uuid';
 
 
-const subscribeWS = createRoute({
-  method: 'get',
-  path: '/api/subscribe/ws',
-  summary: 'Websockets subscribe',
-  tags: ["Subscription"],
-  security: [{ CookieAuth: [] }],
-  responses: {
-    101: {
-      description: 'Subscribe (through WebSockets) to notifications',
-    },
-  },
-});
-
-const subscribeSSE = createRoute({
-  method: 'get',
-  path: '/api/subscribe/sse',
-  summary: 'Server-sent events subscribe',
-  tags: ["Subscription"],
-  security: [{ CookieAuth: [] }],
-  responses: {
-    200: {
-      content: {
-        'text/event-stream': {
-          schema: z.any(),
-        }
-      },
-      description: 'Subscribe (through Server Sent Events) to notifications',
-    },
-  },
-});
-
-const openAPIHonoInstance = new OpenAPIHono();
+const openAPIHonoInstance = new Hono();
 
 export const subscriptionsRouter = openAPIHonoInstance
   .get(
@@ -44,7 +13,7 @@ export const subscriptionsRouter = openAPIHonoInstance
     upgradeWebSocket((c) => {
       const id = uuid4();
       let eventListener: (messageStr: string) => void;
-      
+
       return {
         onOpen(evt, ws) {
           eventListener = (messageStr) => {
@@ -85,7 +54,4 @@ export const subscriptionsRouter = openAPIHonoInstance
       });
     }
   );
-
-openAPIHonoInstance.openAPIRegistry.registerPath(subscribeWS);
-openAPIHonoInstance.openAPIRegistry.registerPath(subscribeSSE);
 

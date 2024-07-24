@@ -10,4 +10,4 @@ export const ConfigurationSchema = z.object({
   ollama: z.object({
     enabled: z.boolean(),
   }),
-}).openapi('Configuration');
+});

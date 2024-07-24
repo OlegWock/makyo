@@ -10,7 +10,7 @@ export const PersonaSchema = z.object({
   providerId: z.string().nullable(),
   modelId: z.string().nullable(),
   createdAt: z.number(),
-}).openapi('Persona');
+});
 
 export type PersonaSchemaType = z.infer<typeof PersonaSchema>;
 

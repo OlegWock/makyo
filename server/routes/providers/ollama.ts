@@ -1,56 +1,10 @@
-import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import { Hono } from "hono";
+import { z } from 'zod';
+import { zValidator } from '@hono/zod-validator';
 import { ollamaProvider } from "@server/providers/ollama/ollama";
-import { OllamaModelResponseSchema } from "@server/schemas/ollama";
 
-
-const getModels = createRoute({
-  method: 'get',
-  path: '/api/providers/ollama/models',
-  summary: 'Get Ollama models',
-  tags: ['Providers', 'Ollama'],
-  security: [{ CookieAuth: [] }],
-  responses: {
-    200: {
-      content: {
-        'application/json': {
-          schema: OllamaModelResponseSchema,
-        },
-      },
-      description: 'Get Ollama models',
-    },
-  },
-});
-
-const removeModel = createRoute({
-  method: 'delete',
-  path: '/api/providers/ollama/models/{modelId}',
-  summary: 'Delete Ollama model',
-  tags: ['Providers', 'Ollama'],
-  security: [{ CookieAuth: [] }],
-  request: {
-    params: z.object({
-      modelId: z.string().openapi({
-        param: {
-          name: 'modelId',
-          in: 'path',
-        },
-      }),
-    }),
-  },
-  responses: {
-    200: {
-      content: {
-        'application/json': {
-          schema: OllamaModelResponseSchema,
-        },
-      },
-      description: 'Delete Ollama model',
-    },
-  },
-});
-
-export const ollamaRouter = new OpenAPIHono()
-  .openapi(getModels, async (c) => {
+export const ollamaRouter = new Hono()
+  .get('/api/providers/ollama/models', async (c) => {
     const models = await ollamaProvider.getModelsWithDetails();
 
     return c.json(
@@ -61,17 +15,20 @@ export const ollamaRouter = new OpenAPIHono()
       }))
     );
   })
-  .openapi(removeModel, async (c) => {
-    const { modelId } = c.req.valid('param');
+  .delete(
+    '/api/providers/ollama/models/:modelId',
+    zValidator('param', z.object({modelId: z.string()})),
+    async (c) => {
+      const { modelId } = c.req.valid('param');
 
-    await ollamaProvider.deleteModel(modelId);
-    const models = await ollamaProvider.getModelsWithDetails();
+      await ollamaProvider.deleteModel(modelId);
+      const models = await ollamaProvider.getModelsWithDetails();
 
-    return c.json(
-      models.map(m => ({
-        id: m.name,
-        name: m.name,
-        size: m.size,
-      }))
-    );
-  });
+      return c.json(
+        models.map(m => ({
+          id: m.name,
+          name: m.name,
+          size: m.size,
+        }))
+      );
+    });

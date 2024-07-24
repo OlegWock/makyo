@@ -5,8 +5,8 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 
 ## Roadmap
 
-* Replace OpenAPI with just RPC
-
+* Go over zod schemas and remove/convert to just types ones we don't need anymore
+* Online/offline indicator for SSE subscription
 
 ---
 
@@ -76,7 +76,6 @@ bun run client
 ```
 
 * Backend available on [localhost:8440](http://localhost:8440)
-  * API docs available on [localhost:8440/scalar](http://localhost:8440/scalar)
 * Frontend available on [localhost:8441](http://localhost:8441)
 
 ## Development

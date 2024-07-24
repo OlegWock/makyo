@@ -1,6 +1,6 @@
-import { z } from "zod";
+import { z, type RefinementCtx } from "zod";
 
-export const transformStringToNumber: z.TransformEffect<string>["transform"] = (val, ctx) => {
+export const transformStringToNumber = (val: any, ctx: RefinementCtx): number => {
   const parsed = parseInt(val);
   if (isNaN(parsed)) {
     ctx.addIssue({

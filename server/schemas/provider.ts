@@ -18,7 +18,7 @@ export const ModelSchema = z.object({
   id: z.string(),
   availableParameters: z.array(ModelParametersSchema.keyof()),
   defaultParameters: ModelParametersSchema.partial(),
-}).openapi('Model');
+});
 
 export type ModelSchemaType = z.infer<typeof ModelSchema>;
 
