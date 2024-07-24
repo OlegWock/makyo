@@ -125,7 +125,7 @@ export const chatsRouter = new Hono()
     return c.json({});
   })
   .put(
-    '/api/chats/{chatId}',
+    '/api/chats/:chatId',
     zValidator('param', z.object({ chatId: z.string().transform(transformStringToNumber) })),
     zValidator('json', NewMessageSchema),
     async (c) => {

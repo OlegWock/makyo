@@ -68,7 +68,7 @@ export const presetsRouter = new Hono()
     }
   )
   .delete(
-    '/api/personas/{personaId}',
+    '/api/personas/:personaId',
     zValidator('param', z.object({ personaId: z.string().transform(transformStringToNumber) })),
     async (c) => {
       const { personaId } = c.req.valid('param');
