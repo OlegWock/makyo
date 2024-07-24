@@ -5,11 +5,6 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 
 ## Roadmap
 
-* Online/offline indicator for SSE subscription
-* Make it look good on mobile
-
----
-
 Nice to have:
 - Multimodal (start with vision, maybe expand to image generation) LLMs support
   Ref [MULTIMODALITY.md](/MULTIMODALITY.md)

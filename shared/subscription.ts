@@ -4,6 +4,7 @@ type SubscriptionMessageGeneric<N extends string, D extends Record<string, any>>
 }
 
 export type SubscriptionMessage =
+  | SubscriptionMessageGeneric<"heartbeat", {}>
   | SubscriptionMessageGeneric<"updateMessage", {
     messageId: number,
     chatId: number,

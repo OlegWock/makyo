@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { sseEmitter } from "@server/utils/subscriptions";
+import { broadcastSubscriptionMessage, sseEmitter } from "@server/utils/subscriptions";
 import { upgradeWebSocket } from "@server/utils/websockets";
 import { streamSSE } from 'hono/streaming';
 import { v4 as uuid4 } from 'uuid';
@@ -49,7 +49,8 @@ export const subscriptionsRouter = openAPIHonoInstance
         // Fun fact: on Linux (in Docker) connection will be closed once function returns
         // so we need to have sleep cycle here (but on Mac, everything works without it!)
         while (!canceled) {
-          await Bun.sleep(2000);
+          await Bun.sleep(1000);
+          broadcastSubscriptionMessage({ type: 'heartbeat', data: {} });
         }
       });
     }

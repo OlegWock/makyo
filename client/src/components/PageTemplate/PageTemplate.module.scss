@@ -47,6 +47,7 @@
   width: 100%;
   justify-content: center;
   align-items: center;
+  position: relative;
 
   @include mobile {
     width: auto;
@@ -60,6 +61,28 @@
     @include mobile {
       width: auto;
       height: 100%;
+    }
+  }
+
+  .dot {
+    position: absolute;
+    bottom: 0.25rem;
+    right: 0.25rem;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+
+    &.connected {
+      // background: #0aa94f;
+      display: none;
+    }
+
+    &.connecting {
+      background: #f59021;
+    }
+
+    &.disconnected {
+      background: rgb(209, 1, 1);
     }
   }
 }

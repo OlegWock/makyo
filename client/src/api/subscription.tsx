@@ -1,162 +1,119 @@
 import { useApiClient } from "@client/api";
 import { createStrictContext } from "@client/utils/context";
 import { ChatSchemaType, ChatWithMessagesSchemaType } from "@shared/api";
-import { safeCall } from "@shared/utils";
 import { SubscriptionMessage } from "@shared/subscription";
 import { useQueryClient } from "@tanstack/react-query";
 import { produce } from "immer";
-import { ReactNode, useEffect, useMemo } from "react";
+import { ReactNode, useEffect, useMemo, useState } from "react";
 
 
-type SubscriptionClient = {
-  onMessage: (cb: (val: SubscriptionMessage) => void) => VoidFunction;
-  onClose: (cb: (e: CloseEvent) => void) => VoidFunction;
-  close: VoidFunction,
-}
-
-const wrapWebSocket = (websocket: WebSocket): SubscriptionClient => {
-  const messageCallbacks = new Set<(val: SubscriptionMessage) => void>();
-  const closeCallbacks = new Set<(e: CloseEvent) => void>();
-
-  websocket.onopen = () => {
-
-  };
-  websocket.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    messageCallbacks.forEach(cb => safeCall(() => cb(data as SubscriptionMessage)));
-  };
-  websocket.onerror = (err) => {
-    console.log('Websocker error', err);
-  };
-  websocket.onclose = (e) => {
-    closeCallbacks.forEach(cb => safeCall(() => cb(e)));
-  };
-
-  const onMessage = (cb: (val: SubscriptionMessage) => void): VoidFunction => {
-    messageCallbacks.add(cb);
-    return () => messageCallbacks.delete(cb);
-  };
-  const onClose = (cb: (e: CloseEvent) => void): VoidFunction => {
-    closeCallbacks.add(cb);
-    return () => closeCallbacks.delete(cb);
-  };
-
-  const close = () => {
-    websocket.close();
-  };
-
-  return {
-    onMessage,
-    onClose,
-    close,
-  };
-};
-
-const wrapEventsSource = (evtSource: EventSource): SubscriptionClient => {
-  const messageCallbacks = new Set<(val: SubscriptionMessage) => void>();
-  const closeCallbacks = new Set<(e: CloseEvent) => void>();
-
-  evtSource.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    messageCallbacks.forEach(cb => safeCall(() => cb(data as SubscriptionMessage)));
-  };
-  evtSource.onerror = (err) => {
-    console.log('SSE error', err);
-  };
-
-  const onMessage = (cb: (val: SubscriptionMessage) => void): VoidFunction => {
-    messageCallbacks.add(cb);
-    return () => messageCallbacks.delete(cb);
-  };
-  const onClose = (cb: (e: CloseEvent) => void): VoidFunction => {
-    closeCallbacks.add(cb);
-    return () => closeCallbacks.delete(cb);
-  };
-
-  const close = () => {
-    evtSource.close();
-  };
-
-  return {
-    onMessage,
-    onClose,
-    close,
-  };
+type SubscriptionContextType = {
+  status: 'connected' | 'disconnected' | 'connecting',
 };
 
 
-const [SubscriptionProviderInner, useSubscriptionClient] = createStrictContext<SubscriptionClient>('SubscriptionContext');
 
-export { useSubscriptionClient };
+const [SubscriptionProviderInner, useSubscription] = createStrictContext<SubscriptionContextType>('SubscriptionContext');
 
-const USE_SSE = true;
+export { useSubscription };
 
-// TODO: add some kind of indicator when subscription isn't connected?
+
 export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   const api = useApiClient();
   const queryClient = useQueryClient();
-
-  const client = useMemo(() => {
-    if (USE_SSE) {
-      return wrapEventsSource(new EventSource(api.subscribe.sse.$url()))
-    }
-    return wrapWebSocket(api.subscribe.ws.$ws());
-  }, [api]);
+  const [status, setStatus] = useState<SubscriptionContextType["status"]>('connecting');
 
   useEffect(() => {
-    return client.onMessage((message) => {
-      console.log('Subscription message', message);
+    const updateStatus = () => {
+      if (client.readyState === EventSource.CONNECTING) setStatus('connecting');
+      if (client.readyState === EventSource.OPEN) setStatus('connected');
+      if (client.readyState === EventSource.CLOSED) setStatus('disconnected');
+    };
 
-      if (message.type === 'updateMessage') {
-        queryClient.setQueryData(['chats', message.data.chatId], (old: ChatWithMessagesSchemaType | undefined): ChatWithMessagesSchemaType | undefined => {
-          if (!old) return old;
+    const attachListeners = (client: EventSource) => {
+      // @ts-ignore
+      window.sseClient = client;
 
-          return produce(old, (draft) => {
-            draft.messages.forEach(m => {
-              if (m.id !== message.data.messageId) return;
+      client.addEventListener('open', (e) => updateStatus());
+      client.addEventListener('error', (e) => {
+        setStatus('disconnected');
+      });
+      client.addEventListener('message', (event) => {
+        lastMessageAt = Date.now();
+        const message = JSON.parse(event.data) as SubscriptionMessage;
+        console.log('Subscription message', message);
 
-              m.text = message.data.text;
-              if (message.data.isGenerating !== undefined) {
-                m.isGenerating = message.data.isGenerating;
+        if (message.type === 'updateMessage') {
+          queryClient.setQueryData(['chats', message.data.chatId], (old: ChatWithMessagesSchemaType | undefined): ChatWithMessagesSchemaType | undefined => {
+            if (!old) return old;
+
+            return produce(old, (draft) => {
+              draft.messages.forEach(m => {
+                if (m.id !== message.data.messageId) return;
+
+                m.text = message.data.text;
+                if (message.data.isGenerating !== undefined) {
+                  m.isGenerating = message.data.isGenerating;
+                }
+                if (message.data.error !== undefined) {
+                  m.error = message.data.error;
+                }
+              })
+            });
+          });
+        } else if (message.type === 'updateChat') {
+          queryClient.setQueryData(['chats', message.data.chatId], (old: ChatWithMessagesSchemaType | undefined): ChatWithMessagesSchemaType | undefined => {
+            if (!old) return old;
+
+            return produce(old, (draft) => {
+              if (message.data.title) {
+                draft.chat.title = message.data.title;
               }
-              if (message.data.error !== undefined) {
-                m.error = message.data.error;
+            });
+          });
+          queryClient.setQueryData(['chats'], (old: ChatSchemaType[] | undefined): ChatSchemaType[] | undefined => {
+            if (!old) return old;
+
+            return produce(old, (draft) => {
+              const chat = draft.find(c => c.id === message.data.chatId);
+              if (chat && message.data.title) {
+                chat.title = message.data.title;
               }
-            })
+            });
           });
-        });
-      } else if (message.type === 'updateChat') {
-        queryClient.setQueryData(['chats', message.data.chatId], (old: ChatWithMessagesSchemaType | undefined): ChatWithMessagesSchemaType | undefined => {
-          if (!old) return old;
+        } else if (message.type === 'updateModels') {
+          console.log('Refetching available models');
+          queryClient.refetchQueries({
+            queryKey: [['models']]
+          });
+        }
+      });
+    };
 
-          return produce(old, (draft) => {
-            if (message.data.title) {
-              draft.chat.title = message.data.title;
-            }
-          });
-        });
-        queryClient.setQueryData(['chats'], (old: ChatSchemaType[] | undefined): ChatSchemaType[] | undefined => {
-          if (!old) return old;
+    const recreateClient = () => {
+      if (client) client.close();
+      client = new EventSource(api.subscribe.sse.$url());
+      attachListeners(client);
+      updateStatus();
+    };
 
-          return produce(old, (draft) => {
-            const chat = draft.find(c => c.id === message.data.chatId);
-            if (chat && message.data.title) {
-              chat.title = message.data.title;
-            }
-          });
-        });
-      } else if (message.type === 'updateModels') {
-        console.log('Refetching available models');
-        queryClient.refetchQueries({
-          queryKey: [['models']]
-        });
+    let client: EventSource;
+    recreateClient();
+
+    let lastMessageAt = 0;
+    const reconnectTimer = setInterval(() => {
+      if (lastMessageAt < Date.now() - 2000) {
+        recreateClient();
       }
-    });
-  }, [client]);
+    }, 3000);
 
-  
+    return () => {
+      client.close();
+      clearInterval(reconnectTimer);
+    }
+  }, [api]);
 
-  return <SubscriptionProviderInner value={client}>
+  return <SubscriptionProviderInner value={{ status }}>
     {children}
   </SubscriptionProviderInner>
 };
