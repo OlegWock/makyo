@@ -1,5 +1,5 @@
 import { Route, Switch } from "wouter";
-import { Layout } from "@client/components/Layout";
+import { PageTemplate } from "@client/components/PageTemplate";
 import { AuthGate } from "@client/components/AuthGate";
 import { RootPage } from "@client/routes/RootPage";
 import { NotFound } from "@client/routes/NotFound";
@@ -30,7 +30,7 @@ export const App = () => {
             <LazyMotion features={fmFeatures} strict>
               <LocalOllamaProxyProvider>
                 <SubscriptionProvider>
-                  <Layout>
+                  <PageTemplate>
                     <ErrorBoundary>
                       <Switch>
                         <Route path="/" component={RootPage} />
@@ -42,7 +42,7 @@ export const App = () => {
                         <Route component={NotFound} />
                       </Switch>
                     </ErrorBoundary>
-                  </Layout>
+                  </PageTemplate>
                 </SubscriptionProvider>
               </LocalOllamaProxyProvider>
             </LazyMotion>
