@@ -5,8 +5,8 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 
 ## Roadmap
 
-* Go over zod schemas and remove/convert to just types ones we don't need anymore
 * Online/offline indicator for SSE subscription
+* Make it look good on mobile
 
 ---
 

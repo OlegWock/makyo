@@ -42,13 +42,25 @@
   }
 }
 
-.logo {
-  padding: 0.5rem;
-  -webkit-user-drag: none;
+.logoCard {
+  aspect-ratio: 1;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
 
   @include mobile {
     width: auto;
     height: 100%;
+  }
+
+  .logo {
+    margin: 0.25rem;
+    -webkit-user-drag: none;
+
+    @include mobile {
+      width: auto;
+      height: 100%;
+    }
   }
 }
 
@@ -66,6 +78,7 @@
 
 .card {
   padding: 0.25rem !important;
+  overflow: hidden !important;
 
   @include mobile {
     flex-direction: row !important;

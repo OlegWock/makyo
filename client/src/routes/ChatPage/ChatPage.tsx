@@ -16,6 +16,7 @@ import { Drawer } from '@client/components/Drawer';
 import { useIsMobile } from '@client/utils/responsive';
 import { FlowHistory } from './FlowHistory';
 import useMotionMeasure from 'react-use-motion-measure';
+import './styles.scss';
 
 
 export const ChatPage = withErrorBoundary(() => {
@@ -24,7 +25,6 @@ export const ChatPage = withErrorBoundary(() => {
   const editChat = useEditChatMutation();
 
   const [searchParams] = useSearchParams();
-  // TODO: implement default scroll to
   const defaultScrollTo = searchParams.messageId ? searchParams.messageId : undefined;
 
   const ref = useRef<HTMLDivElement>(null);

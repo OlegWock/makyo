@@ -1,0 +1,10 @@
+@use "../../styles/utils.scss" as *;
+
+.react-flow__minimap {
+  @include mobile {
+    .react-flow__minimap-svg {
+      width: 100px;
+      height: 75px;
+    }
+  }
+}

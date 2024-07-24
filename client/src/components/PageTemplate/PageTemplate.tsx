@@ -16,7 +16,7 @@ const NavItem = (props: LinkProps) => {
 
 const TopNav = ({ }) => {
   return (<>
-    <Card padding='small' withScrollArea={false} className={styles.card}>
+    <Card padding='small' withScrollArea={false} className={clsx(styles.card, styles.logoCard)}>
       <img src="/favicon.svg" className={styles.logo} />
     </Card>
     <Card padding='small' withScrollArea={false} className={clsx(styles.card, styles.mainCard)}>
