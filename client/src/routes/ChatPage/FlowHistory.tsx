@@ -12,7 +12,7 @@ import { createStrictContext } from "@client/utils/context";
 import { MessageNodeType } from "@client/routes/ChatPage/types";
 import { layoutNodes } from "@client/routes/ChatPage/layout";
 import { useIsMobile } from "@client/utils/responsive";
-import { useAtom, useSetAtom, useStore } from "jotai";
+import { useSetAtom, useStore } from "jotai";
 import { lastInteractedMessageAtom } from "@client/atoms/chat";
 
 const [ScrollToNodeProvider, useScrollToNode] = createStrictContext<{ scrollToNode: (id: string | number, activateReply?: boolean) => void }>('ScrollToNode');
@@ -178,7 +178,7 @@ const FlowHistoryComponent = () => {
   const store = useStore();
   const setLastInteractedMessageMap = useSetAtom(lastInteractedMessageAtom);
   const isMobile = useIsMobile();
-  const { chatInfo, viewportBounds } = useChatPageContext();
+  const { chatInfo, viewportBounds, defaultScrollTo } = useChatPageContext();
   const { setCenter, getNode } = useReactFlow();
 
   const [nodes, setNodes, onNodesChagne] = useNodesState<MessageNodeType>([]);
@@ -208,12 +208,13 @@ const FlowHistoryComponent = () => {
 
   useEffect(() => {
     if (nodesInitialized && layoutedNodes.length > 0) {
+      const defaultScrollToNode = layoutedNodes.find(n => n.id === defaultScrollTo);
       const lastInteractedNodeMap = store.get(lastInteractedMessageAtom);
       const lastInteractedNodeId = lastInteractedNodeMap[chatInfo.chat.id];
       const lastInteractedNode = layoutedNodes.find(n => n.id === lastInteractedNodeId);
       const lastNode = layoutedNodes.reduce((acc, node) => node.data.createdAt > acc.data.createdAt ? node : acc, layoutedNodes[0]);
       setTimeout(() => {
-        scrollToNode((lastInteractedNode ?? lastNode).id, !isMobile, true);
+        scrollToNode((defaultScrollToNode ?? lastInteractedNode ?? lastNode).id, !isMobile, true);
       }, 50);
     }
   }, [nodesInitialized]);

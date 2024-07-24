@@ -1,19 +1,17 @@
 import styles from './ChatPage.module.scss';
 import { useStrictRouteParams } from '@client/utils/routing';
 import { z } from 'zod';
-import { useChat, useSendMessageMutation, useEditChatMutation } from '@client/api';
-import { useMemo, useRef, useState } from 'react';
+import { useChat, useEditChatMutation } from '@client/api';
+import { useRef, useState } from 'react';
 import { ChatPageContextProvider } from './context';
-import { buildTreeFromMessages, getLastMessage, useTreeChoices, walkOverAllMessagesInTree } from './tree';
 import { withErrorBoundary } from '@client/components/ErrorBoundary';
 import { Card } from '@client/components/Card';
 import { ChatSettings, useChatSettings } from '@client/components/ChatSettings';
 import { HiChevronRight, HiOutlineCog6Tooth, HiOutlinePencil } from 'react-icons/hi2';
 import { Button } from '@client/components/Button';
-import { useMount, usePageTitle } from '@client/utils/hooks';
+import { usePageTitle } from '@client/utils/hooks';
 import { Input } from '@client/components/Input';
 import { useSearchParams } from '@client/components/Router/hooks';
-import { produce } from 'immer';
 import { Drawer } from '@client/components/Drawer';
 import { useIsMobile } from '@client/utils/responsive';
 import { FlowHistory } from './FlowHistory';
@@ -23,18 +21,15 @@ import useMotionMeasure from 'react-use-motion-measure';
 export const ChatPage = withErrorBoundary(() => {
   const { id } = useStrictRouteParams({ id: z.coerce.number() });
   const { data: chatInfo } = useChat(id);
-  const sendMessage = useSendMessageMutation();
   const editChat = useEditChatMutation();
 
   const [searchParams] = useSearchParams();
-  const defaultScrollTo = searchParams.messageId ? parseInt(searchParams.messageId) : undefined;
+  // TODO: implement default scroll to
+  const defaultScrollTo = searchParams.messageId ? searchParams.messageId : undefined;
+
   const ref = useRef<HTMLDivElement>(null);
 
   usePageTitle(chatInfo.chat.title);
-
-  const tree = useMemo(() => buildTreeFromMessages(chatInfo.messages), [chatInfo.messages]);
-  const [treeChoices, setTreeChoices] = useTreeChoices(tree);
-  const lastMessage = getLastMessage(tree, treeChoices);
 
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [titleDraft, setTitleDraft] = useState(() => chatInfo.chat.title);
@@ -76,20 +71,8 @@ export const ChatPage = withErrorBoundary(() => {
     chatId: id,
     chatInfo,
     viewportBounds,
-    messagesTree: tree,
-    treeChoices,
-    setTreeChoices,
     providerId: chatInfo.chat.providerId,
-    setMessageText: (text) => {/* TODO: implement this? */ },
-    sendMessage: (text) => {
-      sendMessage.mutate({
-        chatId: id,
-        payload: {
-          text,
-          parentId: lastMessage.message.id,
-        }
-      })
-    },
+    defaultScrollTo,
   }}>
     <div className={styles.ChatPage} ref={ref}>
       <Card flexGrow withScrollArea={false}>
