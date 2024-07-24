@@ -5,10 +5,8 @@ Frontend for ChatGPT, Claude and local Ollama models with modern UI.
 
 ## Roadmap
 
-* Polish new React Flow UI
-  * Remember position on canvas and scroll to it when opening chat
-  * Or scroll to most recent message if no position saved
 * Remove ChatLayout component
+* Merge Layout with TopNav and rename to something like `Root`
 * Get rid of message tree stuff
 * Replace OpenAPI with just RPC
 

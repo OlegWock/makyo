@@ -1,22 +1,26 @@
 import { useChatPageContext } from "@client/routes/ChatPage/context";
-import { Background, BackgroundVariant, Controls, MiniMap, ReactFlow, Edge, useReactFlow, ReactFlowProvider, NodeProps, Handle, Position, MarkerType, useNodesState, useEdgesState, CoordinateExtent } from '@xyflow/react';
+import { Background, BackgroundVariant, Controls, MiniMap, ReactFlow, Edge, useReactFlow, ReactFlowProvider, NodeProps, Handle, Position, MarkerType, useNodesState, useEdgesState, CoordinateExtent, useNodesInitialized } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import styles from './ChatPage.module.scss';
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { MessageSchemaType } from "@shared/api";
 import { MessageBubble, MessageBubbleActionsProp } from "@client/components/MessageBubble";
 import { iife } from "@shared/utils";
 import { useDeleteMessageMutation, useDuplicateMessageMutation, useEditMessageMutation, usePersonas, useRegenerateMessageMutation, useSendMessageMutation } from "@client/api";
 import { ProviderIcon } from "@client/components/icons";
-import useMotionMeasure from 'react-use-motion-measure'
 import { createStrictContext } from "@client/utils/context";
 import { MessageNodeType } from "@client/routes/ChatPage/types";
 import { layoutNodes } from "@client/routes/ChatPage/layout";
+import { useIsMobile } from "@client/utils/responsive";
+import { useAtom, useSetAtom, useStore } from "jotai";
+import { lastInteractedMessageAtom } from "@client/atoms/chat";
 
 const [ScrollToNodeProvider, useScrollToNode] = createStrictContext<{ scrollToNode: (id: string | number, activateReply?: boolean) => void }>('ScrollToNode');
 
 const MessageNode = ({ data: message }: NodeProps<MessageNodeType>) => {
+  const isMobile = useIsMobile();
   const { scrollToNode } = useScrollToNode();
+
   const { data: personas } = usePersonas();
   const regenerateMessage = useRegenerateMessageMutation();
   const duplicateMessage = useDuplicateMessageMutation();
@@ -82,7 +86,7 @@ const MessageNode = ({ data: message }: NodeProps<MessageNodeType>) => {
     }).then(res => {
       if (res.newMessage) {
         setTimeout(() => {
-          scrollToNode(res.newMessage!.id);
+          scrollToNode(res.newMessage!.id, !isMobile);
         }, 200);
       }
     })
@@ -139,7 +143,16 @@ const transformMessagesIntoNodes = (messages: MessageSchemaType[]): MessageNodeT
 }
 
 const FlowHistoryComponent = () => {
-  const scrollToNode = (id: string | number, activateReply = false) => {
+  const registerInteraction = (nodeId: string) => {
+    setLastInteractedMessageMap(p => {
+      return {
+        ...p,
+        [chatInfo.chat.id]: nodeId,
+      }
+    });
+  };
+
+  const scrollToNode = (id: string | number, activateReply = false, instant = false) => {
     const nodeId = id.toString();
     const node = getNode(nodeId);
     if (!node) {
@@ -149,25 +162,31 @@ const FlowHistoryComponent = () => {
 
     setCenter(
       node.position.x + (node.measured?.width ?? 200) / 2,
-      node.position.y + (bounds.height.get() ?? 200) * 0.45,
-      { duration: 650 },
+      node.position.y + (viewportBounds.height.get() ?? 200) * 0.45,
+      { duration: instant ? 0 : 650 },
     );
+    registerInteraction(nodeId);
     if (activateReply) {
       setTimeout(() => {
         const textarea = document.querySelector<HTMLTextAreaElement>(`[data-reply-textarea="${nodeId}"]`);
         console.log("textarea", `[data-reply-textarea="${nodeId}"]`, textarea);
-        textarea?.focus();
+        textarea?.focus({ preventScroll: true });
       }, 600);
     }
   };
 
-  const { chatInfo } = useChatPageContext();
+  const store = useStore();
+  const setLastInteractedMessageMap = useSetAtom(lastInteractedMessageAtom);
+  const isMobile = useIsMobile();
+  const { chatInfo, viewportBounds } = useChatPageContext();
   const { setCenter, getNode } = useReactFlow();
 
   const [nodes, setNodes, onNodesChagne] = useNodesState<MessageNodeType>([]);
   const [edges, setEdges] = useEdgesState<Edge>([]);
 
-  useEffect(() => {
+  const [prevMessages, setPrevMessages] = useState<null | MessageSchemaType[]>(null);
+  if (prevMessages !== chatInfo.messages) {
+    setPrevMessages(chatInfo.messages);
     setEdges(transformMessagesIntoEdges(chatInfo.messages));
     setNodes(prevNodes => {
       const newNodes = transformMessagesIntoNodes(chatInfo.messages);
@@ -182,11 +201,22 @@ const FlowHistoryComponent = () => {
         return node;
       })
     });
-  }, [chatInfo.messages]);
+  }
 
-  const layoutedNodes = useMemo(() => {
-    return layoutNodes(nodes, edges);
-  }, [nodes, edges]);
+  const layoutedNodes = useMemo(() => layoutNodes(nodes, edges), [nodes, edges]);
+  const nodesInitialized = useNodesInitialized();
+
+  useEffect(() => {
+    if (nodesInitialized && layoutedNodes.length > 0) {
+      const lastInteractedNodeMap = store.get(lastInteractedMessageAtom);
+      const lastInteractedNodeId = lastInteractedNodeMap[chatInfo.chat.id];
+      const lastInteractedNode = layoutedNodes.find(n => n.id === lastInteractedNodeId);
+      const lastNode = layoutedNodes.reduce((acc, node) => node.data.createdAt > acc.data.createdAt ? node : acc, layoutedNodes[0]);
+      setTimeout(() => {
+        scrollToNode((lastInteractedNode ?? lastNode).id, !isMobile, true);
+      }, 50);
+    }
+  }, [nodesInitialized]);
 
   const translateExtent = useMemo<CoordinateExtent>(() => {
     if (layoutedNodes.length === 0) return [[-Infinity, -Infinity], [Infinity, Infinity]];
@@ -210,14 +240,11 @@ const FlowHistoryComponent = () => {
     return [topLeft, bottomRight];
   }, [layoutedNodes]);
 
-  const [ref, bounds] = useMotionMeasure();
-
-  console.log('Render flow', nodes);
+  console.log('Render flow', layoutedNodes);
 
   return (
     <ScrollToNodeProvider value={{ scrollToNode }}>
       <ReactFlow<MessageNodeType>
-        ref={ref}
         nodes={layoutedNodes}
         nodeTypes={nodeTypes}
         nodesConnectable={false}
@@ -231,7 +258,7 @@ const FlowHistoryComponent = () => {
         onNodesChange={onNodesChagne}
 
         onPointerDown={() => window.getSelection()?.removeAllRanges()}
-        onEdgeClick={(e, edge) => scrollToNode(edge.target)}
+        onEdgeClick={(e, edge) => scrollToNode(edge.target, !isMobile)}
 
         zoomOnScroll={false}
         zoomOnPinch={true}
@@ -246,7 +273,7 @@ const FlowHistoryComponent = () => {
           pannable
           nodeColor={(node) => node.data.sender === 'ai' ? "var(--jade-8)" : "var(--gray-8)"}
           nodeStrokeWidth={3}
-          onNodeClick={(e, node) => scrollToNode(node.id)}
+          onNodeClick={(e, node) => scrollToNode(node.id, !isMobile)}
         />
         <Background variant={BackgroundVariant.Dots} gap={16 * 3} size={2} />
       </ReactFlow>

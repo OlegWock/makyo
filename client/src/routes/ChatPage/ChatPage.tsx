@@ -17,6 +17,7 @@ import { produce } from 'immer';
 import { Drawer } from '@client/components/Drawer';
 import { useIsMobile } from '@client/utils/responsive';
 import { FlowHistory } from './FlowHistory';
+import useMotionMeasure from 'react-use-motion-measure';
 
 
 export const ChatPage = withErrorBoundary(() => {
@@ -46,35 +47,7 @@ export const ChatPage = withErrorBoundary(() => {
 
   const isMobile = useIsMobile();
 
-  useMount(() => {
-    if (defaultScrollTo) {
-      // TODO: walk tree upwards from defaultScrollTo and switch all preffered routes in treeChoices so this message will be visible
-      walkOverAllMessagesInTree(tree, (node) => {
-        if (node.message.id === defaultScrollTo) {
-          console.log('Scroll to node', node);
-          const nodeIndex = node.parent?.children.indexOf(node) ?? -1;
-          console.log('Parent id', node.parent!.message.id);
-          console.log('Index', nodeIndex);
-          if (nodeIndex !== -1) {
-            setTreeChoices((p) => produce(p, (draft) => {
-              draft[node.parent!.message.id] = nodeIndex;
-            }));
-          }
-          return false;
-        }
-      });
-
-      setTimeout(() => {
-        console.log('Triggering scrollt o message');
-        ref.current?.querySelector(`[data-message-id="${defaultScrollTo}"]`)?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-          inline: 'center',
-        });
-      }, 50);
-    }
-  });
-
+  const [viewportRef, viewportBounds] = useMotionMeasure();
 
   const chatSettingsElement = (<ChatSettings
     settings={chatSettings}
@@ -102,6 +75,7 @@ export const ChatPage = withErrorBoundary(() => {
   return (<ChatPageContextProvider value={{
     chatId: id,
     chatInfo,
+    viewportBounds,
     messagesTree: tree,
     treeChoices,
     setTreeChoices,
@@ -168,7 +142,7 @@ export const ChatPage = withErrorBoundary(() => {
               />
             </div>
           </div>
-          <div className={styles.chat}>
+          <div className={styles.chat} ref={viewportRef}>
             <FlowHistory />
           </div>
         </div>
