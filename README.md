@@ -1,6 +1,7 @@
 # Makyō
 
-Frontend for ChatGPT, Claude and local Ollama models with modern UI.
+Makyo is a modern node-based frontend for LLMs (OpenRouter & Ollama)
+Frontend for ChatGPT, Claude and local Ollama models with modern node-based UI.
 
 
 ## Roadmap

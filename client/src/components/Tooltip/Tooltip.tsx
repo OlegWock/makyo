@@ -27,6 +27,9 @@ const variants = {
   },
 } satisfies Variants;
 
+// TODO: use asChild approach once this issue gets fixed: https://github.com/radix-ui/primitives/issues/2981
+const MotionContent = m(RadixTooltip.Content);
+
 export const Tooltip = ({ children, text, side = 'top', delayDuration = 300, sideOffset = 5, ref }: TooltipProps) => {
   const [open, setOpen] = useState(false);
   return (
@@ -38,24 +41,20 @@ export const Tooltip = ({ children, text, side = 'top', delayDuration = 300, sid
         <RadixTooltip.Portal forceMount>
           <AnimatePresence>
             {open &&
-              <RadixTooltip.Content
+              <MotionContent
                 forceMount
                 className={styles.content}
                 sideOffset={sideOffset}
                 side={side}
-                asChild
+                transition={{ duration: 0.15 }}
+                variants={variants}
+                custom={side}
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
               >
-                <m.div
-                  transition={{ duration: 0.15 }}
-                  variants={variants}
-                  custom={side}
-                  initial="hidden"
-                  animate="visible"
-                  exit="hidden"
-                >
-                  {text}
-                </m.div>
-              </RadixTooltip.Content>
+                {text}
+              </MotionContent>
             }
           </AnimatePresence>
         </RadixTooltip.Portal>
