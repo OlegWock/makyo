@@ -1,4 +1,4 @@
-import { useSettings } from '@client/api';
+import { useApiClient, useAuthStatus, useSettings } from '@client/api';
 import styles from './SettingsPage.module.scss';
 import { HiNoSymbol, HiOutlineCheckCircle } from 'react-icons/hi2';
 import { withErrorBoundary } from '@client/components/ErrorBoundary';
@@ -6,10 +6,12 @@ import { Card } from '@client/components/Card';
 import { usePageTitle } from '@client/utils/hooks';
 import { localOllamaProxyEnabled } from '@client/api/ollama-proxy';
 import { OllamaSettings } from './OllamaSettings';
+import { Button } from '@client/components/Button';
 
 
 export const SettingsPage = withErrorBoundary(() => {
   const { data: { openai, anthropic, ollama } } = useSettings();
+  const { logOut } = useApiClient();
 
   usePageTitle('Settings');
 
@@ -29,7 +31,9 @@ export const SettingsPage = withErrorBoundary(() => {
           <OllamaSettings />
         </section>}
 
-        {/* TODO: Add log out button */}
+        <section>
+          <Button className={styles.logOutButton} variant="danger" size="large" onClick={logOut}>Log out</Button>
+        </section>
       </div>
     </div>
   </Card>);

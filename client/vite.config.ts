@@ -19,6 +19,10 @@ export default defineConfig({
         target: 'http://localhost:8440',
         changeOrigin: true,
       },
+      '/logout': {
+        target: 'http://localhost:8440',
+        changeOrigin: true,
+      },
     }
   }
 });

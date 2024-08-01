@@ -50,7 +50,6 @@ export const subscriptionsRouter = openAPIHonoInstance
         // so we need to have sleep cycle here (but on Mac, everything works without it!)
         while (!canceled) {
           await Bun.sleep(1000);
-          broadcastSubscriptionMessage({ type: 'heartbeat', data: {} });
         }
       });
     }

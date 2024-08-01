@@ -4,6 +4,7 @@ import { AuthProvider, createApiClient, createHttpClient } from '@client/api';
 import { Input } from '@client/components/Input';
 import { Button } from '@client/components/Button';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { json } from 'drizzle-orm/mysql-core';
 
 export type AuthGateProps = {
   children: ReactNode
@@ -31,6 +32,13 @@ export const AuthGate = ({ children }: AuthGateProps) => {
       setIsLoading(false);
     }
   };
+
+  const logOut = async () => {
+    const http = createHttpClient();
+    await http.logout.$post({json: {}});
+    queryClient.setQueryData(['auth'], false);
+  };
+
   const apiClient = useMemo(() => createApiClient(), []);
   const queryClient = useQueryClient();
 
@@ -69,7 +77,7 @@ export const AuthGate = ({ children }: AuthGateProps) => {
     </div>);
   }
 
-  return (<AuthProvider value={apiClient}>
+  return (<AuthProvider value={{ apiClient, logOut }}>
     {children}
   </AuthProvider>);
 };

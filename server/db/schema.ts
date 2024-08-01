@@ -1,12 +1,7 @@
 import { sql } from "drizzle-orm";
-import { type AnySQLiteColumn, integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { type AnySQLiteColumn, index, integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-// TODO: need to add indexes too
-
-export const setting = sqliteTable('setting', {
-  key: text('key').primaryKey(),
-  value: text('value'),
-});
+// TODO: will be nice to use FTS5 to optimize search (instead of using LIKE)
 
 export const chat = sqliteTable('chat', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -31,6 +26,12 @@ export const message = sqliteTable('message', {
   chatId: integer('chatId').references((): AnySQLiteColumn => chat.id, { onDelete: 'cascade' }).notNull(),
   parentId: integer('parentId').references((): AnySQLiteColumn => message.id, { onDelete: 'cascade' }),
   createdAt: integer('createdAt', { mode: 'timestamp_ms' }).notNull().default(sql`(unixepoch() * 1000)`),
+}, (table) => {
+  return {
+    parentIdx: index("parentIdx").on(table.parentId),
+    chatIdx: index("chatIdx").on(table.chatId),
+    createdAtx: index("createdAtx").on(table.createdAt),
+  };
 });
 
 export const snippet = sqliteTable('snippet', {

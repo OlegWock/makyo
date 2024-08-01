@@ -13,6 +13,7 @@ import { bunWebSocket } from '@server/utils/websockets';
 import { presetsRouter } from '@server/routes/presets';
 import { compress } from 'bun-compression';
 import { Hono } from 'hono';
+import { broadcastSubscriptionMessage } from '@server/utils/subscriptions';
 
 const app = new Hono();
 
@@ -52,6 +53,10 @@ app.onError((err, c) => {
   }
   return c.res;
 });
+
+setInterval(() => {
+  broadcastSubscriptionMessage({ type: 'heartbeat', data: {} });
+}, 1000);
 
 export type ApiType = typeof router;
 

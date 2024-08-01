@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { zValidator } from '@hono/zod-validator';
 
 import type { MiddlewareHandler } from "hono";
-import { getCookie, setCookie } from 'hono/cookie';
+import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
 import { HTTPException } from 'hono/http-exception'
 
 
@@ -59,6 +59,10 @@ export const authRouter = new Hono()
         valid: true,
       } as const);
     })
+  .post('/logout', async (c) => {
+    deleteCookie(c, AUTH_COOKIE);
+    return c.json({});
+  })
   .get('/api/auth/verify', async (c) => {
     return c.json({
       valid: true

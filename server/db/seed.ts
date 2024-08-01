@@ -1,18 +1,5 @@
 import { db } from './index';
-import { generate } from "random-words";
 import * as schema from './schema';
-import type { InferInsertModel } from 'drizzle-orm';
-
-// TODO: ensure that seed is run only once (i.e. not run when rolling update)
-
-const menuSnippet = `I need to make a menu for a week for a family of 3. My requirements are:
-1. It should be possible to prepare big portions of dish, at least for 2 days worth (so, 12 potions)
-2. It shouldn't take more than 2 hours to prepare something
-3. It should be relatively healthy, with more focus on proteins (meat and fish) and fiber than carbs. 
-
-We don't have dietary restrictions. I'm looking for 3-4 dishes for week. We have stove and oven. I'm experienced cook.
-
-Please ask a list of clarifying questions which are absolutely required to create a menu and then write at least 12 dish options according to answers and requirements.`;
 
 await db.insert(schema.snippet).values([
   {
@@ -22,7 +9,7 @@ await db.insert(schema.snippet).values([
   },
   {
     name: 'Shorter',
-    shortcut: '/shorter',
+    shortcut: '/short',
     text: `Rewrite your last message to make it shorter.`
   },
   {
@@ -32,13 +19,13 @@ await db.insert(schema.snippet).values([
   },
   {
     name: 'Simplify',
-    shortcut: '/simplify',
+    shortcut: '/simple',
     text: `Rewrite your last message in more simple terms. Avoid using extravagant adjectives.`,
   },
   {
-    name: 'Menu planning',
-    shortcut: '/menu',
-    text: menuSnippet
+    name: 'ELI Grade 10',
+    shortcut: '/grade10',
+    text: `Explain this in simple terms based on practical example. Like I'm in 10th grade.`,
   }
 ]);
 
@@ -93,40 +80,11 @@ await db.insert(schema.persona).values([
     temperature: 0.75,
   },
   {
-    name: 'GTV',
-    avatar: '🇬🇧',
-    system: `User is preparing his documents for UK's Global Talent Visa as software engineer. You should help him with whatever he asks. When writing texts for documents, they should describe everything in great detail highlighting why this is important or why this is significant contribution, etc. Text should be praising, but not overly so. Use simple english without complex adjectives.`,
-    temperature: 0.95
-  }, {
     name: 'Writer',
     avatar: '🖊️',
     system: `You are an experienced writing assistant, proficient in American English. Your task is to help user write messages and assist with their requests. When writing, you should follow user's writing style. User's writing style is concise, simple, friendly and informative. The user uses short sentences and simple vocabulary which makes the text accessible and easy to understand. It's friendly and welcoming with an encouraging tone. Messages are exchanged in chat app, not in the email, so you shouldn't include constructions intended for email like 'I hope this email finds you well' or 'Best regards'. Messages should be in simple, concise and polite style, without extra pleasantries.`,
     temperature: 0.95,
   }
 ]);
-
-// Disabled for now
-if (false) {
-  for (let i = 0; i < 200; i++) {
-    const [chat] = await db.insert(schema.chat).values({
-      title: (generate(3) as string[]).join(' '),
-      providerId: '',
-      modelId: '',
-      system: '',
-      temperature: 1,
-    }).returning();
-
-    const messages = new Array(200).fill(null).map((_, ind): InferInsertModel<typeof schema.message> => {
-      return {
-        text: (generate(50) as string[]).join(' '),
-        senderName: ind % 2 === 0 ? 'LLM' : 'user',
-        sender: ind % 2 === 0 ? 'ai' : 'user',
-        chatId: chat.id,
-      };
-    });
-
-    await db.insert(schema.message).values(messages).returning();
-  }
-}
 
 console.log(`Seeding complete.`);

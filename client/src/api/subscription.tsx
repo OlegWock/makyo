@@ -4,7 +4,7 @@ import { ChatSchemaType, ChatWithMessagesSchemaType } from "@shared/api";
 import { SubscriptionMessage } from "@shared/subscription";
 import { useQueryClient } from "@tanstack/react-query";
 import { produce } from "immer";
-import { ReactNode, useEffect, useMemo, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 
 
 type SubscriptionContextType = {
@@ -19,7 +19,7 @@ export { useSubscription };
 
 
 export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
-  const api = useApiClient();
+  const { apiClient: api } = useApiClient();
   const queryClient = useQueryClient();
   const [status, setStatus] = useState<SubscriptionContextType["status"]>('connecting');
 

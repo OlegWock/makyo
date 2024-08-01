@@ -17,9 +17,5 @@ if (process.env.MAKYO_MACOS_HOMEBREW_SQLITE_PATH) {
   Database.setCustomSQLite(process.env.MAKYO_MACOS_HOMEBREW_SQLITE_PATH);
 }
 const sqlite = new Database(resolve(process.env.MAKYO_DATA_FOLDER, `makyo.db`));
-sqlite.loadExtension(resolve(process.cwd(), `server/db/sqlite/${process.platform}-${process.arch}/define`));
-sqlite.loadExtension(resolve(process.cwd(), `server/db/sqlite/${process.platform}-${process.arch}/fuzzy`));
-sqlite.loadExtension(resolve(process.cwd(), `server/db/sqlite/${process.platform}-${process.arch}/regexp`));
-sqlite.loadExtension(resolve(process.cwd(), `server/db/sqlite/${process.platform}-${process.arch}/text`));
 sqlite.loadExtension(resolve(process.cwd(), `server/db/sqlite/${process.platform}-${process.arch}/unicode`));
 export const db = drizzle(sqlite, { schema });

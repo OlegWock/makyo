@@ -42,6 +42,8 @@ docker-compose up -d
 
 **Due to usage of pre-compiled SQLite extensions, local development only supported for Mac OS on ARM and Linux (ARM/x64).**
 
+We use SQLite extensions from [nalgeon/sqlean](https://github.com/nalgeon/sqlean)
+
 On Mac, you'll need to install SQLite from Homberwer:
 
 ```bash
@@ -60,6 +62,7 @@ Setup database:
 
 ```bash
 bun run drizzle:migrate
+# Optionally seed database with default personas/snippets
 bun run drizzle:seed
 ```
 
@@ -81,19 +84,9 @@ To generate migration after DB schema change:
 bun run drizzle:schema
 ```
 
-To delete DB and all drizzle files and then generate them from scratch:
-
-```bash
-bun run drizzle:nuke
-```
-
 There is a template to easily create new components and routes:
 
 ```bash
 bun scaffold component new Button
 bun scaffold route new DetailsPage
 ```
-
----
-
-This project was created using `bun init` in bun v1.1.4. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.

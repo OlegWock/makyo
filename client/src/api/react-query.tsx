@@ -34,8 +34,6 @@ const queryPersister = createSyncStoragePersister({
 export const QueryClientProvider = ({ children }: { children?: ReactNode }) => {
   const [showContent, setShowContent] = useState(false);
 
-  // TODO: maybe remove persistence at all, if we got broken data once (e.g. due to error in mutation)
-  // it's a lot harder to get app backworking when those data is persisted
   return (<PersistQueryClientProvider
     client={queryClient}
     persistOptions={{ persister: queryPersister, buster: import.meta.env.VITE_MAKYO_BUILDID }}

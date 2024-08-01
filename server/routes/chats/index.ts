@@ -258,7 +258,7 @@ export const chatsRouter = new Hono()
           throw new HTTPException(400, { message: `can't delete AI message if there are no alternative messages` });
         }
       }
-      // TODO: get all child messages
+
       const messages = await getMessageHistoryDownwards(messageId);
       await db.delete(message).where(inArray(message.id, messages.map(m => m.id)));
       return c.json(await getChatWithMessagesFromDb(chatId));

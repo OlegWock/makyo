@@ -17,7 +17,7 @@ const createHookFactory = <S extends boolean>(suspense: S) => <Out, In = void>(
   key: Key<In>,
   func: (api: ApiClient, arg: In) => Promise<ClientResponse<Out>>
 ) => (arg: In, opts: Partial<Options<S, Out>> = {}): Result<S, Out> => {
-  const api = useApiClient();
+  const { apiClient: api } = useApiClient();
   // @ts-ignore
   return (suspense ? useSuspenseQuery : useQuery)({
     queryKey: typeof key === 'function' ? key(arg) : key,
@@ -66,7 +66,7 @@ const createMutationHook = <In, Out>({ mutation, onSuccess, invalidate }: {
   invalidate?: (Array<string | number> | ((input: In, output: Out) => Array<string | number>))[],
 }) => {
   return () => {
-    const api = useApiClient();
+    const { apiClient: api } = useApiClient();
     const client = useQueryClient();
 
     return useMutation({
