@@ -1,4 +1,6 @@
-<h1><img src="https://raw.githubusercontent.com/OlegWock/makyo/main/client/public/favicon.svg" />  Makyō</h1>
+![Banner](.github/banner.svg)
+
+# Makyō
 
 Makyo is a modern node-based frontend for LLMs. It's made with Bun, Hono, and React.
 
