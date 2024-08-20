@@ -3,7 +3,7 @@
 Makyo is a modern node-based frontend for LLMs. It's made with Bun, Hono, and React.
 
 Features:
-* Node-based UI allows for easy and convenient branching of conversation with LLM.
+* Node-based UI allows for easy and convenient branching of conversation.
 * Use quick replies to ask LLM common questions about selected text.
 * Create personas with preset system message and/or temperature.
 * Use snippets to save and quickly paste saved prompts.

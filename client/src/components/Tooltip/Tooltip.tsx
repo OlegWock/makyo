@@ -27,11 +27,14 @@ const variants = {
   },
 } satisfies Variants;
 
-// TODO: use asChild approach once this issue gets fixed: https://github.com/radix-ui/primitives/issues/2981
-const MotionContent = m(RadixTooltip.Content);
+
 
 export const Tooltip = ({ children, text, side = 'top', delayDuration = 300, sideOffset = 5, ref }: TooltipProps) => {
   const [open, setOpen] = useState(false);
+
+  // TODO: noop until this issue gets fixed: https://github.com/radix-ui/primitives/issues/2981
+  return (<>{children}</>);
+
   return (
     <RadixTooltip.Provider>
       <RadixTooltip.Root delayDuration={delayDuration} open={open} onOpenChange={setOpen}>
@@ -41,21 +44,23 @@ export const Tooltip = ({ children, text, side = 'top', delayDuration = 300, sid
         <RadixTooltip.Portal forceMount>
           <AnimatePresence>
             {open &&
-              <MotionContent
+              <RadixTooltip.Content asChild
                 forceMount
-                className={styles.content}
                 sideOffset={sideOffset}
                 side={side}
-                transition={{ duration: 0.15 }}
-                variants={variants}
-                custom={side}
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
               >
-                {text}
-              </MotionContent>
-            }
+                <m.div
+                  className={styles.content}
+                  transition={{ duration: 0.15 }}
+                  variants={variants}
+                  custom={side}
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                >
+                  {text}
+                </m.div>
+              </RadixTooltip.Content>}
           </AnimatePresence>
         </RadixTooltip.Portal>
       </RadixTooltip.Root>

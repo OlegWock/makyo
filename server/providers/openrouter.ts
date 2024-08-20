@@ -24,20 +24,45 @@ export abstract class OpenRouterProvider extends Provider {
       patchedMessages.unshift({ role: 'system', content: system });
     }
 
-    const stream = await openai.chat.completions.create({
-      messages: patchedMessages,
-      model: modelId,
-      temperature: temperature !== undefined ? temperature * 2 : undefined,
-      stream: true,
-    });
-
     let response = '';
-    for await (const chunk of stream) {
-      if (chunk.choices[0]?.delta?.content) {
-        response += chunk.choices[0].delta.content;
-        options?.onProgress?.(response);
+    let retries = 3;
+
+    while (retries > 0 && response === '') {
+      try {
+        const stream = await openai.chat.completions.create({
+          messages: patchedMessages,
+          model: modelId,
+          temperature: temperature !== undefined ? temperature * 2 : undefined,
+          stream: true,
+        });
+
+        for await (const chunk of stream) {
+          if (chunk.choices[0]?.delta?.content) {
+            response += chunk.choices[0].delta.content;
+            options?.onProgress?.(response);
+          }
+        }
+
+        if (response === '') {
+          retries--;
+          if (retries > 0) {
+            await Bun.sleep(1000);
+          }
+        }
+      } catch (error) {
+        retries--;
+        if (retries > 0) {
+          await Bun.sleep(1000);
+        } else {
+          throw error;
+        }
       }
     }
+
+    if (response === '') {
+      throw new Error('Failed to get a response after multiple attempts');
+    }
+
 
     return response;
   }
