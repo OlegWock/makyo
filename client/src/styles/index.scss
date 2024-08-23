@@ -41,6 +41,26 @@
   }
 }
 
+pre > div {
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #ffffff59;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #eee;
+  }
+}
+
 :root {
   font-family: 'Work Sans', 'Mulish', 'Seravek', 'Gill Sans Nova', 'Ubuntu', 'Calibri', 'DejaVu Sans', 'source-sans-pro', sans-serif;
   font-weight: 400;
