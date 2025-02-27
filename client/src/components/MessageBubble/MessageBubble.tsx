@@ -4,7 +4,7 @@ import { MessageSchemaType } from "@shared/api";
 import styles from './MessageBubble.module.scss';
 import clsx from 'clsx';
 import { Button } from '@client/components/Button';
-import { HiArrowPath, HiChevronLeft, HiChevronRight, HiOutlinePencil, HiOutlineTrash } from 'react-icons/hi2';
+import { HiArrowPath, HiOutlinePencil, HiOutlineTrash } from 'react-icons/hi2';
 import { PiArrowsSplit, PiCopyLight } from "react-icons/pi";
 import { createStrictContext } from '@client/utils/context';
 import { ReactNode, RefObject, useRef, useState } from 'react';
@@ -66,9 +66,7 @@ const MessageBubbleActions = () => {
 
   return (<div className={styles.actions}>
     {copy && <ToastTarget name={`copy-${message.id}`}>
-      <Tooltip text='Copy message' side='top'>
         <Button onClick={onCopy} variant="borderless"><PiCopyLight /></Button>
-      </Tooltip>
     </ToastTarget>}
     {!!onRegenerate && <Tooltip
       side='top'
@@ -197,7 +195,7 @@ export const MessageBubble = (props: MessageBubbleProps) => {
                   onValueChange={setReplyMessageDraft}
                   onKeyDown={onKeyDown}
                   minRows={1}
-                  maxRows={20}
+                  maxRows={40}
                   placeholder="Reply"
                   data-reply-textarea={message.id}
                 />
