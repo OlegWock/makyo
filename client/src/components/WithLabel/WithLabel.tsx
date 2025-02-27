@@ -1,4 +1,4 @@
-import { Children, cloneElement, isValidElement, ReactNode, useId } from 'react';
+import { Children, cloneElement, isValidElement, ReactElement, ReactNode, useId } from 'react';
 import styles from './WithLabel.module.scss';
 import clsx from 'clsx';
 
@@ -15,13 +15,14 @@ export const WithLabel = ({ children, label, className, hint }: WithLabelProps) 
     throw new Error('WithLabel works only with elements');
   }
 
+  const narrowedChild = child as ReactElement<Record<string, unknown>>;
   const id = useId();
   return (<div className={clsx(styles.WithLabel, className)}>
     <div className={styles.label}>
       <label htmlFor={id}>{label}</label>
     </div>
     <div className={styles.content}>
-      {cloneElement(child, { ...child.props, id })}
+      {cloneElement(narrowedChild, { ...narrowedChild.props, id })}
     </div>
     {!!hint && <div className={styles.hint}>{hint}</div>}
   </div>);

@@ -2,7 +2,7 @@ import { Link as WouterLink, LinkProps as WouterLinkProps } from 'wouter';
 import styles from './Link.module.scss';
 import buttonStyles from '../Button/Button.module.scss';
 import clsx from 'clsx';
-import { cloneElement, ReactElement, Ref } from 'react';
+import { cloneElement, HTMLAttributes, ReactElement, Ref } from 'react';
 
 type Variant = "underline" | "unstyled" | "button" | "button-primary" | "button-text" | "button-borderless";
 
@@ -10,7 +10,7 @@ export type LinkProps = {
   className?: string | ((active: boolean) => string),
   variant?: Variant,
   size?: 'small' | 'medium' | 'large',
-  icon?: ReactElement,
+  icon?: ReactElement<HTMLAttributes<SVGSVGElement>>,
   iconPosition?: 'before' | 'after',
   ref?: Ref<HTMLAnchorElement>;
 } & WouterLinkProps;

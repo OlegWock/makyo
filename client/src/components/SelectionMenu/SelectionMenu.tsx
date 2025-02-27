@@ -12,7 +12,7 @@ import { RefObject, useEffect, useRef, useState } from "react";
 import styles from './SelectionMenu.module.scss';
 
 export type SelectionMenuProps = {
-  targetRef: RefObject<HTMLElement>;
+  targetRef: RefObject<HTMLElement | null>;
   onClick: (text: string, send: boolean) => void;
 };
 

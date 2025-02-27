@@ -37,7 +37,7 @@ export type MessageBubbleProps = {
 
 const [Provider, useBubbleContext] = createStrictContext<MessageBubbleProps & {
   initiateEditing: VoidFunction,
-  ref: RefObject<HTMLDivElement>,
+  ref: RefObject<HTMLDivElement | null>,
 }>('MessageBubbleContext');
 
 const MessageBubbleActions = () => {

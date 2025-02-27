@@ -1,16 +1,17 @@
-import { cloneElement, ComponentPropsWithRef, MouseEventHandler, ReactElement, ReactNode } from 'react';
+import { cloneElement, ComponentPropsWithRef, HTMLAttributes, MouseEventHandler, ReactElement, ReactNode } from 'react';
 import styles from './Button.module.scss';
 import clsx from 'clsx';
 import { m } from 'framer-motion';
+import type {MotionProps} from 'framer-motion'
 
 export type ButtonProps = {
   loading?: boolean,
   variant?: 'primary' | 'danger' | 'normal' | 'borderless' | 'text',
   size?: 'small' | 'medium' | 'large',
-  icon?: ReactElement,
+  icon?: ReactElement<HTMLAttributes<SVGSVGElement>>,
   iconPosition?: 'before' | 'after',
   children?: ReactNode;
-} & Omit<ComponentPropsWithRef<typeof m.button>, 'children'>;
+} & Omit<ComponentPropsWithRef<'button'>, 'children'> & MotionProps;
 
 export const Button = ({ loading = false, variant = 'normal', iconPosition = 'before', onClick, className, style = {}, icon, children, size = 'medium', ...props }: ButtonProps) => {
   const localOnClick: MouseEventHandler<HTMLButtonElement> = (e) => {
