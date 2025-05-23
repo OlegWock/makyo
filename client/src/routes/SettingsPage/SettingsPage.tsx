@@ -10,7 +10,7 @@ import { Button } from '@client/components/Button';
 
 
 export const SettingsPage = withErrorBoundary(() => {
-  const { data: { openai, anthropic, ollama } } = useSettings();
+  const { data: { openai, google, anthropic, ollama } } = useSettings();
   const { logOut } = useApiClient();
 
   usePageTitle('Settings');
@@ -23,6 +23,7 @@ export const SettingsPage = withErrorBoundary(() => {
 
           <div className={styles.status}>{openai.enabled ? <HiOutlineCheckCircle /> : <HiNoSymbol />} OpenAI – {openai.enabled ? 'enabled' : 'API key not set'}</div>
           <div className={styles.status}>{anthropic.enabled ? <HiOutlineCheckCircle /> : <HiNoSymbol />} Anthropic – {anthropic.enabled ? 'enabled' : 'API key not set'}</div>
+          <div className={styles.status}>{google.enabled ? <HiOutlineCheckCircle /> : <HiNoSymbol />} Google – {google.enabled ? 'enabled' : 'API key not set'}</div>
           <div className={styles.status}>{ollama.enabled ? <HiOutlineCheckCircle /> : <HiNoSymbol />} Ollama – {ollama.enabled ? `enabled${localOllamaProxyEnabled ? ' (through proxy in browser)' : ''}` : 'disabled'}</div>
         </section>
 
